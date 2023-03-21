@@ -1,0 +1,59 @@
+{
+  "manage-users": {
+    "login": {
+      "login-title": "Logowanie",
+      "username": "Nazwa użytkownika",
+      "password": "Hasło",
+      "username-error": "Nazwa użytkownika jest wymagana",
+      "password-error": "Hasło jest wymagane",
+      "login-button": "Zaloguj",
+      "error-message": "Logowanie nie powiodło się"
+    },
+    "profile": {
+      "change-password": "Zmień hasło",
+      "old-password": "Podaj stare hasło",
+      "old-password-error": "Wprowadź aktualne hasło",
+      "new-password": "Nowe hasło",
+      "new-password-hint": "Minimum 12 znaków",
+      "new-password-error": "Wprowadź hasło, minimum 12 znaków",
+      "confirm-password": "Powtórz nowe hasło",
+      "confirm-password-error": "Hasło nie pasuje",
+      "close": "Zamknij",
+      "save": "Zapisz",
+      "password-success": "Pomyślnie zmieniono hasło",
+      "password-error": "Nie udało się zmienić hasła"
+    },
+    "register": {
+      "register-title": "Rejestracja",
+      "user-data": "Wprowadź dane osobowe",
+      "name": "Imię",
+      "name-error": "Podaj imię",
+      "surname": "Nazwisko",
+      "surname-error": "Podaj nazwisko",
+      "email": "Email",
+      "email-error": "Podaj poprawny adres email",
+      "next": "Dalej",
+      "back": "Wstecz",
+      "profile-data": "Wprowadź dane do logowania",
+      "username": "Nazwa użytkownika",
+      "username-hint": "Minimum 6 znaków",
+      "username-error": "Wprowadź nazwę użytkownika, minimum 6 znaków",
+      "password": "Hasło",
+      "password-hint": "Minimum 12 znaków",
+      "password-error": "Wprowadź hasło, minimum 12 znaków",
+      "confirm-password": "Powtórz hasło",
+      "confirm-password-error": "Hasło nie pasuje",
+      "register-button": "Zarejestruj",
+      "register-success": "Rejestracja przebiegła pomyślnie!",
+      "register-success-can-login": "Możesz zalogować się na swoje konto",
+      "register-error": "Rejestracja nie powiodła się"
+    }
+  },
+  "nav": {
+    "my-account": "MOJE KONTO",
+    "logout": "Wyloguj",
+    "login": "Logowanie",
+    "register": "Rejestracja",
+    "change-password": "Zmień hasło"
+  }
+}

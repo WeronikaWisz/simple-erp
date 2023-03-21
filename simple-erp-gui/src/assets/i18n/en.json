@@ -1,0 +1,59 @@
+{
+  "manage-users": {
+    "login": {
+      "login-title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "username-error": "Username is required",
+      "password-error": "Password is required",
+      "login-button": "Sign in",
+      "error-message": "Login failed"
+    },
+    "profile": {
+      "change-password": "Change password",
+      "old-password": "Enter old password",
+      "old-password-error": "Enter your current password",
+      "new-password": "New password",
+      "new-password-hint": "Minimum 12 characters",
+      "new-password-error": "Enter password, at least 12 characters",
+      "confirm-password": "Confirm password",
+      "confirm-password-error": "Password not match",
+      "close": "Close",
+      "save": "Save",
+      "password-success": "Password changed successfully",
+      "password-error": "Password change failed"
+    },
+    "register": {
+      "register-title": "Register",
+      "user-data": "Enter personal data",
+      "name": "Name",
+      "name-error": "Enter name",
+      "surname": "Surname",
+      "surname-error": "Enter surname",
+      "email": "Email",
+      "email-error": "Enter valid email",
+      "next": "Next",
+      "back": "Back",
+      "profile-data": "Enter login data",
+      "username": "Username",
+      "username-hint": "Minimum 6 characters",
+      "username-error": "Enter username, minimum 6 characters",
+      "password": "Password",
+      "password-hint": "Minimum 12 characters",
+      "password-error": "Enter password, at least 12 characters",
+      "confirm-password": "Confirm password",
+      "confirm-password-error": "Password not match",
+      "register-button": "Sign up",
+      "register-success": "Successfully registered!",
+      "register-success-can-login": "You can login to your account",
+      "register-error": "Registration failed"
+    }
+  },
+  "nav": {
+    "my-account": "MY ACCOUNT",
+    "logout": "Logout",
+    "login": "Sign in",
+    "register": "Sign up",
+    "change-password": "Change password"
+  }
+}

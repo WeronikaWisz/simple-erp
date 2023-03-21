@@ -1,0 +1,30 @@
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content>
+    <form *ngIf="!isLoggedIn" [formGroup]="form">
+      <h2>{{ 'manage-users.login.login-title' | translate}}</h2>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'manage-users.login.username' | translate}}</mat-label>
+        <input matInput formControlName="username" required>
+        <mat-error>
+          {{ 'manage-users.login.username-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'manage-users.login.password' | translate}}</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required>
+        <button mat-icon-button matSuffix (click)="hide = !hide"
+                [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error>
+          {{ 'manage-users.login.password-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <button id="submit-login-button" mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+        <mat-icon>login</mat-icon>
+        <span class="login-button">
+          {{ 'manage-users.login.login-button' | translate}}
+        </span></button>
+    </form>
+  </mat-card-content>
+</mat-card>
