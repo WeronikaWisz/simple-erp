@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatDialogRef} from "@angular/material/dialog";
-import {UsersService} from "../../../services/manage-users/users.service";
-import Validation from "../../../helpers/validation";
-// import Swal from "sweetalert2";
+import {UsersService} from "../../../../services/manage-users/users.service";
+import Validation from "../../../../helpers/validation";
+import Swal from "sweetalert2";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
@@ -59,23 +59,23 @@ export class ChangePasswordDialogComponent implements OnInit {
     }).subscribe({
       next: (data) => {
         console.log(data);
-        // Swal.fire({
-        //   position: 'top-end',
-        //   title: this.getTranslateMessage("manage-users.profile.password-success"),
-        //   icon: 'success',
-        //   showConfirmButton: false
-        // })
-        // this.form.reset();
-        // this.form.markAsUntouched();
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("manage-users.profile.password-success"),
+          icon: 'success',
+          showConfirmButton: false
+        })
+        this.form.reset();
+        this.form.markAsUntouched();
       },
       error: (err) => {
-        // Swal.fire({
-        //   position: 'top-end',
-        //   title: this.getTranslateMessage("manage-users.profile.password-error"),
-        //   text: err.error.message,
-        //   icon: 'error',
-        //   showConfirmButton: false
-        // })
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("manage-users.profile.password-error"),
+          text: err.error.message,
+          icon: 'error',
+          showConfirmButton: false
+        })
       }
     });
   }

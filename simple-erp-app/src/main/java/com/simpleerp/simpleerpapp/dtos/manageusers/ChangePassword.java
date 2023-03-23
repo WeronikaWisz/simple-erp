@@ -1,4 +1,4 @@
-package com.simpleerp.simpleerpapp.dtos.auth;
+package com.simpleerp.simpleerpapp.dtos.manageusers;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

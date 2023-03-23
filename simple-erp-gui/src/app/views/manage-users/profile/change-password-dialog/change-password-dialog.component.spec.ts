@@ -7,7 +7,7 @@ import {RouterTestingModule} from "@angular/router/testing";
 import {TranslateModule} from "@ngx-translate/core";
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {of, throwError} from "rxjs";
-import {UsersService} from "../../../services/manage-users/users.service";
+import {UsersService} from "../../../../services/manage-users/users.service";
 import Swal from "sweetalert2";
 
 describe('ChangePasswordDialogComponent', () => {

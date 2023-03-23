@@ -1,0 +1,21 @@
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content *ngIf="profileData">
+    <div class="name-edit" *ngIf="isLoggedIn">
+      <h2>{{profileData.name}} {{profileData.surname}}</h2>
+      <button mat-mini-fab color="primary" (click)="editProfile()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    <h3>{{profileData.username}}</h3>
+    <p class="description-titles">{{profileData.email}}</p>
+    <p><span class="description-titles" *ngIf="profileData.phone">tel. {{profileData.phone}}</span></p>
+    <br/>
+    <hr>
+    <br/>
+    <div class="change-password">
+      <button mat-raised-button color="white" (click)="changePassword()">
+        {{ 'manage-users.profile.change-password' | translate}}
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

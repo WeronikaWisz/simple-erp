@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>{{ 'manage-users.profile.edit-profile' | translate}}</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+        <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+          <mat-label>{{ 'manage-users.profile.name' | translate}}</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+        <mat-form-field class="full-width-input" appearance="outline">
+          <mat-label>{{ 'manage-users.profile.surname' | translate}}</mat-label>
+          <input matInput formControlName="surname">
+        </mat-form-field>
+        <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+          <mat-label>{{ 'manage-users.profile.email' | translate}}</mat-label>
+          <input matInput formControlName="email">
+        </mat-form-field>
+        <mat-form-field class="full-width-input" appearance="outline">
+          <mat-label>{{ 'manage-users.profile.phone' | translate}}</mat-label>
+          <input matInput placeholder="(+48) 123 456 789" formControlName="phone">
+          <mat-error>
+            {{ 'manage-users.profile.phone-error' | translate}}
+          </mat-error>
+        </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'manage-users.profile.close' | translate}}
+  </button>
+  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid || !form.dirty">
+    {{ 'manage-users.profile.save' | translate}}
+  </button>
+</div>
+

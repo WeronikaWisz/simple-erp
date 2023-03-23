@@ -16,10 +16,10 @@
         <mat-icon>person</mat-icon>
       </button>
       <mat-menu #profile="matMenu">
-        <button mat-menu-item (click)="changePassword()">
-          <mat-icon>lock</mat-icon> {{ 'manage-users.profile.change-password' | translate}}
+        <button mat-menu-item routerLink="profile">
+          <mat-icon>person_outline</mat-icon> {{ 'nav.my-profile' | translate}}
         </button>
-        <button id="logout-button" mat-menu-item (click)="logout()">
+        <button mat-menu-item (click)="logout()">
           <mat-icon>logout</mat-icon> {{ 'nav.logout' | translate}}
         </button>
       </mat-menu>

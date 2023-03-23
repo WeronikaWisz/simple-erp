@@ -4,7 +4,6 @@ import { TokenStorageService } from '../../../services/token-storage.service';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import Swal from "sweetalert2";
-// import Swal from 'sweetalert2/dist/sweetalert2.js';
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
@@ -32,7 +31,7 @@ export class LoginComponent implements OnInit {
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
       this.roles = this.tokenStorage.getUser().roles;
-      // this.router.navigate(['/profile']).then(() => this.reloadPage());
+      this.router.navigate(['/profile']).then(() => this.reloadPage());
     }
   }
 
@@ -48,7 +47,7 @@ export class LoginComponent implements OnInit {
         console.log(data.token);
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
-        // this.router.navigate(['/shopping-list']).then(() => this.reloadPage());
+        this.router.navigate(['/profile']).then(() => this.reloadPage());
       },
       error: (err) => {
         this.form.controls['username'].setErrors({'incorrect': true});

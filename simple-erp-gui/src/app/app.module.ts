@@ -19,7 +19,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import { MatButtonModule } from '@angular/material/button'
 import {MatStepperModule} from "@angular/material/stepper";
-import {ChangePasswordDialogComponent} from "./views/manage-users/change-password-dialog/change-password-dialog.component";
+import {ChangePasswordDialogComponent} from "./views/manage-users/profile/change-password-dialog/change-password-dialog.component";
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatRippleModule} from "@angular/material/core";
@@ -31,13 +31,17 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import { MatNativeDateModule } from '@angular/material/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
+import {UpdateProfileDialogComponent} from "./views/manage-users/profile/update-profile-dialog/update-profile-dialog.component";
+import {ProfileComponent} from "./views/manage-users/profile/profile.component";
 
 @NgModule({
   declarations: [
     AppComponent,
     MainNavComponent,
     LoginComponent,
-    ChangePasswordDialogComponent
+    ChangePasswordDialogComponent,
+    UpdateProfileDialogComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

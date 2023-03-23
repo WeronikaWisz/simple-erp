@@ -3,7 +3,7 @@ import {TokenStorageService} from "../services/token-storage.service";
 import {TranslateService} from "@ngx-translate/core";
 import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
-import {ChangePasswordDialogComponent} from "../views/manage-users/change-password-dialog/change-password-dialog.component";
+import {ChangePasswordDialogComponent} from "../views/manage-users/profile/change-password-dialog/change-password-dialog.component";
 
 @Component({
   selector: 'app-main-nav',

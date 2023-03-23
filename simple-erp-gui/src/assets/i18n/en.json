@@ -21,7 +21,19 @@
       "close": "Close",
       "save": "Save",
       "password-success": "Password changed successfully",
-      "password-error": "Password change failed"
+      "password-error": "Password change failed",
+      "name": "Name",
+      "name-error": "Enter name",
+      "surname": "Surname",
+      "surname-error": "Enter surname",
+      "email": "Email",
+      "email-error": "Enter valid email",
+      "phone": "Phone number",
+      "phone-error": "Enter valid phone number",
+      "edit-profile": "Edit profile",
+      "load-data-error": "Retrieving user data has failed",
+      "update-success": "Profile data successfully updated",
+      "update-error": "Data update failed"
     },
     "register": {
       "register-title": "Register",
@@ -51,9 +63,9 @@
   },
   "nav": {
     "my-account": "MY ACCOUNT",
+    "my-profile": "My profile",
     "logout": "Logout",
     "login": "Sign in",
-    "register": "Sign up",
     "change-password": "Change password"
   }
 }

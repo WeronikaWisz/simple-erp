@@ -21,7 +21,19 @@
       "close": "Zamknij",
       "save": "Zapisz",
       "password-success": "Pomyślnie zmieniono hasło",
-      "password-error": "Nie udało się zmienić hasła"
+      "password-error": "Nie udało się zmienić hasła",
+      "name": "Imię",
+      "name-error": "Podaj imię",
+      "surname": "Nazwisko",
+      "surname-error": "Podaj nazwisko",
+      "email": "Email",
+      "email-error": "Podaj poprawny adres email",
+      "phone": "Numer telefonu",
+      "phone-error": "Podaj poprawny numer telefonu",
+      "edit-profile": "Edytuj profil",
+      "load-data-error": "Pobranie danych użytkownika nie powiodło się",
+      "update-success": "Pomyślnie zaktualizowano dane profilowe",
+      "update-error": "Aktualizacja danych nie powiodła się"
     },
     "register": {
       "register-title": "Rejestracja",
@@ -51,9 +63,9 @@
   },
   "nav": {
     "my-account": "MOJE KONTO",
+    "my-profile": "Mój profil",
     "logout": "Wyloguj",
     "login": "Logowanie",
-    "register": "Rejestracja",
     "change-password": "Zmień hasło"
   }
 }
