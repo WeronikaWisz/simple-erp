@@ -131,4 +131,8 @@ export class BrowseUsersComponent implements OnInit {
     return !roles.includes(ERole[ERole.ROLE_ADMIN]);
   }
 
+  goToAddUser(){
+    this.router.navigate(['/add-user']);
+  }
+
 }

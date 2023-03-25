@@ -1,6 +1,15 @@
 <div class="content mat-elevation-z8" *ngIf="isLoggedIn">
-  <h2>{{ 'manage-users.browse-users.browse-title' | translate}}</h2>
-  <p>{{ 'manage-users.browse-users.user-count' | translate}}: {{userCount}}</p>
+  <div class="user-list-header">
+    <div>
+      <h2>{{ 'manage-users.browse-users.browse-title' | translate}}</h2>
+      <p>{{ 'manage-users.browse-users.user-count' | translate}}: {{userCount}}</p>
+    </div>
+    <div>
+      <button mat-raised-button (click)="goToAddUser()">
+        {{ 'nav.add-user' | translate}}
+      </button>
+    </div>
+  </div>
   <mat-table #table [dataSource]="dataSource" matSort>
 
     <ng-container matColumnDef="username">
