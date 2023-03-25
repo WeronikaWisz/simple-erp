@@ -58,13 +58,30 @@
       "confirm-password": "Powtórz hasło",
       "confirm-password-error": "Hasło nie pasuje",
       "register-button": "Zapisz",
-      "register-success": "Pomyślnie dodano użytkonika!",
+      "register-success": "Pomyślnie dodano użytkonika",
       "register-error": "Dodanie użytkownika nie powiodło się",
       "role-warehouse": "Magazyn",
       "role-production": "Produkcja",
       "role-trade": "Handel",
       "role": "Role użytkownika",
-      "role-error": "Wybierz co najmniej jedną rolę"
+      "role-error": "Wybierz co najmniej jedną rolę",
+      "role-admin": "Admin",
+      "edit-title": "Edytuj użytkownika",
+      "load-error": "Nie udało się załadować danych profilu",
+      "button-edit": "Aktualizuj",
+      "update-error": "Aktualizacja użytkownika nie powiodło się",
+      "update-success": "Pomyślnie zaktualizowano użytkonika"
+    },
+    "browse-users": {
+      "browse-title": "Użytkownicy systemu",
+      "user-count": "Liczba użytkowników",
+      "username": "Nazwa",
+      "name": "Imię",
+      "surname": "Nazwisko",
+      "email": "Email",
+      "phone": "Telefon",
+      "roles": "Role",
+      "delete-error": "Nie udało się usunąć użytkownika"
     }
   },
   "nav": {

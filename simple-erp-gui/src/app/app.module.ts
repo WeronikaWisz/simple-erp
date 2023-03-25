@@ -34,6 +34,9 @@ import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {UpdateProfileDialogComponent} from "./views/manage-users/profile/update-profile-dialog/update-profile-dialog.component";
 import {ProfileComponent} from "./views/manage-users/profile/profile.component";
 import { AddUserComponent } from './views/manage-users/add-user/add-user.component';
+import { BrowseUsersComponent } from './views/manage-users/browse-users/browse-users.component';
+import {MatTableModule} from "@angular/material/table";
+import {MatChipsModule} from "@angular/material/chips";
 
 @NgModule({
   declarations: [
@@ -43,41 +46,44 @@ import { AddUserComponent } from './views/manage-users/add-user/add-user.compone
     ChangePasswordDialogComponent,
     UpdateProfileDialogComponent,
     ProfileComponent,
-    AddUserComponent
+    AddUserComponent,
+    BrowseUsersComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
-    BrowserAnimationsModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
-    MatIconModule,
-    MatMenuModule,
-    MatCardModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatButtonModule,
-    MatStepperModule,
-    MatPaginatorModule,
-    MatTabsModule,
-    MatRippleModule,
-    FormsModule,
-    MatDialogModule,
-    MatCheckboxModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        TranslateModule.forRoot({
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        BrowserAnimationsModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatListModule,
+        MatIconModule,
+        MatMenuModule,
+        MatCardModule,
+        MatFormFieldModule,
+        ReactiveFormsModule,
+        MatInputModule,
+        MatButtonModule,
+        MatStepperModule,
+        MatPaginatorModule,
+        MatTabsModule,
+        MatRippleModule,
+        FormsModule,
+        MatDialogModule,
+        MatCheckboxModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatTableModule,
+        MatChipsModule
+    ],
   providers: [authInterceptorProviders,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
   bootstrap: [AppComponent]

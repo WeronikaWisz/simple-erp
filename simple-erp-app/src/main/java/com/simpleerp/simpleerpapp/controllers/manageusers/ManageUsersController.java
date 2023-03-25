@@ -2,22 +2,16 @@ package com.simpleerp.simpleerpapp.controllers.manageusers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.AddUserRequest;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
-import com.simpleerp.simpleerpapp.enums.ERole;
-import com.simpleerp.simpleerpapp.models.Role;
-import com.simpleerp.simpleerpapp.models.User;
+import com.simpleerp.simpleerpapp.dtos.auth.UpdateUserRequest;
+import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
+import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
 import com.simpleerp.simpleerpapp.services.ManageUsersService;
-import com.simpleerp.simpleerpapp.services.UsersService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/manage-users")
@@ -35,10 +29,37 @@ public class ManageUsersController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping("/add-user")
+    @PostMapping("/user")
     public ResponseEntity<?> addUser(@RequestBody AddUserRequest addUserRequest) {
         manageUsersService.addUser(addUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.userRegister", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<?> loadUsers(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
+        UsersResponse usersResponse = manageUsersService.loadUsers(page, size);
+        return ResponseEntity.ok(usersResponse);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
+        manageUsersService.deleteUser(id);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.userDeleted", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PutMapping("/user")
+    public ResponseEntity<?> editUser(@RequestBody UpdateUserRequest updateUserRequest) {
+        manageUsersService.updateUser(updateUserRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.profileUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
+        UserListItem user = manageUsersService.getUser(id);
+        return ResponseEntity.ok(user);
     }
 }

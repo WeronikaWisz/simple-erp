@@ -1,0 +1,63 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn">
+  <h2>{{ 'manage-users.browse-users.browse-title' | translate}}</h2>
+  <p>{{ 'manage-users.browse-users.user-count' | translate}}: {{userCount}}</p>
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="username">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.username' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.username}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.name' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="surname">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.surname' | translate}}</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.surname}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.email' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.phone' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="roles">
+      <mat-header-cell *matHeaderCellDef> {{ 'manage-users.browse-users.roles' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <mat-chip-list>
+         <span *ngFor="let role of element.roles">
+              <mat-chip> {{getRoleName(role)}} </mat-chip>
+          </span>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToEditUser(row.id)" *ngIf="isNotAdmin(row.roles)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deleteUser(row.id)" *ngIf="isNotAdmin(row.roles)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="totalUsersLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>

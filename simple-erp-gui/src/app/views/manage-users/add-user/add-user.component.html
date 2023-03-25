@@ -1,7 +1,7 @@
 <mat-card class="example-card mat-elevation-z8">
   <mat-card-content>
     <form *ngIf="isLoggedIn" [formGroup]="form">
-      <h2>{{ 'manage-users.register.register-title' | translate}}</h2>
+      <h2>{{formTitle}}</h2>
       <mat-vertical-stepper formArrayName="formArray" [linear]="false" #stepper>
         <mat-step formGroupName="0" [stepControl]="formArray?.get([0])!">
           <ng-template matStepLabel>{{ 'manage-users.register.user-data' | translate}}</ng-template>
@@ -57,7 +57,10 @@
             </mat-error>
           </mat-form-field>
           <br/>
-          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+          <mat-checkbox class="change-password-checkbox" *ngIf="isEditUserView" (change)="editPassword($event)">
+            {{ 'manage-users.profile.change-password' | translate}}</mat-checkbox>
+          <br *ngIf="isEditUserView"/>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline" *ngIf="!isEditUserView || changePassword">
             <mat-label>{{ 'manage-users.register.password' | translate}}</mat-label>
             <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required id="password">
             <button mat-icon-button matSuffix (click)="hide = !hide"
@@ -69,7 +72,7 @@
               {{ 'manage-users.register.password-error' | translate}}
             </mat-error>
           </mat-form-field>
-          <mat-form-field class="full-width-input" appearance="outline">
+          <mat-form-field class="full-width-input" appearance="outline" *ngIf="!isEditUserView || changePassword">
             <mat-label>{{ 'manage-users.register.confirm-password' | translate}}</mat-label>
             <input matInput type="password" formControlName="confirmPassword" required id="confirm-password">
             <mat-error>
@@ -82,10 +85,15 @@
         </mat-step>
       </mat-vertical-stepper>
       <span class="register-button">
-        <button id="submit-register-button" mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+        <button id="submit-register-button" mat-raised-button color="primary" *ngIf="!isEditUserView" [disabled]="form.invalid" (click)="onSubmit()">
           <mat-icon>how_to_reg</mat-icon>
           <span class="signup-button">{{ 'manage-users.register.register-button' | translate}}</span>
         </button>
+        <button mat-raised-button color="primary" *ngIf="isEditUserView" [disabled]="form.invalid || !form.dirty"
+                (click)="updateUser()">
+        <mat-icon>update</mat-icon>
+        <span class="signup-button">{{ 'manage-users.register.button-edit' | translate}}</span>
+      </button>
       </span>
     </form>
   </mat-card-content>

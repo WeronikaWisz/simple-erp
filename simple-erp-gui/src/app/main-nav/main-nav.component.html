@@ -9,6 +9,9 @@
       <a mat-list-item href routerLink="add-user"><mat-icon>add_circle_outline</mat-icon>
         <span class="button-text">{{ 'nav.add-user' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-users"><mat-icon>face</mat-icon>
+        <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
+      </a>
       <h2 matSubheader>{{ 'nav.my-account' | translate}}</h2>
       <a mat-list-item href routerLink="profile"><mat-icon>person_outline</mat-icon>
         <span class="button-text">{{ 'nav.my-profile' | translate}}</span>
@@ -43,6 +46,9 @@
         <mat-menu #users="matMenu">
           <button mat-menu-item routerLink="add-user">
             <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-user' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-users">
+            <mat-icon>face</mat-icon> {{ 'nav.browse-users' | translate}}
           </button>
         </mat-menu>
       </span>

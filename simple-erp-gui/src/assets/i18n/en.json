@@ -58,13 +58,30 @@
       "confirm-password": "Confirm password",
       "confirm-password-error": "Password not match",
       "register-button": "Create",
-      "register-success": "Successfully created user!",
+      "register-success": "Successfully created user",
       "register-error": "Creating user failed",
       "role-warehouse": "Warehouse",
       "role-production": "Production",
       "role-trade": "Trade",
       "role": "User roles",
-      "role-error": "Choose at least one role"
+      "role-error": "Choose at least one role",
+      "role-admin": "Admin",
+      "edit-title": "Edit user",
+      "load-error": "Cannot load user data",
+      "button-edit": "Update",
+      "update-error": "Updating user failed",
+      "update-success": "Successfully updated user"
+    },
+    "browse-users": {
+      "browse-title": "System users",
+      "user-count": "User count",
+      "username": "Username",
+      "name": "Name",
+      "surname": "Surname",
+      "email": "Email",
+      "phone": "Phone",
+      "roles": "Roles",
+      "delete-error": "Cannot delete user"
     }
   },
   "nav": {
