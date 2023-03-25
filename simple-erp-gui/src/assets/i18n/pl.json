@@ -36,7 +36,7 @@
       "update-error": "Aktualizacja danych nie powiodła się"
     },
     "register": {
-      "register-title": "Rejestracja",
+      "register-title": "Dodaj użytkownika",
       "user-data": "Wprowadź dane osobowe",
       "name": "Imię",
       "name-error": "Podaj imię",
@@ -44,9 +44,11 @@
       "surname-error": "Podaj nazwisko",
       "email": "Email",
       "email-error": "Podaj poprawny adres email",
+      "phone": "Numer telefonu",
+      "phone-error": "Podaj poprawny numer telefonu",
       "next": "Dalej",
       "back": "Wstecz",
-      "profile-data": "Wprowadź dane do logowania",
+      "profile-data": "Wprowadź dane konta",
       "username": "Nazwa użytkownika",
       "username-hint": "Minimum 6 znaków",
       "username-error": "Wprowadź nazwę użytkownika, minimum 6 znaków",
@@ -55,10 +57,14 @@
       "password-error": "Wprowadź hasło, minimum 12 znaków",
       "confirm-password": "Powtórz hasło",
       "confirm-password-error": "Hasło nie pasuje",
-      "register-button": "Zarejestruj",
-      "register-success": "Rejestracja przebiegła pomyślnie!",
-      "register-success-can-login": "Możesz zalogować się na swoje konto",
-      "register-error": "Rejestracja nie powiodła się"
+      "register-button": "Zapisz",
+      "register-success": "Pomyślnie dodano użytkonika!",
+      "register-error": "Dodanie użytkownika nie powiodło się",
+      "role-warehouse": "Magazyn",
+      "role-production": "Produkcja",
+      "role-trade": "Handel",
+      "role": "Role użytkownika",
+      "role-error": "Wybierz co najmniej jedną rolę"
     }
   },
   "nav": {
@@ -66,6 +72,11 @@
     "my-profile": "Mój profil",
     "logout": "Wyloguj",
     "login": "Logowanie",
-    "change-password": "Zmień hasło"
+    "change-password": "Zmień hasło",
+    "manage-users": "UŻYTKOWNICY",
+    "manage-users-l": "Użytkownicy",
+    "browse-users": "Lista użytkowików",
+    "add-user": "Dodaj użytkownika",
+    "default-user": "Domyślni użytkownicy dla zadań"
   }
 }

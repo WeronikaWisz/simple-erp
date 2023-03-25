@@ -1,8 +1,34 @@
 <mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport (click)="drawer.toggle()"
+               [ngClass]="{hidden: (isHandset$ | async) === false}"
+               [attr.role]="'navigation'"
+               [mode]="'over'">
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-nav-list>
+      <h2 matSubheader>{{ 'nav.manage-users' | translate}}</h2>
+      <a mat-list-item href routerLink="add-user"><mat-icon>add_circle_outline</mat-icon>
+        <span class="button-text">{{ 'nav.add-user' | translate}}</span>
+      </a>
+      <h2 matSubheader>{{ 'nav.my-account' | translate}}</h2>
+      <a mat-list-item href routerLink="profile"><mat-icon>person_outline</mat-icon>
+        <span class="button-text">{{ 'nav.my-profile' | translate}}</span>
+      </a>
+      <a mat-list-item href (click)="logout()"><mat-icon>logout</mat-icon>
+        <span class="button-text">{{ 'nav.logout' | translate}}</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="(isHandset$ | async) && isLoggedIn">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
       <span>Simple ERP</span>
-      <span class="spacer"></span>
       <button mat-button [matMenuTriggerFor]="intern">
         <mat-icon>language</mat-icon> {{translate.currentLang}}
       </button>
@@ -11,6 +37,15 @@
           {{lang}}
         </button>
       </mat-menu>
+      <span class="spacer"></span>
+      <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="users">{{ 'nav.manage-users-l' | translate}}</button>
+        <mat-menu #users="matMenu">
+          <button mat-menu-item routerLink="add-user">
+            <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-user' | translate}}
+          </button>
+        </mat-menu>
+      </span>
       <button id="profile-button" mat-button [matMenuTriggerFor]="profile" *ngIf="isLoggedIn">
         <span class="user-info">{{username}}</span>
         <mat-icon>person</mat-icon>

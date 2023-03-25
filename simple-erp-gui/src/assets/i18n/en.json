@@ -36,7 +36,7 @@
       "update-error": "Data update failed"
     },
     "register": {
-      "register-title": "Register",
+      "register-title": "Add user",
       "user-data": "Enter personal data",
       "name": "Name",
       "name-error": "Enter name",
@@ -44,9 +44,11 @@
       "surname-error": "Enter surname",
       "email": "Email",
       "email-error": "Enter valid email",
+      "phone": "Phone number",
+      "phone-error": "Enter valid phone number",
       "next": "Next",
       "back": "Back",
-      "profile-data": "Enter login data",
+      "profile-data": "Enter profile data",
       "username": "Username",
       "username-hint": "Minimum 6 characters",
       "username-error": "Enter username, minimum 6 characters",
@@ -55,10 +57,14 @@
       "password-error": "Enter password, at least 12 characters",
       "confirm-password": "Confirm password",
       "confirm-password-error": "Password not match",
-      "register-button": "Sign up",
-      "register-success": "Successfully registered!",
-      "register-success-can-login": "You can login to your account",
-      "register-error": "Registration failed"
+      "register-button": "Create",
+      "register-success": "Successfully created user!",
+      "register-error": "Creating user failed",
+      "role-warehouse": "Warehouse",
+      "role-production": "Production",
+      "role-trade": "Trade",
+      "role": "User roles",
+      "role-error": "Choose at least one role"
     }
   },
   "nav": {
@@ -66,6 +72,11 @@
     "my-profile": "My profile",
     "logout": "Logout",
     "login": "Sign in",
-    "change-password": "Change password"
+    "change-password": "Change password",
+    "manage-users": "USERS",
+    "manage-users-l": "Users",
+    "browse-users": "Users list",
+    "add-user": "Add user",
+    "default-user": "Default users for tasks"
   }
 }

@@ -3,7 +3,8 @@ import {TokenStorageService} from "../services/token-storage.service";
 import {TranslateService} from "@ngx-translate/core";
 import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
-import {ChangePasswordDialogComponent} from "../views/manage-users/profile/change-password-dialog/change-password-dialog.component";
+import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
+import {map, shareReplay, Observable} from 'rxjs';
 
 @Component({
   selector: 'app-main-nav',
@@ -12,12 +13,18 @@ import {ChangePasswordDialogComponent} from "../views/manage-users/profile/chang
 })
 export class MainNavComponent implements OnInit {
 
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    .pipe(
+      map(result => result.matches),
+      shareReplay()
+    );
+
   private roles: string[] = [];
   isLoggedIn = false;
   username?: string;
 
   constructor(private tokenStorageService: TokenStorageService, public translate: TranslateService,
-              public dialog: MatDialog, private router: Router) { }
+              public dialog: MatDialog, private router: Router, private breakpointObserver: BreakpointObserver) { }
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenStorageService.getToken();
@@ -34,13 +41,6 @@ export class MainNavComponent implements OnInit {
     this.tokenStorageService.signOut();
     this.router.navigate(['/login']).then(() => this.reloadPage());
   }
-
-  changePassword(){
-    this.dialog.open(ChangePasswordDialogComponent, {
-      maxWidth: '650px'
-    });
-  }
-
 
   reloadPage(): void {
     window.location.reload();

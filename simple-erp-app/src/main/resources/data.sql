@@ -10,3 +10,15 @@ INSERT INTO simpleerp.user_roles (user_id, role_id)
 SELECT (SELECT id FROM simpleerp.user WHERE username='admin'), (SELECT id FROM simpleerp.role WHERE name='ROLE_ADMIN')
 WHERE NOT EXISTS (SELECT * FROM simpleerp.user_roles
 WHERE user_id=(SELECT id FROM simpleerp.user WHERE username='admin') AND role_id=(SELECT id FROM simpleerp.role WHERE name='ROLE_ADMIN'));
+
+INSERT INTO simpleerp.role (id, name)
+SELECT nextval('simpleerp.role_seq'), 'ROLE_WAREHOUSE'
+WHERE NOT EXISTS (SELECT * FROM simpleerp.role WHERE name='ROLE_WAREHOUSE');
+
+INSERT INTO simpleerp.role (id, name)
+SELECT nextval('simpleerp.role_seq'), 'ROLE_PRODUCTION'
+WHERE NOT EXISTS (SELECT * FROM simpleerp.role WHERE name='ROLE_PRODUCTION');
+
+INSERT INTO simpleerp.role (id, name)
+SELECT nextval('simpleerp.role_seq'), 'ROLE_TRADE'
+WHERE NOT EXISTS (SELECT * FROM simpleerp.role WHERE name='ROLE_TRADE');

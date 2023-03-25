@@ -33,6 +33,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {UpdateProfileDialogComponent} from "./views/manage-users/profile/update-profile-dialog/update-profile-dialog.component";
 import {ProfileComponent} from "./views/manage-users/profile/profile.component";
+import { AddUserComponent } from './views/manage-users/add-user/add-user.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import {ProfileComponent} from "./views/manage-users/profile/profile.component";
     LoginComponent,
     ChangePasswordDialogComponent,
     UpdateProfileDialogComponent,
-    ProfileComponent
+    ProfileComponent,
+    AddUserComponent
   ],
   imports: [
     BrowserModule,
