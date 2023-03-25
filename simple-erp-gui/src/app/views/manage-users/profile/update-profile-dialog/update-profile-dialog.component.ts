@@ -26,9 +26,9 @@ export class UpdateProfileDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-        name: [this.data.name],
-        surname: [this.data.surname],
-        email: [this.data.email, Validators.email],
+        name: [this.data.name, Validators.required],
+        surname: [this.data.surname, Validators.required],
+        email: [this.data.email, [Validators.required, Validators.email]],
         phone: [this.data.phone ? this.data.phone : '', Validators.pattern('(\\+48)?\\s?[0-9]{3}\\s?[0-9]{3}\\s?[0-9]{3}')]
       })
   }

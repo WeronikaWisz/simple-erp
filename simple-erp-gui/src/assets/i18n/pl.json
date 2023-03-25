@@ -82,6 +82,26 @@
       "phone": "Telefon",
       "roles": "Role",
       "delete-error": "Nie udało się usunąć użytkownika"
+    },
+    "default-users": {
+      "default-title": "Domyślni użytkownicy zadań",
+      "task": "Zadanie",
+      "employee": "Pracownik",
+      "load-error": "Nie udało się załadować domyślnych użytkowników",
+      "task-purchase": "Zakup",
+      "task-sale": "Sprzedaż",
+      "task-production": "Produkcja",
+      "task-internal-release": "Wydanie wewnętrzne",
+      "task-internal-acceptance": "Przyjęcie wewnętrzne",
+      "task-external-release": "Wydanie zewnętrzne",
+      "task-external-acceptance": "Przyjęcie zewnętrzne",
+      "edit-user": "Zmień użytkownika dla zadania: ",
+      "user-name": "Użytkownik",
+      "close": "Zamknij",
+      "save": "Zapisz",
+      "load-error-2": "Nie udało się załadować użytkowników",
+      "update-success": "Pomyślnie zaktualizowano domyślnego użytkownika",
+      "update-error": "Nie udało się zaktualizować domyślnego użytkownika"
     }
   },
   "nav": {
@@ -94,6 +114,7 @@
     "manage-users-l": "Użytkownicy",
     "browse-users": "Lista użytkowików",
     "add-user": "Dodaj użytkownika",
-    "default-user": "Domyślni użytkownicy dla zadań"
+    "default-user": "Domyślni użytkownicy dla zadań",
+    "default-users": "Ustawienia domyślne"
   }
 }

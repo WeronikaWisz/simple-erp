@@ -4,6 +4,7 @@ import {LoginComponent} from "./views/manage-users/login/login.component";
 import {ProfileComponent} from "./views/manage-users/profile/profile.component";
 import {AddUserComponent} from "./views/manage-users/add-user/add-user.component";
 import {BrowseUsersComponent} from "./views/manage-users/browse-users/browse-users.component";
+import {DefaultUsersComponent} from "./views/manage-users/default-users/default-users.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: 'add-user', component: AddUserComponent },
   { path: 'edit-user/:id', component: AddUserComponent },
   { path: 'browse-users', component: BrowseUsersComponent },
+  { path: 'default-users', component: DefaultUsersComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

@@ -1,0 +1,11 @@
+package com.simpleerp.simpleerpapp.enums;
+
+public enum ETask {
+    TASK_PURCHASE,
+    TASK_SALE,
+    TASK_PRODUCTION,
+    TASK_INTERNAL_RELEASE,
+    TASK_INTERNAL_ACCEPTANCE,
+    TASK_EXTERNAL_RELEASE,
+    TASK_EXTERNAL_ACCEPTANCE
+}

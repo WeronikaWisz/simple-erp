@@ -3,15 +3,15 @@
   <form [formGroup]="form">
         <mat-form-field class="full-width-input left-mat-field" appearance="outline">
           <mat-label>{{ 'manage-users.profile.name' | translate}}</mat-label>
-          <input matInput formControlName="name">
+          <input matInput formControlName="name" required>
         </mat-form-field>
         <mat-form-field class="full-width-input" appearance="outline">
           <mat-label>{{ 'manage-users.profile.surname' | translate}}</mat-label>
-          <input matInput formControlName="surname">
+          <input matInput formControlName="surname" required>
         </mat-form-field>
         <mat-form-field class="full-width-input left-mat-field" appearance="outline">
           <mat-label>{{ 'manage-users.profile.email' | translate}}</mat-label>
-          <input matInput formControlName="email">
+          <input matInput formControlName="email" required>
         </mat-form-field>
         <mat-form-field class="full-width-input" appearance="outline">
           <mat-label>{{ 'manage-users.profile.phone' | translate}}</mat-label>

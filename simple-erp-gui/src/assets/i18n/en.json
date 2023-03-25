@@ -82,6 +82,26 @@
       "phone": "Phone",
       "roles": "Roles",
       "delete-error": "Cannot delete user"
+    },
+    "default-users": {
+      "default-title": "Default task employees",
+      "task": "Tasks",
+      "employee": "Employees",
+      "load-error": "Cannot load default users",
+      "task-purchase": "Purchase",
+      "task-sale": "Sale",
+      "task-production": "Production",
+      "task-internal-release": "Internal release",
+      "task-internal-acceptance": "Internal acceptance",
+      "task-external-release": "External release",
+      "task-external-acceptance": "External acceptance",
+      "edit-user": "Edit user for task: ",
+      "user-name": "User",
+      "close": "Close",
+      "save": "Save",
+      "load-error-2": "Cannot load users",
+      "update-success": "Successfully updated default user",
+      "update-error": "Cannot update default user"
     }
   },
   "nav": {
@@ -94,6 +114,7 @@
     "manage-users-l": "Users",
     "browse-users": "Users list",
     "add-user": "Add user",
-    "default-user": "Default users for tasks"
+    "default-user": "Default users for tasks",
+    "default-users": "Default settings"
   }
 }

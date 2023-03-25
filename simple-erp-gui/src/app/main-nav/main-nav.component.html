@@ -6,11 +6,14 @@
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
       <h2 matSubheader>{{ 'nav.manage-users' | translate}}</h2>
+      <a mat-list-item href routerLink="browse-users"><mat-icon>face</mat-icon>
+        <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="add-user"><mat-icon>add_circle_outline</mat-icon>
         <span class="button-text">{{ 'nav.add-user' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="browse-users"><mat-icon>face</mat-icon>
-        <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
+      <a mat-list-item href routerLink="default-users"><mat-icon>settings</mat-icon>
+        <span class="button-text">{{ 'nav.default-users' | translate}}</span>
       </a>
       <h2 matSubheader>{{ 'nav.my-account' | translate}}</h2>
       <a mat-list-item href routerLink="profile"><mat-icon>person_outline</mat-icon>
@@ -44,11 +47,14 @@
       <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
         <button mat-button [matMenuTriggerFor]="users">{{ 'nav.manage-users-l' | translate}}</button>
         <mat-menu #users="matMenu">
+          <button mat-menu-item routerLink="browse-users">
+            <mat-icon>face</mat-icon> {{ 'nav.browse-users' | translate}}
+          </button>
           <button mat-menu-item routerLink="add-user">
             <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-user' | translate}}
           </button>
-          <button mat-menu-item routerLink="browse-users">
-            <mat-icon>face</mat-icon> {{ 'nav.browse-users' | translate}}
+          <button mat-menu-item routerLink="default-users">
+            <mat-icon>settings</mat-icon> {{ 'nav.default-users' | translate}}
           </button>
         </mat-menu>
       </span>
@@ -65,7 +71,6 @@
         </button>
       </mat-menu>
       <button mat-button *ngIf="!isLoggedIn" routerLink="login">{{ 'nav.login' | translate}}</button>
-<!--      <button mat-button *ngIf="!isLoggedIn" routerLink="register">{{ 'nav.register' | translate}}</button>-->
     </mat-toolbar>
     <ng-content></ng-content>
     <div class="content">

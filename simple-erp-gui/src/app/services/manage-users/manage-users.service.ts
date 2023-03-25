@@ -7,6 +7,9 @@ import {UserListItem} from "../../models/manage-users/UserListItem";
 import {ProfileData} from "../../models/manage-users/ProfileData";
 import {UpdateUserData} from "../../models/manage-users/UpdateUserData";
 import {UpdateUserRequest} from "../../models/auth/UpdateUserRequest";
+import {DefaultUser} from "../../models/manage-users/DefaultUser";
+import {UpdateDefaultUserRequest} from "../../models/manage-users/UpdateDefaultUserRequest";
+import {UserName} from "../../models/manage-users/UserName";
 
 const MANAGE_USERS_API = 'http://localhost:8080/manage-users/';
 
@@ -40,6 +43,18 @@ export class ManageUsersService {
 
   updateUser(updateUserRequest: UpdateUserRequest): Observable<any> {
     return this.http.put(MANAGE_USERS_API + 'user', JSON.stringify(updateUserRequest), httpOptions);
+  }
+
+  loadDefaultUsers(pageIndex: number, pageSize: number): Observable<DefaultUser[]> {
+    return this.http.get<DefaultUser[]>(MANAGE_USERS_API + `default-users?page=${pageIndex}&size=${pageSize}`, httpOptions);
+  }
+
+  updateDefaultUser(updateDefaultUserRequest: UpdateDefaultUserRequest): Observable<any> {
+    return this.http.put(MANAGE_USERS_API + 'default-user', JSON.stringify(updateDefaultUserRequest), httpOptions);
+  }
+
+  loadUserForTask(id: number): Observable<UserName[]> {
+    return this.http.get<UserName[]>(MANAGE_USERS_API + 'users-task/' + id, httpOptions);
   }
 
 }

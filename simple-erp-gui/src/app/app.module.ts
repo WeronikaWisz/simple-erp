@@ -37,6 +37,8 @@ import { AddUserComponent } from './views/manage-users/add-user/add-user.compone
 import { BrowseUsersComponent } from './views/manage-users/browse-users/browse-users.component';
 import {MatTableModule} from "@angular/material/table";
 import {MatChipsModule} from "@angular/material/chips";
+import { DefaultUsersComponent } from './views/manage-users/default-users/default-users.component';
+import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +49,9 @@ import {MatChipsModule} from "@angular/material/chips";
     UpdateProfileDialogComponent,
     ProfileComponent,
     AddUserComponent,
-    BrowseUsersComponent
+    BrowseUsersComponent,
+    DefaultUsersComponent,
+    ChangeDefaultUserDialogComponent
   ],
     imports: [
         BrowserModule,

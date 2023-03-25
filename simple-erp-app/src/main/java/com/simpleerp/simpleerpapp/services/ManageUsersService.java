@@ -2,14 +2,15 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.auth.AddUserRequest;
 import com.simpleerp.simpleerpapp.dtos.auth.UpdateUserRequest;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
+import com.simpleerp.simpleerpapp.dtos.manageusers.*;
 import com.simpleerp.simpleerpapp.enums.ERole;
 import com.simpleerp.simpleerpapp.exception.ApiBadRequestException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.Role;
+import com.simpleerp.simpleerpapp.models.Task;
 import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.repositories.RoleRepository;
+import com.simpleerp.simpleerpapp.repositories.TaskRepository;
 import com.simpleerp.simpleerpapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,12 +25,15 @@ public class ManageUsersService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TaskRepository taskRepository;
     PasswordEncoder encoder;
 
     @Autowired
-    public ManageUsersService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder encoder) {
+    public ManageUsersService(UserRepository userRepository, RoleRepository roleRepository,
+                              TaskRepository taskRepository, PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.taskRepository = taskRepository;
         this.encoder = encoder;
     }
 
@@ -167,5 +171,48 @@ public class ManageUsersService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.userDeleted"));
         return userListToUserListItem(List.of(user)).get(0);
+    }
+
+    public List<DefaultUser> loadDefaultUsers(int page, int size) {
+        List<Task> taskList = taskRepository.findAll();
+        int total = taskList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        List<DefaultUser> defaultUsers = new ArrayList<>();
+        if(end >= start) {
+            defaultUsers = taskListToDefaultUsersList(
+                    taskList.stream().sorted(Comparator.comparing(Task::getId))
+                            .collect(Collectors.toList()).subList(start, end));
+        }
+        return defaultUsers;
+    }
+
+    private List<DefaultUser> taskListToDefaultUsersList(List<Task> taskList){
+        List<DefaultUser> defaultUsers = new ArrayList<>();
+        for(Task task: taskList){
+            DefaultUser defaultUser = new DefaultUser(task.getId(), task.getDefaultUser().getId(), task.getName().name(),
+                    task.getDefaultUser().getName() + " " + task.getDefaultUser().getSurname());
+            defaultUsers.add(defaultUser);
+        }
+        return defaultUsers;
+    }
+
+    public void updateDefaultUser(UpdateDefaultUserRequest updateDefaultUserRequest) {
+        Task task = taskRepository.findById(updateDefaultUserRequest.getTaskId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.defaultUpdate"));
+        User user = userRepository.findById(updateDefaultUserRequest.getEmployeeId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.defaultUpdate"));
+        task.setDefaultUser(user);
+        taskRepository.save(task);
+    }
+
+    //TODO do zmiany - tylko uzytkownicy z dobra rola
+    public List<UserName> loadUsersName(Long id) {
+        List<User> userList = userRepository.findAll();
+        List<UserName> userNameList = new ArrayList<>();
+        for (User user: userList){
+            userNameList.add(new UserName(user.getId(), user.getName() + " " + user.getSurname()));
+        }
+        return userNameList;
     }
 }
