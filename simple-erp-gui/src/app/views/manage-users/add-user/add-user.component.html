@@ -1,0 +1,92 @@
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content>
+    <form *ngIf="isLoggedIn" [formGroup]="form">
+      <h2>{{ 'manage-users.register.register-title' | translate}}</h2>
+      <mat-vertical-stepper formArrayName="formArray" [linear]="false" #stepper>
+        <mat-step formGroupName="0" [stepControl]="formArray?.get([0])!">
+          <ng-template matStepLabel>{{ 'manage-users.register.user-data' | translate}}</ng-template>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'manage-users.register.name' | translate}}</mat-label>
+            <input matInput formControlName="name" required id="name">
+            <mat-error>
+              {{ 'manage-users.register.name-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'manage-users.register.surname' | translate}}</mat-label>
+            <input matInput formControlName="surname" required id="surname">
+            <mat-error>
+              {{ 'manage-users.register.surname-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'manage-users.register.email' | translate}}</mat-label>
+            <input matInput formControlName="email" required id="email">
+            <mat-error>
+              {{ 'manage-users.register.email-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'manage-users.register.phone' | translate}}</mat-label>
+            <input matInput placeholder="(+48) 123 456 789" formControlName="phone">
+            <mat-error>
+              {{ 'manage-users.register.phone-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <div class="buttons-section">
+            <button mat-button matStepperNext>{{ 'manage-users.register.next' | translate}}</button>
+          </div>
+        </mat-step>
+        <mat-step formGroupName="1" [stepControl]="formArray?.get([1])!">
+          <ng-template matStepLabel>{{ 'manage-users.register.profile-data' | translate}}</ng-template>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'manage-users.register.username' | translate}}</mat-label>
+            <input matInput formControlName="username" required id="username">
+            <mat-hint>{{ 'manage-users.register.username-hint' | translate}}</mat-hint>
+            <mat-error>
+              {{ 'manage-users.register.username-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'manage-users.register.role' | translate}}</mat-label>
+            <mat-select formControlName="roles" multiple required>
+              <mat-option *ngFor="let role of rolesList" [value]="role.role">{{role.name}}</mat-option>
+            </mat-select>
+            <mat-error>
+              {{ 'manage-users.register.role-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <br/>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'manage-users.register.password' | translate}}</mat-label>
+            <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required id="password">
+            <button mat-icon-button matSuffix (click)="hide = !hide"
+                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+              <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-hint>{{ 'manage-users.register.password-hint' | translate}}</mat-hint>
+            <mat-error>
+              {{ 'manage-users.register.password-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'manage-users.register.confirm-password' | translate}}</mat-label>
+            <input matInput type="password" formControlName="confirmPassword" required id="confirm-password">
+            <mat-error>
+              {{ 'manage-users.register.confirm-password-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <div class="buttons-section">
+            <button mat-button matStepperPrevious>{{ 'manage-users.register.back' | translate}}</button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+      <span class="register-button">
+        <button id="submit-register-button" mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+          <mat-icon>how_to_reg</mat-icon>
+          <span class="signup-button">{{ 'manage-users.register.register-button' | translate}}</span>
+        </button>
+      </span>
+    </form>
+  </mat-card-content>
+</mat-card>
