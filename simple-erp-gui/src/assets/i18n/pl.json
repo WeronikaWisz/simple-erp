@@ -81,7 +81,8 @@
       "email": "Email",
       "phone": "Telefon",
       "roles": "Role",
-      "delete-error": "Nie udało się usunąć użytkownika"
+      "delete-error": "Nie udało się usunąć użytkownika",
+      "load-error": "Nie można załadować użytkowników"
     },
     "default-users": {
       "default-title": "Domyślni użytkownicy zadań",

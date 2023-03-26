@@ -1,4 +1,4 @@
-<div class="content mat-elevation-z8" *ngIf="isLoggedIn">
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && isAdmin">
   <h2>{{ 'manage-users.default-users.default-title' | translate}}</h2>
   <mat-table #table [dataSource]="dataSource" matSort>
 

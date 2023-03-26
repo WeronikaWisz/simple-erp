@@ -1,6 +1,6 @@
 <mat-card class="example-card mat-elevation-z8">
   <mat-card-content>
-    <form *ngIf="isLoggedIn" [formGroup]="form">
+    <form *ngIf="isLoggedIn && isAdmin" [formGroup]="form">
       <h2>{{formTitle}}</h2>
       <mat-vertical-stepper formArrayName="formArray" [linear]="false" #stepper>
         <mat-step formGroupName="0" [stepControl]="formArray?.get([0])!">

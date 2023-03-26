@@ -81,7 +81,8 @@
       "email": "Email",
       "phone": "Phone",
       "roles": "Roles",
-      "delete-error": "Cannot delete user"
+      "delete-error": "Cannot delete user",
+      "load-error": "Cannot load users"
     },
     "default-users": {
       "default-title": "Default task employees",

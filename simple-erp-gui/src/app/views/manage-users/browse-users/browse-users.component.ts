@@ -18,6 +18,7 @@ import {ERole} from "../../../enums/ERole";
 export class BrowseUsersComponent implements OnInit {
 
   isLoggedIn = false;
+  isAdmin = false;
 
   displayedColumns = ['username', 'name', 'surname', 'email', 'phone', 'roles', 'actions'];
   dataSource: MatTableDataSource<UserListItem> = new MatTableDataSource<UserListItem>([]);
@@ -42,6 +43,11 @@ export class BrowseUsersComponent implements OnInit {
     } else {
       this.router.navigate(['/login']).then(() => this.reloadPage());
     }
+    if(this.tokenStorage.getUser() && this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN])){
+      this.isAdmin = true;
+    } else {
+      this.router.navigate(['/profile']).then(() => this.reloadPage());
+    }
     this.loadUsers();
   }
 
@@ -62,7 +68,7 @@ export class BrowseUsersComponent implements OnInit {
         error: (err) => {
           Swal.fire({
             position: 'top-end',
-            title: this.getTranslateMessage("user-books.browse-books.load-error"),
+            title: this.getTranslateMessage("manage-users.browse-users.load-error"),
             text: err.error.message,
             icon: 'error',
             showConfirmButton: false

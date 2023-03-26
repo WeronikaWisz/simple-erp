@@ -11,6 +11,7 @@ import {ETask} from "../../../enums/ETask";
 import {MatDialog} from "@angular/material/dialog";
 import {UpdateProfileDialogComponent} from "../profile/update-profile-dialog/update-profile-dialog.component";
 import {ChangeDefaultUserDialogComponent} from "./change-default-user-dialog/change-default-user-dialog.component";
+import {ERole} from "../../../enums/ERole";
 
 @Component({
   selector: 'app-default-users',
@@ -20,6 +21,7 @@ import {ChangeDefaultUserDialogComponent} from "./change-default-user-dialog/cha
 export class DefaultUsersComponent implements OnInit {
 
   isLoggedIn = false;
+  isAdmin = false;
 
   displayedColumns = ['task', 'employee', 'actions'];
   dataSource: MatTableDataSource<DefaultUser> = new MatTableDataSource<DefaultUser>([]);
@@ -39,6 +41,11 @@ export class DefaultUsersComponent implements OnInit {
       this.isLoggedIn = true;
     } else {
       this.router.navigate(['/login']).then(() => this.reloadPage());
+    }
+    if(this.tokenStorage.getUser() && this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN])){
+      this.isAdmin = true;
+    } else {
+      this.router.navigate(['/profile']).then(() => this.reloadPage());
     }
     this.loadDefaultUsers();
   }

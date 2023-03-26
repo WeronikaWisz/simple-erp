@@ -5,6 +5,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
 import {map, shareReplay, Observable} from 'rxjs';
+import {ERole} from "../enums/ERole";
 
 @Component({
   selector: 'app-main-nav',
@@ -44,6 +45,22 @@ export class MainNavComponent implements OnInit {
 
   reloadPage(): void {
     window.location.reload();
+  }
+
+  hasAdminRole(): boolean{
+    return this.roles.includes(ERole[ERole.ROLE_ADMIN]);
+  }
+
+  hasWarehouseRole(): boolean{
+    return this.roles.includes(ERole[ERole.ROLE_WAREHOUSE]);
+  }
+
+  hasProductionRole(): boolean{
+    return this.roles.includes(ERole[ERole.ROLE_PRODUCTION]);
+  }
+
+  hasTradeRole(): boolean{
+    return this.roles.includes(ERole[ERole.ROLE_TRADE]);
   }
 
 }

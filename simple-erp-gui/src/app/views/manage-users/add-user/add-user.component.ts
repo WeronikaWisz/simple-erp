@@ -25,6 +25,7 @@ export class AddUserComponent implements OnInit {
 
   form!: FormGroup;
   isLoggedIn = false;
+  isAdmin = false;
   hide = true;
 
   get formArray(): AbstractControl | null { return this.form.get('formArray'); }
@@ -95,6 +96,11 @@ export class AddUserComponent implements OnInit {
     } else {
       this.router.navigate(['/login']).then(() => this.reloadPage());
     }
+    if(this.tokenStorage.getUser() && this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN])){
+      this.isAdmin = true;
+    } else {
+      this.router.navigate(['/profile']).then(() => this.reloadPage());
+    }
     this.checkIfEditUserView();
   }
 
@@ -109,6 +115,8 @@ export class AddUserComponent implements OnInit {
             this.formTitle = this.getTranslateMessage("manage-users.register.edit-title")
             this.formArray!.get([1])!.get('password')?.clearValidators();
             this.formArray!.get([1])!.get('confirmPassword')?.clearValidators();
+            this.formArray!.get([1])!.get('password')?.updateValueAndValidity();
+            this.formArray!.get([1])!.get('confirmPassword')?.updateValueAndValidity();
             this.getUser()
           } else {
             this.formTitle = this.getTranslateMessage("manage-users.register.register-title")
@@ -216,6 +224,8 @@ export class AddUserComponent implements OnInit {
       this.formArray!.get([1])!.get('password')?.clearValidators();
       this.formArray!.get([1])!.get('confirmPassword')?.clearValidators();
     }
+    this.formArray!.get([1])!.get('password')?.updateValueAndValidity();
+    this.formArray!.get([1])!.get('confirmPassword')?.updateValueAndValidity();
   }
 
   showSuccess(key: string): void {

@@ -32,11 +32,12 @@ export class ProfileComponent implements OnInit {
   }
 
   getUserProfileData(){
-    this.usersService.getUserProfileData().subscribe(
-      data => {
+    this.usersService.getUserProfileData().subscribe({
+      next: (data) => {
         console.log(data)
         this.profileData = data;
-      }, err => {
+      },
+      error: (err) => {
         Swal.fire({
           position: 'top-end',
           title: this.getTranslateMessage("manage-users.profile.load-data-error"),
@@ -45,7 +46,7 @@ export class ProfileComponent implements OnInit {
           showConfirmButton: false
         })
       }
-    )
+    })
   }
 
   editProfile(){
