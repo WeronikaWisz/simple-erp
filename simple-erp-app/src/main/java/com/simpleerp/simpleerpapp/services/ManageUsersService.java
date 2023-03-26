@@ -115,13 +115,13 @@ public class ManageUsersService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ApiNotFoundException("exception.userDeleted"));
+                .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
         userRepository.delete(user);
     }
 
     public void updateUser(UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(updateUserRequest.getId())
-                .orElseThrow(() -> new ApiNotFoundException("exception.userDeleted"));
+                .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
 
         if(!Objects.equals(updateUserRequest.getUsername(), user.getUsername())){
             if (userRepository.existsByUsername(updateUserRequest.getUsername())) {
@@ -169,7 +169,7 @@ public class ManageUsersService {
 
     public UserListItem getUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ApiNotFoundException("exception.userDeleted"));
+                .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
         return userListToUserListItem(List.of(user)).get(0);
     }
 
@@ -199,16 +199,20 @@ public class ManageUsersService {
 
     public void updateDefaultUser(UpdateDefaultUserRequest updateDefaultUserRequest) {
         Task task = taskRepository.findById(updateDefaultUserRequest.getTaskId())
-                .orElseThrow(() -> new ApiNotFoundException("exception.defaultUpdate"));
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
         User user = userRepository.findById(updateDefaultUserRequest.getEmployeeId())
-                .orElseThrow(() -> new ApiNotFoundException("exception.defaultUpdate"));
+                .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
         task.setDefaultUser(user);
         taskRepository.save(task);
     }
 
-    //TODO do zmiany - tylko uzytkownicy z dobra rola
-    public List<UserName> loadUsersName(Long id) {
-        List<User> userList = userRepository.findAll();
+    public List<UserName> loadUserForTask(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        List<User> userList = userRepository.findAll()
+                .stream().filter(user -> user.getRoles().contains(task.getRole())).collect(Collectors.toList());
+        Optional<User> admin = userRepository.findByUsername("admin");
+        admin.ifPresent(userList::add);
         List<UserName> userNameList = new ArrayList<>();
         for (User user: userList){
             userNameList.add(new UserName(user.getId(), user.getName() + " " + user.getSurname()));

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class ManageUsersController {
     }
 
     @PostMapping("/user")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addUser(@RequestBody AddUserRequest addUserRequest) {
         manageUsersService.addUser(addUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
@@ -38,6 +40,7 @@ public class ManageUsersController {
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> loadUsers(@RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "10") int size) {
         UsersResponse usersResponse = manageUsersService.loadUsers(page, size);
@@ -45,6 +48,7 @@ public class ManageUsersController {
     }
 
     @DeleteMapping("/user/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
         manageUsersService.deleteUser(id);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
@@ -52,6 +56,7 @@ public class ManageUsersController {
     }
 
     @PutMapping("/user")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> editUser(@RequestBody UpdateUserRequest updateUserRequest) {
         manageUsersService.updateUser(updateUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
@@ -59,12 +64,14 @@ public class ManageUsersController {
     }
 
     @GetMapping("/user/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
         UserListItem user = manageUsersService.getUser(id);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/default-users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> loadDefaultUsers(@RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "10") int size) {
         List<DefaultUser> defaultUsers = manageUsersService.loadDefaultUsers(page, size);
@@ -72,6 +79,7 @@ public class ManageUsersController {
     }
 
     @PutMapping("/default-user")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateDefaultUser(@RequestBody UpdateDefaultUserRequest updateDefaultUserRequest) {
         manageUsersService.updateDefaultUser(updateDefaultUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
@@ -79,8 +87,9 @@ public class ManageUsersController {
     }
 
     @GetMapping("/users-task/{id}")
-    public ResponseEntity<?> loadUserNames(@PathVariable("id") Long id) {
-        List<UserName> userNameList = manageUsersService.loadUsersName(id);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadUserForTask(@PathVariable("id") Long id) {
+        List<UserName> userNameList = manageUsersService.loadUserForTask(id);
         return ResponseEntity.ok(userNameList);
     }
 }

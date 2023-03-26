@@ -32,14 +32,14 @@ public class UsersController {
     }
 
     @GetMapping(path = "/user")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE') or hasRole('ROLE_PRODUCTION') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> getUserProfileData() {
         ProfileData profileData = mapUserToProfileData(usersService.getUserProfileData());
         return ResponseEntity.ok(profileData);
     }
 
     @PutMapping(path = "/user")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE') or hasRole('ROLE_PRODUCTION') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> updateUserProfileData(@RequestBody UpdateUserData updateUserData) {
         boolean dataChanged = usersService.updateUserProfileData(updateUserData);
         String message;
@@ -57,7 +57,7 @@ public class UsersController {
     }
 
     @PutMapping(path = "/user/password")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE') or hasRole('ROLE_PRODUCTION') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> changePassword(@RequestBody ChangePassword changePassword) {
         usersService.changePassword(changePassword);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
