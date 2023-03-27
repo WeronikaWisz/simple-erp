@@ -5,6 +5,10 @@
                [mode]="'over'">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.products' | translate}}</h2>
+      <a mat-list-item href routerLink="add-product" *ngIf="hasAdminRole()"><mat-icon>add_circle_outline</mat-icon>
+        <span class="button-text">{{ 'nav.add-product' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.manage-users' | translate}}</h2>
       <a mat-list-item href routerLink="browse-users" *ngIf="hasAdminRole()"><mat-icon>face</mat-icon>
         <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
@@ -45,6 +49,12 @@
       </mat-menu>
       <span class="spacer"></span>
       <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="products" *ngIf="hasAdminRole()">{{ 'nav.products-l' | translate}}</button>
+        <mat-menu #products="matMenu">
+          <button mat-menu-item routerLink="add-product">
+            <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-product' | translate}}
+          </button>
+        </mat-menu>
         <button mat-button [matMenuTriggerFor]="users" *ngIf="hasAdminRole()">{{ 'nav.manage-users-l' | translate}}</button>
         <mat-menu #users="matMenu">
           <button mat-menu-item routerLink="browse-users">

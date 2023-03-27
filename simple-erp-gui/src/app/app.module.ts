@@ -39,6 +39,7 @@ import {MatTableModule} from "@angular/material/table";
 import {MatChipsModule} from "@angular/material/chips";
 import { DefaultUsersComponent } from './views/manage-users/default-users/default-users.component';
 import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component';
+import { AddProductComponent } from './views/products/add-product/add-product.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-u
     AddUserComponent,
     BrowseUsersComponent,
     DefaultUsersComponent,
-    ChangeDefaultUserDialogComponent
+    ChangeDefaultUserDialogComponent,
+    AddProductComponent
   ],
     imports: [
         BrowserModule,

@@ -105,6 +105,16 @@
       "update-error": "Cannot update default user"
     }
   },
+  "products": {
+    "add-product": {
+      "product-title": "Add product",
+      "code": "Code",
+      "code-error": "Enter code",
+      "add-button": "Save",
+      "name": "Name",
+      "name-error": "Enter name"
+    }
+  },
   "nav": {
     "my-account": "MY ACCOUNT",
     "my-profile": "My profile",
@@ -116,6 +126,9 @@
     "browse-users": "Users list",
     "add-user": "Add user",
     "default-user": "Default users for tasks",
-    "default-users": "Default settings"
+    "default-users": "Default settings",
+    "products": "PRODUCTS",
+    "products-l": "Products",
+    "add-product": "Add product"
   }
 }

@@ -105,6 +105,16 @@
       "update-error": "Nie udało się zaktualizować domyślnego użytkownika"
     }
   },
+  "products": {
+    "add-product": {
+      "product-title": "Dodaj produkt",
+      "code": "Kod",
+      "code-error": "Wprowadź kod",
+      "add-button": "Zapisz",
+      "name": "Nazwa",
+      "name-error": "Wprowadź nazwę"
+    }
+  },
   "nav": {
     "my-account": "MOJE KONTO",
     "my-profile": "Mój profil",
@@ -116,6 +126,9 @@
     "browse-users": "Lista użytkowików",
     "add-user": "Dodaj użytkownika",
     "default-user": "Domyślni użytkownicy dla zadań",
-    "default-users": "Ustawienia domyślne"
+    "default-users": "Ustawienia domyślne",
+    "products": "PRODUKTY",
+    "products-l": "Produkty",
+    "add-product": "Dodaj produkt"
   }
 }
