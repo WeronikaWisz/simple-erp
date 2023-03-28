@@ -61,7 +61,7 @@ export class DefaultUsersComponent implements OnInit {
         error: (err) => {
           Swal.fire({
             position: 'top-end',
-            title: this.getTranslateMessage("user-books.default-users.load-error"),
+            title: this.getTranslateMessage("manage-users.default-users.load-error"),
             text: err.error.message,
             icon: 'error',
             showConfirmButton: false
