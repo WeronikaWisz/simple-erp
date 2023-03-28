@@ -40,6 +40,7 @@ import {MatChipsModule} from "@angular/material/chips";
 import { DefaultUsersComponent } from './views/manage-users/default-users/default-users.component';
 import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component';
 import { AddProductComponent } from './views/products/add-product/add-product.component';
+import { BrowseProductsComponent } from './views/products/browse-products/browse-products.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { AddProductComponent } from './views/products/add-product/add-product.co
     BrowseUsersComponent,
     DefaultUsersComponent,
     ChangeDefaultUserDialogComponent,
-    AddProductComponent
+    AddProductComponent,
+    BrowseProductsComponent
   ],
     imports: [
         BrowserModule,

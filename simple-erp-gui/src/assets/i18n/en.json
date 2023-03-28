@@ -128,7 +128,20 @@
       "load-error": "Cannot load products",
       "add-success": "Successfully added product",
       "add-error": "Cannot add product",
-      "add": "Add"
+      "add": "Add",
+      "edit-title": "Edit product"
+    },
+    "browse-product": {
+      "browse-title": "Defined products",
+      "product-count": "Products count",
+      "code": "Code",
+      "name": "Name",
+      "type": "Type",
+      "unit": "Unit",
+      "purchase-price": "Purchase price",
+      "sale-price": "Sale price",
+      "load-error": "Cannot load products",
+      "delete-error": "Cannot delete product"
     },
     "unit-pieces": "Pieces",
     "unit-kg": "Kilograms",
@@ -158,6 +171,7 @@
     "default-users": "Default settings",
     "products": "PRODUCTS",
     "products-l": "Products",
-    "add-product": "Add product"
+    "add-product": "Add product",
+    "browse-products": "Products list"
   }
 }

@@ -128,7 +128,20 @@
       "load-error": "Nie udało się załadować produktów",
       "add-success": "Pomyślnie dodano produkt",
       "add-error": "Nie udało się dodać produktu",
-      "add": "Dodaj"
+      "add": "Dodaj",
+      "edit-title": "Edytuj produkt"
+    },
+    "browse-product" : {
+      "browse-title": "Zdefiniowane produkty",
+      "product-count": "Liczba produktów",
+      "code": "Kod",
+      "name": "Nazwa",
+      "type": "Typ",
+      "unit": "Jednostka",
+      "purchase-price": "Cena zakupu",
+      "sale-price": "Cena sprzedaży",
+      "load-error": "Nie udało się załadować produktów",
+      "delete-error": "Nie udało się usunąć produktu"
     },
     "unit-pieces": "Sztuki",
     "unit-kg": "Kilogramy",
@@ -158,6 +171,7 @@
     "default-users": "Ustawienia domyślne",
     "products": "PRODUKTY",
     "products-l": "Produkty",
-    "add-product": "Dodaj produkt"
+    "add-product": "Dodaj produkt",
+    "browse-products": "Lista produktów"
   }
 }

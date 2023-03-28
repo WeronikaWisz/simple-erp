@@ -1,30 +1,29 @@
 package com.simpleerp.simpleerpapp.dtos.products;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class ProductQuantity {
-    private Long product;
-    private String quantity;
+public class ProductsResponse {
+    private List<ProductListItem> productsList;
+    private Integer totalProductsLength;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProductQuantity that = (ProductQuantity) o;
-        return Objects.equals(product, that.product) && Objects.equals(quantity, that.quantity);
+        ProductsResponse that = (ProductsResponse) o;
+        return Objects.equals(productsList, that.productsList) && Objects.equals(totalProductsLength, that.totalProductsLength);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(product, quantity);
+        return Objects.hash(productsList, totalProductsLength);
     }
 }

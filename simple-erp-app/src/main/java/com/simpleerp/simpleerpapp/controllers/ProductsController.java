@@ -4,9 +4,13 @@ import com.simpleerp.simpleerpapp.dtos.auth.AddUserRequest;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.ProfileData;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateUserData;
+import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
 import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.ProductListItem;
+import com.simpleerp.simpleerpapp.dtos.products.ProductsResponse;
+import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.models.Product;
 import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.services.ProductsService;
@@ -39,6 +43,14 @@ public class ProductsController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping("/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadProducts(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "10") int size) {
+        ProductsResponse productsResponse = productsService.loadProducts(page, size);
+        return ResponseEntity.ok(productsResponse);
+    }
+
     @GetMapping("/set-products")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> loadProductForSetList() {
@@ -53,6 +65,21 @@ public class ProductsController {
         productsService.addProduct(addProductRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.productAdded", null, LocaleContextHolder.getLocale())));
+    }
+
+    @DeleteMapping("/product/{type}/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> deleteProduct(@PathVariable("type") EType type, @PathVariable("id") Long id) {
+        productsService.deleteProduct(id, type);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.productDeleted", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/product/{type}/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getProduct(@PathVariable("type") EType type, @PathVariable("id") Long id) {
+        ProductListItem product = productsService.getProduct(id, type);
+        return ResponseEntity.ok(product);
     }
 
     private ProductCode mapProductToProductCode(Product product){

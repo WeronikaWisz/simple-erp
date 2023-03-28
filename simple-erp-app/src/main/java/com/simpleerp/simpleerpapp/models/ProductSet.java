@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,10 +31,14 @@ public class ProductSet {
     @OneToMany(mappedBy = "productSet")
     List<ProductSetProducts> productsSets = new ArrayList<>();
 
-    public ProductSet(String code, String name, BigDecimal salePrice) {
+    private LocalDateTime creationDate;
+    private LocalDateTime updateDate;
+
+    public ProductSet(String code, String name, BigDecimal salePrice, LocalDateTime creationDate) {
         this.code = code;
         this.name = name;
         this.salePrice = salePrice;
+        this.creationDate = creationDate;
     }
 
     public void addProduct(Product product, BigDecimal quantity){

@@ -3,6 +3,9 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ProductCode} from "../models/products/ProductCode";
 import {AddProductRequest} from "../models/products/AddProductRequest";
+import {ProductListItem} from "../models/products/ProductListItem";
+import {ProductsResponse} from "../models/products/ProductsResponse";
+import {EType} from "../enums/EType";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -23,5 +26,17 @@ export class ProductsService {
 
   addProduct(addProductRequest: AddProductRequest): Observable<any> {
     return this.http.post(PRODUCTS_API + 'product', JSON.stringify(addProductRequest), httpOptions);
+  }
+
+  loadProducts(pageIndex: number, pageSize: number): Observable<ProductsResponse> {
+    return this.http.get<ProductsResponse>(PRODUCTS_API + `products?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  deleteProduct(id: number, type: EType): Observable<any> {
+    return this.http.delete(PRODUCTS_API + 'product/' + type + "/" + id)
+  }
+
+  getProduct(id: number, type: EType): Observable<ProductListItem> {
+    return this.http.get<ProductListItem>(PRODUCTS_API + 'product/' + type + "/" + id, httpOptions);
   }
 }

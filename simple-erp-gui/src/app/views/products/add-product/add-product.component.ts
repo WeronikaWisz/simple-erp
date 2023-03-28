@@ -11,6 +11,7 @@ import {EUnit} from "../../../enums/EUnit";
 import {EType} from "../../../enums/EType";
 import {ProductCode} from "../../../models/products/ProductCode";
 import {ProductsService} from "../../../services/products.service";
+import {ProductListItem} from "../../../models/products/ProductListItem";
 
 @Component({
   selector: 'app-add-product',
@@ -34,6 +35,10 @@ export class AddProductComponent implements OnInit {
   productList: ProductCode[] = [];
   unitsForProducts: string[] = [];
 
+  isEditProductView = false;
+  productId?: number;
+  productType?: EType;
+
   constructor(private formBuilder: FormBuilder, private productsService: ProductsService,
               private translate: TranslateService, private route: ActivatedRoute,
               private router: Router, private tokenStorage: TokenStorageService) { }
@@ -48,7 +53,6 @@ export class AddProductComponent implements OnInit {
       salePrice: ['', Validators.required],
       productSet: this.formBuilder.array([])
     });
-    this.formTitle = this.getTranslateMessage("products.add-product.product-title")
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
     } else {
@@ -62,6 +66,7 @@ export class AddProductComponent implements OnInit {
     this.loadUnits();
     this.loadTypes();
     this.loadProductForSetList();
+    this.checkIfEditProductView();
   }
 
   get productSet(): FormArray {
@@ -207,12 +212,12 @@ export class AddProductComponent implements OnInit {
 
   changeUnitForProduct(i: number) {
     const id = this.productSet.get([i])!.get('product')?.value
-    const unit = this.productList.find(product => product.id === id)!.unit
-    this.unitsForProducts[i] = this.units.find(unit => unit.unit === unit.unit)!.shortcut
+    const productUnit = this.productList.find(product => product.id === id)!.unit as unknown as string;
+    this.unitsForProducts[i] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
   }
 
   getUnit(i: number): String{
-    return this.unitsForProducts[0];
+    return this.unitsForProducts[i];
   }
 
   reloadPage(): void {
@@ -237,4 +242,64 @@ export class AddProductComponent implements OnInit {
     return message;
   }
 
+  checkIfEditProductView(){
+    this.route.params
+      .subscribe(
+        params => {
+          console.log(params);
+          if (params['id'] && params['type']){
+            this.isEditProductView = true;
+            this.productId = params['id'];
+            this.productType = params['type']
+            this.formTitle = this.getTranslateMessage("products.add-product.edit-title")
+            this.getProduct()
+          } else {
+            this.formTitle = this.getTranslateMessage("products.add-product.product-title")
+          }
+        }
+      );
+  }
+
+  getProduct() {
+    this.productsService.getProduct(this.productId!, this.productType!).subscribe({
+      next: (data) => {
+        console.log(data)
+        this.fillFormWithEditedProduct(data);
+      },
+      error: (err) => {
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("products.add-product.load-error"),
+          text: err.error.message,
+          icon: 'error',
+          showConfirmButton: false
+        })
+      }
+    })
+  }
+
+  fillFormWithEditedProduct(data: ProductListItem){
+    this.form.get('type')?.setValue(EType[data.type])
+    this.typeChange()
+    this.form.get('code')?.setValue(data.code)
+    this.form.get('name')?.setValue(data.name)
+    this.form.get('purchasePrice')?.setValue(data.purchasePrice)
+    this.form.get('salePrice')?.setValue(data.salePrice)
+    this.form.get('unit')?.setValue(EUnit[data.unit])
+    if(data.productSet) {
+      const productUnit = this.productList.find(product => product.id === data.productSet![0].product)!.unit as unknown as string;
+      this.unitsForProducts[0] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
+      for (let i= 1; i < data.productSet.length; i++){
+        this.addProduct();
+        const productUnit = this.productList.find(product => product.id === data.productSet![i].product)!.unit as unknown as string;
+        this.unitsForProducts[i] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
+      }
+    }
+    this.form.get('productSet')?.setValue(data.productSet)
+  }
+
+  // TODO
+  updateProduct() {
+
+  }
 }

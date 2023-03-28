@@ -1,7 +1,7 @@
 <mat-card class="example-card mat-elevation-z8">
   <mat-card-content>
     <form *ngIf="isLoggedIn && isAdmin" [formGroup]="form">
-      <h2>{{ 'products.add-product.product-title' | translate}}</h2>
+      <h2>{{ formTitle }}</h2>
       <mat-form-field class="full-width-input" appearance="outline">
         <mat-label>{{ 'products.add-product.type' | translate}}</mat-label>
         <mat-select formControlName="type" (selectionChange)="typeChange()" required>
@@ -75,20 +75,18 @@
         <button mat-flat-button color="primary" (click)="addProduct()">{{ 'products.add-product.add' | translate}}</button>
         </div>
       </div>
-<!--      <mat-form-field class="full-width-input wider-input" appearance="outline" *ngIf="isProductSet">-->
-<!--        <mat-label>{{ 'products.add-product.product-set' | translate}}</mat-label>-->
-<!--        <mat-select formControlName="productSet" multiple>-->
-<!--          <mat-option *ngFor="let product of productList" [value]="product.id">{{product.code}} - {{product.name}}</mat-option>-->
-<!--        </mat-select>-->
-<!--        <mat-error>-->
-<!--          {{ 'products.add-product.product-set-error' | translate}}-->
-<!--        </mat-error>-->
-<!--      </mat-form-field>-->
-      <button id="submit-button" mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+      <span class="save-button">
+      <button id="submit-button" mat-raised-button color="primary" *ngIf="!isEditProductView" [disabled]="form.invalid" (click)="onSubmit()">
         <mat-icon>save_alt</mat-icon>
         <span class="submit-span">
           {{ 'products.add-product.add-button' | translate}}
         </span></button>
+      <button mat-raised-button color="primary" *ngIf="isEditProductView" [disabled]="form.invalid || !form.dirty"
+              (click)="updateProduct()">
+        <mat-icon>update</mat-icon>
+        <span class="signup-button">{{ 'manage-users.register.button-edit' | translate}}</span>
+      </button>
+      </span>
     </form>
   </mat-card-content>
 </mat-card>
