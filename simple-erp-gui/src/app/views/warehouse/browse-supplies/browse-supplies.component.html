@@ -1,0 +1,64 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
+<!--  <div class="product-list-header">-->
+<!--    <div>-->
+      <h2>{{ 'supplies.browse-supplies.browse-title' | translate}}</h2>
+      <p>{{ 'products.browse-product.product-count' | translate}}: {{productCount}}</p>
+<!--    </div>-->
+<!--    <div>-->
+<!--      <button mat-raised-button (click)="goToAddProduct()">-->
+<!--        {{ 'nav.add-product' | translate}}-->
+<!--      </button>-->
+<!--    </div>-->
+<!--  </div>-->
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="code">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.code' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.code}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.name' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.type' | translate}}</mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{getType(element.type)}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-supplies.quantity' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.quantity}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="unit">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.unit' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{getUnit(element.unit)}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToEditSupplies(row.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-stroked-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row.id)">
+          {{ 'supplies.browse-supplies.purchase-task' | translate}}
+        </button>
+        <button mat-stroked-button *ngIf="isProductionType(row.type)" (click)="addProductionTask(row.id)">
+          {{ 'supplies.browse-supplies.production-task' | translate}}
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="totalProductsLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>

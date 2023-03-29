@@ -159,6 +159,14 @@
     "type-produced": "Produced",
     "type-set": "Products set"
   },
+  "supplies": {
+    "browse-supplies" : {
+      "browse-title": "Supplies levels",
+      "quantity": "Quantity",
+      "purchase-task": "Delegate purchase",
+      "production-task": "Delegate production"
+    }
+  },
   "nav": {
     "my-account": "MY ACCOUNT",
     "my-profile": "My profile",
@@ -174,6 +182,9 @@
     "products": "PRODUCTS",
     "products-l": "Products",
     "add-product": "Add product",
-    "browse-products": "Products list"
+    "browse-products": "Products list",
+    "warehouse": "WAREHOUSE",
+    "warehouse-l": "Warehouse",
+    "browse-supplies": "Browse supplies"
   }
 }

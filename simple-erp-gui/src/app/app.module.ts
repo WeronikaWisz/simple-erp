@@ -41,6 +41,7 @@ import { DefaultUsersComponent } from './views/manage-users/default-users/defaul
 import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component';
 import { AddProductComponent } from './views/products/add-product/add-product.component';
 import { BrowseProductsComponent } from './views/products/browse-products/browse-products.component';
+import { BrowseSuppliesComponent } from './views/warehouse/browse-supplies/browse-supplies.component';
 
 @NgModule({
   declarations: [
@@ -55,7 +56,8 @@ import { BrowseProductsComponent } from './views/products/browse-products/browse
     DefaultUsersComponent,
     ChangeDefaultUserDialogComponent,
     AddProductComponent,
-    BrowseProductsComponent
+    BrowseProductsComponent,
+    BrowseSuppliesComponent
   ],
     imports: [
         BrowserModule,

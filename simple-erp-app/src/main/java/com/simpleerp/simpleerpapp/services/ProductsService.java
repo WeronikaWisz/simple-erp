@@ -1,7 +1,5 @@
 package com.simpleerp.simpleerpapp.services;
 
-import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
 import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.enums.EUnit;
@@ -24,13 +22,16 @@ public class ProductsService {
     private final ProductRepository productRepository;
     private final ProductSetRepository productSetRepository;
     private final ProductSetProductsRepository productSetProductsRepository;
+    private final StockLevelRepository stockLevelRepository;
 
     @Autowired
     public ProductsService(ProductRepository productRepository, ProductSetRepository productSetRepository,
-                           ProductSetProductsRepository productSetProductsRepository) {
+                           ProductSetProductsRepository productSetProductsRepository,
+                           StockLevelRepository stockLevelRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.productSetProductsRepository = productSetProductsRepository;
+        this.stockLevelRepository = stockLevelRepository;
     }
 
     @Transactional
@@ -73,6 +74,10 @@ public class ProductsService {
         Product product = new Product(addProductRequest.getCode(), addProductRequest.getName(), purchasePrice,
                 salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now());
         productRepository.save(product);
+
+        StockLevel stockLevel = new StockLevel(product, BigDecimal.ZERO, BigDecimal.ZERO,
+                0, LocalDateTime.now());
+        stockLevelRepository.save(stockLevel);
     }
 
     public List<Product> loadProductForSetList() {

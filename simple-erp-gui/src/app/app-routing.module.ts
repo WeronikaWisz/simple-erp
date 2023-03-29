@@ -7,6 +7,7 @@ import {BrowseUsersComponent} from "./views/manage-users/browse-users/browse-use
 import {DefaultUsersComponent} from "./views/manage-users/default-users/default-users.component";
 import {AddProductComponent} from "./views/products/add-product/add-product.component";
 import {BrowseProductsComponent} from "./views/products/browse-products/browse-products.component";
+import {BrowseSuppliesComponent} from "./views/warehouse/browse-supplies/browse-supplies.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,6 +19,7 @@ const routes: Routes = [
   { path: 'add-product', component: AddProductComponent },
   { path: 'browse-products', component: BrowseProductsComponent },
   { path: 'edit-product/:type/:id', component: AddProductComponent },
+  { path: 'browse-supplies', component: BrowseSuppliesComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

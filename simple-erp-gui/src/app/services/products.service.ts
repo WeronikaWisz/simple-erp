@@ -6,7 +6,6 @@ import {AddProductRequest} from "../models/products/AddProductRequest";
 import {ProductListItem} from "../models/products/ProductListItem";
 import {ProductsResponse} from "../models/products/ProductsResponse";
 import {EType} from "../enums/EType";
-import {UpdateUserRequest} from "../models/auth/UpdateUserRequest";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';

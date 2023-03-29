@@ -5,6 +5,10 @@
                [mode]="'over'">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.warehouse' | translate}}</h2>
+      <a mat-list-item href routerLink="browse-supplies" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>storage</mat-icon>
+        <span class="button-text">{{ 'nav.browse-supplies' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.products' | translate}}</h2>
       <a mat-list-item href routerLink="browse-products" *ngIf="hasAdminRole()"><mat-icon>category</mat-icon>
         <span class="button-text">{{ 'nav.browse-products' | translate}}</span>
@@ -52,6 +56,12 @@
       </mat-menu>
       <span class="spacer"></span>
       <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="warehouse" *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse-l' | translate}}</button>
+        <mat-menu #warehouse="matMenu">
+          <button mat-menu-item routerLink="browse-supplies">
+            <mat-icon>storage</mat-icon> {{ 'nav.browse-supplies' | translate}}
+          </button>
+        </mat-menu>
         <button mat-button [matMenuTriggerFor]="products" *ngIf="hasAdminRole()">{{ 'nav.products-l' | translate}}</button>
         <mat-menu #products="matMenu">
           <button mat-menu-item routerLink="browse-products">

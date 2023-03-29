@@ -1,7 +1,6 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
-import com.simpleerp.simpleerpapp.dtos.auth.UpdateUserRequest;
 import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.models.Product;

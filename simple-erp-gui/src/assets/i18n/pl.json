@@ -159,6 +159,14 @@
     "type-produced": "Produkowany",
     "type-set": "Zestaw produktów"
   },
+  "supplies": {
+    "browse-supplies" : {
+      "browse-title": "Stany magazynowe",
+      "quantity": "Ilość",
+      "purchase-task": "Zleć zakup",
+      "production-task": "Zleć produkcję"
+    }
+  },
   "nav": {
     "my-account": "MOJE KONTO",
     "my-profile": "Mój profil",
@@ -174,6 +182,9 @@
     "products": "PRODUKTY",
     "products-l": "Produkty",
     "add-product": "Dodaj produkt",
-    "browse-products": "Lista produktów"
+    "browse-products": "Lista produktów",
+    "warehouse": "MAGAZYN",
+    "warehouse-l": "Magazyn",
+    "browse-supplies": "Przeglądaj zapasy"
   }
 }

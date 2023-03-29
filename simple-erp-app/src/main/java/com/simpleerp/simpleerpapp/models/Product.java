@@ -37,6 +37,9 @@ public class Product {
     @OneToMany(mappedBy = "product")
     List<ProductSetProducts> productsSets = new ArrayList<>();
 
+    @OneToOne
+    private StockLevel stockLevel;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
