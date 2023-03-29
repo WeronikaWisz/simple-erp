@@ -1,19 +1,19 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {TranslateService} from "@ngx-translate/core";
-import Swal from "sweetalert2";
-import {WarehouseService} from "../../../../services/warehouse.service";
-import {UpdateSuppliesData} from "../../../../models/warehouse/UpdateSuppliesData";
-import {EUnit} from "../../../../enums/EUnit";
 import {Unit} from "../../../../models/products/Unit";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+import {UpdateSuppliesData} from "../../../../models/warehouse/UpdateSuppliesData";
+import {WarehouseService} from "../../../../services/warehouse.service";
+import {TranslateService} from "@ngx-translate/core";
+import {EUnit} from "../../../../enums/EUnit";
+import Swal from "sweetalert2";
 
 @Component({
-  selector: 'app-update-supplies-dialog',
-  templateUrl: './update-supplies-dialog.component.html',
-  styleUrls: ['./update-supplies-dialog.component.sass']
+  selector: 'app-delegate-purchase-dialog',
+  templateUrl: './delegate-purchase-dialog.component.html',
+  styleUrls: ['./delegate-purchase-dialog.component.sass']
 })
-export class UpdateSuppliesDialogComponent implements OnInit {
+export class DelegatePurchaseDialogComponent implements OnInit {
 
   form!: FormGroup;
   dataChanged = false;
@@ -21,50 +21,54 @@ export class UpdateSuppliesDialogComponent implements OnInit {
   units: Unit[] = [];
 
   constructor(
-      public dialogRef: MatDialogRef<UpdateSuppliesDialogComponent>,
-      @Inject(MAT_DIALOG_DATA) public data: UpdateSuppliesData, private formBuilder: FormBuilder,
-      private suppliesService: WarehouseService, private translate: TranslateService
+    public dialogRef: MatDialogRef<DelegatePurchaseDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: UpdateSuppliesData, private formBuilder: FormBuilder,
+    private suppliesService: WarehouseService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
   }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      quantity: [this.data.quantity, Validators.required],
-      minQuantity: [this.data.minQuantity, Validators.required],
-      days: [this.data.days, Validators.required]
+      quantity: [null, Validators.required],
+      days: [null]
     })
     this.loadUnits();
   }
 
   saveData(){
-    this.suppliesService.updateSupplies({
-        id: this.data.id,
-        quantity: this.form.get('quantity')?.value,
-        minQuantity: this.form.get('minQuantity')?.value,
-        days: this.form.get('days')?.value
-      }).subscribe({
+    this.suppliesService.delegatePurchaseTask({
+      id: this.data.id,
+      quantity: this.form.get('quantity')?.value
+    }).subscribe({
       next: (data) => {
         console.log(data);
-        this.dataChanged = true
-        this.form.markAsPristine();
         Swal.fire({
           position: 'top-end',
-          title: this.getTranslateMessage("supplies.browse-supplies.update-success"),
+          title: this.getTranslateMessage("supplies.browse-supplies.delegate-purchase-success"),
           icon: 'success',
           showConfirmButton: false
         })
+        this.dialogRef.close();
       },
       error: (err) => {
         Swal.fire({
           position: 'top-end',
-          title: this.getTranslateMessage("supplies.browse-supplies.update-error"),
+          title: this.getTranslateMessage("supplies.browse-supplies.delegate-purchase-error"),
           text: err.error.message,
           icon: 'error',
           showConfirmButton: false
         })
       }
     });
+  }
+
+  suggestQuantity() {
+
+  }
+
+  daysNotSet(): boolean {
+    return this.form.get('days')?.value === null || this.form.get('days')?.value <= 0
   }
 
   getTranslateMessage(key: string): string{

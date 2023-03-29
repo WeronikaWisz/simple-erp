@@ -43,6 +43,7 @@ import { AddProductComponent } from './views/products/add-product/add-product.co
 import { BrowseProductsComponent } from './views/products/browse-products/browse-products.component';
 import { BrowseSuppliesComponent } from './views/warehouse/browse-supplies/browse-supplies.component';
 import { UpdateSuppliesDialogComponent } from './views/warehouse/browse-supplies/update-supplies-dialog/update-supplies-dialog.component';
+import { DelegatePurchaseDialogComponent } from './views/warehouse/browse-supplies/delegate-purchase-dialog/delegate-purchase-dialog.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { UpdateSuppliesDialogComponent } from './views/warehouse/browse-supplies
     AddProductComponent,
     BrowseProductsComponent,
     BrowseSuppliesComponent,
-    UpdateSuppliesDialogComponent
+    UpdateSuppliesDialogComponent,
+    DelegatePurchaseDialogComponent
   ],
     imports: [
         BrowserModule,

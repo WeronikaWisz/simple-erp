@@ -28,13 +28,22 @@
       <mat-cell *matCellDef="let element"> {{getUnit(element.unit)}} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="message">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list *ngIf="row.message">
+          <mat-chip> {{row.message}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row" class="action-buttons">
         <button mat-icon-button (click)="goToEditSupplies(row)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-stroked-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row.id)">
+        <button mat-stroked-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row)">
           {{ 'supplies.browse-supplies.purchase-task' | translate}}
         </button>
         <button mat-stroked-button *ngIf="isProductionType(row.type)" (click)="addProductionTask(row.id)">

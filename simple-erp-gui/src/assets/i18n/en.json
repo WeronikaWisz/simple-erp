@@ -173,7 +173,13 @@
       "settings": "Settings",
       "info": "Set the allowable minimum quantity of the product and how many days before the product is expected to run out, a warning should be displayed.",
       "update-success": "Successfully updated supplies",
-      "update-error": "Cannot update supplies"
+      "update-error": "Cannot update supplies",
+      "current-quantity": "Current quantity available: ",
+      "help": "Suggesting inventory planning",
+      "suggestion": "Enter the number of days for which the stock of the product should suffice and the purchase quantity will be suggested.",
+      "suggest-button": "Suggest",
+      "delegate-purchase-success": "Successfully added purchase task",
+      "delegate-purchase-error": "Cannot add purchase task"
     }
   },
   "nav": {

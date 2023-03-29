@@ -10,5 +10,5 @@ export interface SuppliesListItem {
   quantity: string;
   minQuantity: string;
   days: number;
-  warningMessage: string;
+  message: string;
 }

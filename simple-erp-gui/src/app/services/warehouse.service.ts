@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {SuppliesResponse} from "../models/warehouse/SuppliesResponse";
 import {UpdateSuppliesRequest} from "../models/warehouse/UpdateSuppliesRequest";
+import {PurchaseTaskRequest} from "../models/warehouse/PurchaseTaskRequest";
 
 const SUPPLIES_API = 'http://localhost:8080/supplies/';
 
@@ -13,7 +14,7 @@ const httpOptions = {
 @Injectable({
   providedIn: 'root'
 })
-export class SuppliesService {
+export class WarehouseService {
 
   constructor(private http: HttpClient) { }
 
@@ -23,6 +24,10 @@ export class SuppliesService {
 
   updateSupplies(updateSuppliesRequest: UpdateSuppliesRequest): Observable<any> {
     return this.http.put(SUPPLIES_API + 'supplies', JSON.stringify(updateSuppliesRequest), httpOptions);
+  }
+
+  delegatePurchaseTask(purchaseTaskRequest: PurchaseTaskRequest): Observable<any> {
+    return this.http.post(SUPPLIES_API + 'delegate-purchase', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
 }

@@ -1,4 +1,4 @@
-package com.simpleerp.simpleerpapp.dtos.supplies;
+package com.simpleerp.simpleerpapp.dtos.warehouse;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

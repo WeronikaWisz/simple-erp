@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ 'supplies.browse-supplies.purchase-task' | translate}}</h2>
+<div mat-dialog-content>
+  <h3>{{data.code}} - {{data.name}}</h3>
+  <h3>{{ 'supplies.browse-supplies.current-quantity' | translate}} <span class="thick">{{data.quantity}} {{getUnit()}}</span></h3>
+  <form [formGroup]="form">
+    <mat-form-field class="full-width-input" appearance="outline">
+      <mat-label>{{ 'supplies.browse-supplies.quantity' | translate}}</mat-label>
+      <input matInput type="number" formControlName="quantity">
+      <span matSuffix>{{getUnit()}}</span>
+    </mat-form-field>
+    <h3><mat-icon>live_help</mat-icon> {{ 'supplies.browse-supplies.help' | translate}}</h3>
+    <h3>{{ 'supplies.browse-supplies.suggestion' | translate}}</h3>
+    <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+      <mat-label>{{ 'supplies.browse-supplies.days' | translate}}</mat-label>
+      <input matInput type="number" formControlName="days">
+    </mat-form-field>
+    <button mat-raised-button (click)="suggestQuantity()" [disabled]="daysNotSet()">
+      {{ 'supplies.browse-supplies.suggest-button' | translate}}
+    </button>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid">
+    {{ 'supplies.browse-supplies.save' | translate}}
+  </button>
+</div>
+

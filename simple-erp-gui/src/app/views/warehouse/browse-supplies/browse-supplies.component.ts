@@ -10,10 +10,10 @@ import {TokenStorageService} from "../../../services/token-storage.service";
 import {ERole} from "../../../enums/ERole";
 import {SuppliesListItem} from "../../../models/warehouse/SuppliesListItem";
 import Swal from "sweetalert2";
-import {SuppliesService} from "../../../services/supplies.service";
+import {WarehouseService} from "../../../services/warehouse.service";
 import {MatDialog} from "@angular/material/dialog";
-import {UpdateProfileDialogComponent} from "../../manage-users/profile/update-profile-dialog/update-profile-dialog.component";
 import {UpdateSuppliesDialogComponent} from "./update-supplies-dialog/update-supplies-dialog.component";
+import {DelegatePurchaseDialogComponent} from "./delegate-purchase-dialog/delegate-purchase-dialog.component";
 
 @Component({
   selector: 'app-browse-supplies',
@@ -25,7 +25,7 @@ export class BrowseSuppliesComponent implements OnInit {
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['code', 'name', 'type', 'quantity', 'unit', 'actions'];
+  displayedColumns = ['code', 'name', 'type', 'quantity', 'unit', 'message', 'actions'];
   dataSource: MatTableDataSource<SuppliesListItem> = new MatTableDataSource<SuppliesListItem>([]);
 
   supplies: SuppliesListItem[] = [];
@@ -38,7 +38,7 @@ export class BrowseSuppliesComponent implements OnInit {
 
   emptySearchList = false;
 
-  constructor(private formBuilder: FormBuilder, private suppliesService: SuppliesService,
+  constructor(private formBuilder: FormBuilder, private suppliesService: WarehouseService,
               private translate: TranslateService, public dialog: MatDialog,
               private router: Router, private tokenStorage: TokenStorageService) { }
 
@@ -83,8 +83,25 @@ export class BrowseSuppliesComponent implements OnInit {
       })
   }
 
-  addPurchaseTask(id: number) {
-
+  addPurchaseTask(supplies: SuppliesListItem) {
+    const dialogRef = this.dialog.open(DelegatePurchaseDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: supplies.id,
+        code: supplies.code,
+        name: supplies.name,
+        unit: supplies.unit,
+        quantity: supplies.quantity,
+        minQuantity: supplies.minQuantity,
+        days: supplies.days
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if(result){
+        this.loadSupplies();
+      }
+    });
   }
 
   // TODO

@@ -173,7 +173,13 @@
       "settings": "Ustawienia",
       "info": "Ustaw dopuszczalną minimalną ilość produktu oraz ile dni przed przewidywanym wyczerpaniem produktu wyświetlać ostrzeżenie.",
       "update-success": "Pomyślnie zaktualizowano zapasy",
-      "update-error": "Nie udało się zaktualizować zapasów"
+      "update-error": "Nie udało się zaktualizować zapasów",
+      "current-quantity": "Aktualny stan na magazynie: ",
+      "help": "Podpowiadanie planowania stanów magazynowych",
+      "suggestion": "Podaj liczbę dni na jaką ma wystarczyć zapas produktu i zasugerowana zostanie ilość zakupu.",
+      "suggest-button": "Sugeruj",
+      "delegate-purchase-success": "Pomyślnie dodano zadanie zakupu",
+      "delegate-purchase-error": "Nie udało się dodać zadania zakupu"
     }
   },
   "nav": {
