@@ -42,6 +42,7 @@ import { ChangeDefaultUserDialogComponent } from './views/manage-users/default-u
 import { AddProductComponent } from './views/products/add-product/add-product.component';
 import { BrowseProductsComponent } from './views/products/browse-products/browse-products.component';
 import { BrowseSuppliesComponent } from './views/warehouse/browse-supplies/browse-supplies.component';
+import { UpdateSuppliesDialogComponent } from './views/warehouse/browse-supplies/update-supplies-dialog/update-supplies-dialog.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { BrowseSuppliesComponent } from './views/warehouse/browse-supplies/brows
     ChangeDefaultUserDialogComponent,
     AddProductComponent,
     BrowseProductsComponent,
-    BrowseSuppliesComponent
+    BrowseSuppliesComponent,
+    UpdateSuppliesDialogComponent
   ],
     imports: [
         BrowserModule,

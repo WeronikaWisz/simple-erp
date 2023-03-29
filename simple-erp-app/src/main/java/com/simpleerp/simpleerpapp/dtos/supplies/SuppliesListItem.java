@@ -16,15 +16,19 @@ public class SuppliesListItem {
     private String name;
     private EUnit unit;
     private String quantity;
-    private boolean isQuantityLessThanMin;
+    private String minQuantity;
+    private Integer days;
     private String warningMessage;
 
-    public SuppliesListItem(Long id, EType type, String code, String name, EUnit unit, String quantity) {
+    public SuppliesListItem(Long id, EType type, String code, String name, EUnit unit,
+                            String quantity, String minQuantity, Integer days) {
         this.id = id;
         this.type = type;
         this.code = code;
         this.name = name;
         this.unit = unit;
         this.quantity = quantity;
+        this.minQuantity = minQuantity;
+        this.days = days;
     }
 }

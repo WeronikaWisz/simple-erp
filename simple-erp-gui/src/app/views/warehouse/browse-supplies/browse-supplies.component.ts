@@ -11,6 +11,9 @@ import {ERole} from "../../../enums/ERole";
 import {SuppliesListItem} from "../../../models/warehouse/SuppliesListItem";
 import Swal from "sweetalert2";
 import {SuppliesService} from "../../../services/supplies.service";
+import {MatDialog} from "@angular/material/dialog";
+import {UpdateProfileDialogComponent} from "../../manage-users/profile/update-profile-dialog/update-profile-dialog.component";
+import {UpdateSuppliesDialogComponent} from "./update-supplies-dialog/update-supplies-dialog.component";
 
 @Component({
   selector: 'app-browse-supplies',
@@ -36,7 +39,7 @@ export class BrowseSuppliesComponent implements OnInit {
   emptySearchList = false;
 
   constructor(private formBuilder: FormBuilder, private suppliesService: SuppliesService,
-              private translate: TranslateService,
+              private translate: TranslateService, public dialog: MatDialog,
               private router: Router, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
@@ -84,6 +87,7 @@ export class BrowseSuppliesComponent implements OnInit {
 
   }
 
+  // TODO
   addProductionTask(id: number) {
 
   }
@@ -98,8 +102,25 @@ export class BrowseSuppliesComponent implements OnInit {
     return type === EType[EType.BOUGHT];
   }
 
-  goToEditSupplies(id: number) {
-
+  goToEditSupplies(supplies: SuppliesListItem) {
+      const dialogRef = this.dialog.open(UpdateSuppliesDialogComponent, {
+        maxWidth: '650px',
+        data: {
+          id: supplies.id,
+          code: supplies.code,
+          name: supplies.name,
+          unit: supplies.unit,
+          quantity: supplies.quantity,
+          minQuantity: supplies.minQuantity,
+          days: supplies.days
+        }
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        console.log(result);
+        if(result){
+          this.loadSupplies();
+        }
+      });
   }
 
   getUnit(eUnit: EUnit): string{

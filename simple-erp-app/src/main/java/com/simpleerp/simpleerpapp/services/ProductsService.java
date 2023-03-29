@@ -131,6 +131,8 @@ public class ProductsService {
             if(productSetProductsList.isPresent() && !productSetProductsList.get().isEmpty()){
                 throw new ApiExpectationFailedException("exception.productIsInSet");
             } else {
+                StockLevel stockLevel = product.getStockLevel();
+                stockLevelRepository.delete(stockLevel);
                 productRepository.delete(product);
             }
         }

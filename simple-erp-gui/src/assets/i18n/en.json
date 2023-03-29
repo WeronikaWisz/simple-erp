@@ -164,7 +164,16 @@
       "browse-title": "Supplies levels",
       "quantity": "Quantity",
       "purchase-task": "Delegate purchase",
-      "production-task": "Delegate production"
+      "production-task": "Delegate production",
+      "edit-title": "Edit supplies level",
+      "min-quantity": "Minimum quantity",
+      "days": "Number of days",
+      "close": "Close",
+      "save": "Save",
+      "settings": "Settings",
+      "info": "Set the allowable minimum quantity of the product and how many days before the product is expected to run out, a warning should be displayed.",
+      "update-success": "Successfully updated supplies",
+      "update-error": "Cannot update supplies"
     }
   },
   "nav": {

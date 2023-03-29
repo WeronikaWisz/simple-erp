@@ -5,7 +5,7 @@
                [mode]="'over'">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.warehouse' | translate}}</h2>
+      <h2 matSubheader *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse' | translate}}</h2>
       <a mat-list-item href routerLink="browse-supplies" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>storage</mat-icon>
         <span class="button-text">{{ 'nav.browse-supplies' | translate}}</span>
       </a>

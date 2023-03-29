@@ -164,7 +164,16 @@
       "browse-title": "Stany magazynowe",
       "quantity": "Ilość",
       "purchase-task": "Zleć zakup",
-      "production-task": "Zleć produkcję"
+      "production-task": "Zleć produkcję",
+      "edit-title": "Zmień stany magazynowe",
+      "min-quantity": "Minimalna ilość",
+      "days": "Liczba dni",
+      "close": "Zamknij",
+      "save": "Zapisz",
+      "settings": "Ustawienia",
+      "info": "Ustaw dopuszczalną minimalną ilość produktu oraz ile dni przed przewidywanym wyczerpaniem produktu wyświetlać ostrzeżenie.",
+      "update-success": "Pomyślnie zaktualizowano zapasy",
+      "update-error": "Nie udało się zaktualizować zapasów"
     }
   },
   "nav": {

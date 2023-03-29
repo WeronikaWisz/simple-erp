@@ -2,11 +2,16 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.supplies.SuppliesListItem;
 import com.simpleerp.simpleerpapp.dtos.supplies.SuppliesResponse;
+import com.simpleerp.simpleerpapp.dtos.supplies.UpdateSuppliesRequest;
+import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.StockLevelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -43,12 +48,22 @@ public class SuppliesService {
         for(StockLevel stockLevel: stockLevelList){
             SuppliesListItem suppliesListItem = new SuppliesListItem(stockLevel.getId(), stockLevel.getProduct().getType(),
                     stockLevel.getProduct().getCode(), stockLevel.getProduct().getName(), stockLevel.getProduct().getUnit(),
-                    stockLevel.getQuantity().toString());
-            suppliesListItem.setQuantityLessThanMin(stockLevel.getQuantity().compareTo(stockLevel.getMinQuantity()) < 0);
+                    stockLevel.getQuantity().toString(), stockLevel.getMinQuantity().toString(), stockLevel.getDaysUntilStockLasts());
             // TODO here will be message that supplies end in a few days
             suppliesListItem.setWarningMessage("");
             suppliesListItems.add(suppliesListItem);
         }
         return suppliesListItems;
+    }
+
+    @Transactional
+    public void updateSupplies(UpdateSuppliesRequest updateSuppliesRequest) {
+        StockLevel stockLevel = stockLevelRepository.findById(updateSuppliesRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException(""));
+        stockLevel.setQuantity(new BigDecimal(updateSuppliesRequest.getQuantity()));
+        stockLevel.setMinQuantity(new BigDecimal(updateSuppliesRequest.getMinQuantity()));
+        stockLevel.setDaysUntilStockLasts(updateSuppliesRequest.getDays());
+        stockLevel.setUpdateDate(LocalDateTime.now());
+        stockLevelRepository.save(stockLevel);
     }
 }

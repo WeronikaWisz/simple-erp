@@ -1,15 +1,6 @@
 <div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
-<!--  <div class="product-list-header">-->
-<!--    <div>-->
-      <h2>{{ 'supplies.browse-supplies.browse-title' | translate}}</h2>
-      <p>{{ 'products.browse-product.product-count' | translate}}: {{productCount}}</p>
-<!--    </div>-->
-<!--    <div>-->
-<!--      <button mat-raised-button (click)="goToAddProduct()">-->
-<!--        {{ 'nav.add-product' | translate}}-->
-<!--      </button>-->
-<!--    </div>-->
-<!--  </div>-->
+  <h2>{{ 'supplies.browse-supplies.browse-title' | translate}}</h2>
+  <p>{{ 'products.browse-product.product-count' | translate}}: {{productCount}}</p>
   <mat-table #table [dataSource]="dataSource" matSort>
 
     <ng-container matColumnDef="code">
@@ -40,7 +31,7 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row" class="action-buttons">
-        <button mat-icon-button (click)="goToEditSupplies(row.id)">
+        <button mat-icon-button (click)="goToEditSupplies(row)">
           <mat-icon>edit</mat-icon>
         </button>
         <button mat-stroked-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row.id)">

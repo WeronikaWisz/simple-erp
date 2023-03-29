@@ -1,14 +1,11 @@
-import {EType} from "../../enums/EType";
 import {EUnit} from "../../enums/EUnit";
 
-export interface SuppliesListItem {
+export interface UpdateSuppliesData {
   id: number
-  type: EType;
   code: string;
   name: string;
   unit: EUnit;
   quantity: string;
   minQuantity: string;
   days: number;
-  warningMessage: string;
 }
