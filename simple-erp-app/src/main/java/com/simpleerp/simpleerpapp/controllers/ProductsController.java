@@ -1,25 +1,15 @@
 package com.simpleerp.simpleerpapp.controllers;
 
-import com.simpleerp.simpleerpapp.dtos.auth.AddUserRequest;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
-import com.simpleerp.simpleerpapp.dtos.manageusers.ProfileData;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateUserData;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
-import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
-import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.products.ProductListItem;
-import com.simpleerp.simpleerpapp.dtos.products.ProductsResponse;
+import com.simpleerp.simpleerpapp.dtos.auth.UpdateUserRequest;
+import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.models.Product;
-import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.services.ProductsService;
-import com.simpleerp.simpleerpapp.services.UsersService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +70,14 @@ public class ProductsController {
     public ResponseEntity<?> getProduct(@PathVariable("type") EType type, @PathVariable("id") Long id) {
         ProductListItem product = productsService.getProduct(id, type);
         return ResponseEntity.ok(product);
+    }
+
+    @PutMapping("/product")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateProduct(@RequestBody UpdateProductRequest updateProductRequest) {
+        productsService.updateProduct(updateProductRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.productUpdate", null, LocaleContextHolder.getLocale())));
     }
 
     private ProductCode mapProductToProductCode(Product product){

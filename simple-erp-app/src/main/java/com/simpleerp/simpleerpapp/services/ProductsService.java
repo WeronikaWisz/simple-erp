@@ -2,10 +2,7 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserListItem;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UsersResponse;
-import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
-import com.simpleerp.simpleerpapp.dtos.products.ProductListItem;
-import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
-import com.simpleerp.simpleerpapp.dtos.products.ProductsResponse;
+import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.enums.EUnit;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
@@ -65,9 +62,16 @@ public class ProductsService {
     }
 
     private void addSingleProduct(AddProductRequest addProductRequest) {
-        Product product = new Product(addProductRequest.getCode(), addProductRequest.getName(),
-                new BigDecimal(addProductRequest.getPurchasePrice()), new BigDecimal(addProductRequest.getSalePrice()),
-                addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now());
+        BigDecimal purchasePrice = null;
+        BigDecimal salePrice = null;
+        if(addProductRequest.getPurchasePrice() != null && !addProductRequest.getPurchasePrice().isEmpty()) {
+            purchasePrice = new BigDecimal(addProductRequest.getPurchasePrice());
+        }
+        if(addProductRequest.getSalePrice() != null && !addProductRequest.getSalePrice().isEmpty()) {
+            salePrice = new BigDecimal(addProductRequest.getSalePrice());
+        }
+        Product product = new Product(addProductRequest.getCode(), addProductRequest.getName(), purchasePrice,
+                salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now());
         productRepository.save(product);
     }
 
@@ -95,14 +99,14 @@ public class ProductsService {
         List<ProductListItem> productListItems = new ArrayList<>();
         for(Product product: productList){
             ProductListItem productListItem = new ProductListItem(product.getId(), product.getType(), product.getCode(),
-                    product.getName(), product.getUnit(), product.getPurchasePrice().toString(),
-                    product.getSalePrice().toString());
+                    product.getName(), product.getUnit(), product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
+                    product.getSalePrice() != null ? product.getSalePrice().toString() : "");
             productListItems.add(productListItem);
         }
         for(ProductSet productSet: productSetList){
             ProductListItem productListItem = new ProductListItem(productSet.getId(), EType.SET, productSet.getCode(),
                     productSet.getName(), EUnit.PIECES, "",
-                    productSet.getSalePrice().toString());
+                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "");
             productListItems.add(productListItem);
         }
         return productListItems;
@@ -134,7 +138,7 @@ public class ProductsService {
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
             productListItem = new ProductListItem(productSet.getId(), EType.SET, productSet.getCode(),
                     productSet.getName(), EUnit.PIECES, "",
-                    productSet.getSalePrice().toString());
+                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "");
             List<ProductQuantity> productQuantityList = new ArrayList<>();
             for(ProductSetProducts productSetProductsList : productSet.getProductsSets()){
                 ProductQuantity productQuantity = new ProductQuantity(productSetProductsList.getProduct().getId(),
@@ -146,9 +150,73 @@ public class ProductsService {
             Product product = productRepository.findById(id).
                     orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
             productListItem = new ProductListItem(product.getId(), product.getType(), product.getCode(),
-                    product.getName(), product.getUnit(), product.getPurchasePrice().toString(),
-                    product.getSalePrice().toString());
+                    product.getName(), product.getUnit(),
+                    product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
+                    product.getSalePrice() != null ? product.getSalePrice().toString() : "");
         }
         return productListItem;
+    }
+
+    @Transactional
+    public void updateProduct(UpdateProductRequest updateProductRequest) {
+        if(updateProductRequest.getType().equals(EType.SET)){
+            updateProductSet(updateProductRequest);
+        } else {
+            updateSingleProduct(updateProductRequest);
+        }
+    }
+
+    private void updateProductSet(UpdateProductRequest updateProductRequest) {
+        ProductSet productSet = productSetRepository.findById(updateProductRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        List<ProductSetProducts> productSetProducts = productSet.getProductsSets();
+        productSet.setCode(updateProductRequest.getCode());
+        productSet.setName(updateProductRequest.getName());
+        productSet.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
+        productSet.setUpdateDate(LocalDateTime.now());
+
+        for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
+            Product product = productRepository.findById(productQuantity.getProduct())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            Optional<ProductSetProducts> productAlreadyInList = productSetProducts.stream()
+                    .filter(currentProduct -> currentProduct.getProduct().getId().equals(product.getId())).findFirst();
+            if(productAlreadyInList.isPresent()){
+                productAlreadyInList.get().setQuantity(new BigDecimal(productQuantity.getQuantity()));
+                productSetProductsRepository.save(productAlreadyInList.get());
+            } else {
+                ProductSetProducts newProductSetProducts = new ProductSetProducts(productSet, product,
+                    new BigDecimal(productQuantity.getQuantity()));
+                productSetProductsRepository.save(newProductSetProducts);
+            }
+        }
+
+        List<ProductSetProducts> productSetProductsToDelete = new ArrayList<>();
+        for(ProductSetProducts productSetProduct: productSetProducts){
+            if(!updateProductRequest.getProductSet().stream().map(ProductQuantity::getProduct)
+                    .collect(Collectors.toList()).contains(productSetProduct.getProduct().getId())){
+                productSetProductsToDelete.add(productSetProduct);
+            }
+        }
+        productSetProductsRepository.deleteAll(productSetProductsToDelete);
+    }
+
+    private void updateSingleProduct(UpdateProductRequest updateProductRequest){
+        Product product = productRepository.findById(updateProductRequest.getId()).
+                orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        product.setCode(updateProductRequest.getCode());
+        product.setName(updateProductRequest.getName());
+        product.setUnit(updateProductRequest.getUnit());
+        if(updateProductRequest.getPurchasePrice() != null && !updateProductRequest.getPurchasePrice().isEmpty()) {
+            product.setPurchasePrice(new BigDecimal(updateProductRequest.getPurchasePrice()));
+        } else {
+            product.setPurchasePrice(null);
+        }
+        if(updateProductRequest.getSalePrice() != null && !updateProductRequest.getSalePrice().isEmpty()) {
+            product.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
+        } else {
+            product.setSalePrice(null);
+        }
+        product.setUpdateDate(LocalDateTime.now());
+        productRepository.save(product);
     }
 }

@@ -251,6 +251,7 @@ export class AddProductComponent implements OnInit {
             this.isEditProductView = true;
             this.productId = params['id'];
             this.productType = params['type']
+            this.form.get('type')?.disable();
             this.formTitle = this.getTranslateMessage("products.add-product.edit-title")
             this.getProduct()
           } else {
@@ -298,8 +299,36 @@ export class AddProductComponent implements OnInit {
     this.form.get('productSet')?.setValue(data.productSet)
   }
 
-  // TODO
-  updateProduct() {
+  updateProduct(): void {
+      this.productsService.updateProduct({
+        id: this.productId!,
+        code: this.form.get('code')?.value,
+        name: this.form.get('name')?.value,
+        productSet: this.form.get('productSet')?.value,
+        purchasePrice: this.form.get('purchasePrice')?.value,
+        salePrice: this.form.get('salePrice')?.value,
+        type: this.form.get('type')?.value,
+        unit: this.form.get('unit')?.value
+      }).subscribe({
+        next: (data) => {
+          console.log(data);
+          this.router.navigate(['/browse-products']).then(() => this.showSuccess("products.add-product.update-success"));
+        },
+        error: (err) => {
+          Swal.fire({
+            position: 'top-end',
+            title: this.getTranslateMessage("products.add-product.update-error"),
+            text: err.error.message,
+            icon: 'error',
+            showConfirmButton: false
+          })
+        }
+      });
+  }
 
+  deleteProduct(i: number) {
+    const products = this.form.controls['productSet'] as FormArray;
+    products.removeAt(i)
+    this.unitsForProducts = this.unitsForProducts.slice(i,i+1)
   }
 }

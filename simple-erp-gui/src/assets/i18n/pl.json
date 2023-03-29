@@ -129,7 +129,9 @@
       "add-success": "Pomyślnie dodano produkt",
       "add-error": "Nie udało się dodać produktu",
       "add": "Dodaj",
-      "edit-title": "Edytuj produkt"
+      "edit-title": "Edytuj produkt",
+      "update-success": "Pomyśnie zaktualizowano produkt",
+      "update-error": "Nie udało się zaktualizować produktu"
     },
     "browse-product" : {
       "browse-title": "Zdefiniowane produkty",

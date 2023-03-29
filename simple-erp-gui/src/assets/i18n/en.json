@@ -129,7 +129,9 @@
       "add-success": "Successfully added product",
       "add-error": "Cannot add product",
       "add": "Add",
-      "edit-title": "Edit product"
+      "edit-title": "Edit product",
+      "update-success": "Successfully updated product",
+      "update-error": "Cannot update product"
     },
     "browse-product": {
       "browse-title": "Defined products",

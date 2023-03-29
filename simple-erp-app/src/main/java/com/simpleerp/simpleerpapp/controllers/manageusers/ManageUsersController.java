@@ -57,7 +57,7 @@ public class ManageUsersController {
 
     @PutMapping("/user")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> editUser(@RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<?> updateUser(@RequestBody UpdateUserRequest updateUserRequest) {
         manageUsersService.updateUser(updateUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.profileUpdate", null, LocaleContextHolder.getLocale())));

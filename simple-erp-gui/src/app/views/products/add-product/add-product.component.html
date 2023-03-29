@@ -69,6 +69,7 @@
               <input matInput type="number" formControlName="quantity">
               <span matSuffix>{{getUnit(i)}}</span>
             </mat-form-field>
+            <button mat-icon-button color="warn" (click)="deleteProduct(i)"><mat-icon>clear</mat-icon></button>
           </ng-container>
         </div>
         <div id="button-add-product">
