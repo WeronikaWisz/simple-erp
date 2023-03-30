@@ -200,6 +200,7 @@
     "browse-products": "Products list",
     "warehouse": "WAREHOUSE",
     "warehouse-l": "Warehouse",
-    "browse-supplies": "Browse supplies"
+    "browse-supplies": "Browse supplies",
+    "browse-delegated-tasks": "Delegated tasks"
   }
 }

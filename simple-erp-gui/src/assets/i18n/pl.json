@@ -200,6 +200,7 @@
     "browse-products": "Lista produktów",
     "warehouse": "MAGAZYN",
     "warehouse-l": "Magazyn",
-    "browse-supplies": "Przeglądaj zapasy"
+    "browse-supplies": "Przeglądaj zapasy",
+    "browse-delegated-tasks": "Zlecone zadania"
   }
 }

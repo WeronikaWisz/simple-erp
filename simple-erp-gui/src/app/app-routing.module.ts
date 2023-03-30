@@ -8,6 +8,7 @@ import {DefaultUsersComponent} from "./views/manage-users/default-users/default-
 import {AddProductComponent} from "./views/products/add-product/add-product.component";
 import {BrowseProductsComponent} from "./views/products/browse-products/browse-products.component";
 import {BrowseSuppliesComponent} from "./views/warehouse/browse-supplies/browse-supplies.component";
+import {BrowseDelegatedTasksComponent} from "./views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'browse-products', component: BrowseProductsComponent },
   { path: 'edit-product/:type/:id', component: AddProductComponent },
   { path: 'browse-supplies', component: BrowseSuppliesComponent },
+  { path: 'browse-delegated-tasks', component: BrowseDelegatedTasksComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 
