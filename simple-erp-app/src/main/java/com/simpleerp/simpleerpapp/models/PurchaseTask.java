@@ -1,7 +1,6 @@
 package com.simpleerp.simpleerpapp.models;
 
 import com.simpleerp.simpleerpapp.enums.EStatus;
-import com.simpleerp.simpleerpapp.enums.EType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

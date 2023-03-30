@@ -44,6 +44,7 @@ import { BrowseProductsComponent } from './views/products/browse-products/browse
 import { BrowseSuppliesComponent } from './views/warehouse/browse-supplies/browse-supplies.component';
 import { UpdateSuppliesDialogComponent } from './views/warehouse/browse-supplies/update-supplies-dialog/update-supplies-dialog.component';
 import { DelegatePurchaseDialogComponent } from './views/warehouse/browse-supplies/delegate-purchase-dialog/delegate-purchase-dialog.component';
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -96,7 +97,8 @@ import { DelegatePurchaseDialogComponent } from './views/warehouse/browse-suppli
         MatDatepickerModule,
         MatNativeDateModule,
         MatTableModule,
-        MatChipsModule
+        MatChipsModule,
+        MatTooltipModule
     ],
   providers: [authInterceptorProviders,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],

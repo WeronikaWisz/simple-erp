@@ -11,4 +11,5 @@ export interface SuppliesListItem {
   minQuantity: string;
   days: number;
   message: string;
+  isWarningMessage: boolean;
 }

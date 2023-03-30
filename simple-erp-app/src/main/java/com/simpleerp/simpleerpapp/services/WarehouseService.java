@@ -6,11 +6,14 @@ import com.simpleerp.simpleerpapp.dtos.warehouse.SuppliesResponse;
 import com.simpleerp.simpleerpapp.dtos.warehouse.UpdateSuppliesRequest;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.ETask;
+import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -31,14 +34,16 @@ public class WarehouseService {
     private final PurchaseTaskRepository purchaseTaskRepository;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
+    private MessageSource messageSource;
 
     @Autowired
     public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseTaskRepository purchaseTaskRepository,
-                            UserRepository userRepository, TaskRepository taskRepository) {
+                            UserRepository userRepository, TaskRepository taskRepository, MessageSource messageSource) {
         this.stockLevelRepository = stockLevelRepository;
         this.purchaseTaskRepository = purchaseTaskRepository;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
+        this.messageSource = messageSource;
     }
 
 
@@ -63,11 +68,14 @@ public class WarehouseService {
             SuppliesListItem suppliesListItem = new SuppliesListItem(stockLevel.getId(), stockLevel.getProduct().getType(),
                     stockLevel.getProduct().getCode(), stockLevel.getProduct().getName(), stockLevel.getProduct().getUnit(),
                     stockLevel.getQuantity().toString(), stockLevel.getMinQuantity().toString(), stockLevel.getDaysUntilStockLasts());
-            if(purchaseTaskDelegated(stockLevel.getProduct())){
-                suppliesListItem.setMessage("Zlecono zakup");
+            if(stockLevel.getProduct().getType().equals(EType.BOUGHT) && purchaseTaskDelegated(stockLevel.getProduct())){
+                suppliesListItem.setMessage(messageSource.getMessage(
+                        "message.purchaseDelegated", null, LocaleContextHolder.getLocale()));
+            //TODO here will be check id production task delegated
             } else {
-                // TODO here will be message that supplies end in a few days
+//                 TODO here will be message that supplies end in a few days
                 suppliesListItem.setMessage("");
+//                suppliesListItem.setWarningMessage(true);
             }
             suppliesListItems.add(suppliesListItem);
         }

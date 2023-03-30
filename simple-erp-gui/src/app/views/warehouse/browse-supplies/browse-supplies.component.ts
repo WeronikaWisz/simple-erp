@@ -192,4 +192,8 @@ export class BrowseSuppliesComponent implements OnInit {
     this.pageIndex = event.pageIndex;
     this.loadSupplies();
   }
+
+  isLessThatMin(element: SuppliesListItem): boolean {
+    return element.quantity < element.minQuantity;
+  }
 }

@@ -20,7 +20,10 @@
 
     <ng-container matColumnDef="quantity">
       <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-supplies.quantity' | translate}} </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.quantity}} </mat-cell>
+      <mat-cell *matCellDef="let element">
+        <span *ngIf="!isLessThatMin(element)">{{element.quantity}}</span>
+        <span *ngIf="isLessThatMin(element)" class="quantity-insufficiency">{{element.quantity}}</span>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="unit">
@@ -32,7 +35,8 @@
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-chip-list *ngIf="row.message">
-          <mat-chip> {{row.message}} </mat-chip>
+          <mat-chip class="chip-info" *ngIf="!row.isWarningMessage"> {{row.message}} </mat-chip>
+          <mat-chip class="chip-warning" *ngIf="row.isWarningMessage"> {{row.message}} </mat-chip>
         </mat-chip-list>
       </mat-cell>
     </ng-container>
@@ -43,11 +47,11 @@
         <button mat-icon-button (click)="goToEditSupplies(row)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-stroked-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row)">
-          {{ 'supplies.browse-supplies.purchase-task' | translate}}
+        <button mat-icon-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row)">
+          <mat-icon matTooltip="{{ 'supplies.browse-supplies.purchase-task' | translate}}">add_shopping_cart</mat-icon>
         </button>
-        <button mat-stroked-button *ngIf="isProductionType(row.type)" (click)="addProductionTask(row.id)">
-          {{ 'supplies.browse-supplies.production-task' | translate}}
+        <button mat-icon-button *ngIf="isProductionType(row.type)" (click)="addProductionTask(row.id)">
+          <mat-icon matTooltip="{{ 'supplies.browse-supplies.production-task' | translate}}">build</mat-icon>
         </button>
       </mat-cell>
     </ng-container>
