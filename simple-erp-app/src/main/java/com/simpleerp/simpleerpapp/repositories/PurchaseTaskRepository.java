@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface PurchaseTaskRepository extends JpaRepository<PurchaseTask, Long> {
 
     Optional<List<PurchaseTask>> findByProductAndStatusNotIn(Product product, List<EStatus> statuses);
+
+    Optional<List<PurchaseTask>> findByStatusIn(List<EStatus> statuses);
 }

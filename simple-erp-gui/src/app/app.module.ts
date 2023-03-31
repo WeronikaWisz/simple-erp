@@ -46,6 +46,7 @@ import { UpdateSuppliesDialogComponent } from './views/warehouse/browse-supplies
 import { DelegatePurchaseDialogComponent } from './views/warehouse/browse-supplies/delegate-purchase-dialog/delegate-purchase-dialog.component';
 import {MatTooltipModule} from "@angular/material/tooltip";
 import { BrowseDelegatedTasksComponent } from './views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component';
+import { AssignedUsersDialogComponent } from './views/warehouse/browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import { BrowseDelegatedTasksComponent } from './views/warehouse/browse-delegate
     BrowseSuppliesComponent,
     UpdateSuppliesDialogComponent,
     DelegatePurchaseDialogComponent,
-    BrowseDelegatedTasksComponent
+    BrowseDelegatedTasksComponent,
+    AssignedUsersDialogComponent
   ],
     imports: [
         BrowserModule,

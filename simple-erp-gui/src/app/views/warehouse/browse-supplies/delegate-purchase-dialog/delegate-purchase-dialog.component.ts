@@ -2,11 +2,11 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Unit} from "../../../../models/products/Unit";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {UpdateSuppliesData} from "../../../../models/warehouse/UpdateSuppliesData";
 import {WarehouseService} from "../../../../services/warehouse.service";
 import {TranslateService} from "@ngx-translate/core";
 import {EUnit} from "../../../../enums/EUnit";
 import Swal from "sweetalert2";
+import {DelegatedTaskData} from "../../../../models/warehouse/DelegatedTaskData";
 
 @Component({
   selector: 'app-delegate-purchase-dialog',
@@ -20,36 +20,48 @@ export class DelegatePurchaseDialogComponent implements OnInit {
 
   units: Unit[] = [];
 
+  isEditView = false;
+
   constructor(
     public dialogRef: MatDialogRef<DelegatePurchaseDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UpdateSuppliesData, private formBuilder: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: DelegatedTaskData, private formBuilder: FormBuilder,
     private suppliesService: WarehouseService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
   }
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      quantity: [null, Validators.required],
-      days: [null]
-    })
+    if(this.data.taskId && this.data.quantity){
+      this.isEditView = true;
+      this.form = this.formBuilder.group({
+        quantity: [this.data.quantity, Validators.required],
+        days: [null]
+      })
+    } else {
+      this.form = this.formBuilder.group({
+        quantity: [null, Validators.required],
+        days: [null]
+      })
+    }
     this.loadUnits();
   }
 
   saveData(){
     this.suppliesService.delegatePurchaseTask({
-      id: this.data.id,
+      id: this.data.stockLevelId!,
       quantity: this.form.get('quantity')?.value
     }).subscribe({
       next: (data) => {
         console.log(data);
+        this.dataChanged = true
+        this.form.markAsPristine()
         Swal.fire({
           position: 'top-end',
           title: this.getTranslateMessage("supplies.browse-supplies.delegate-purchase-success"),
           icon: 'success',
           showConfirmButton: false
         })
-        this.dialogRef.close();
+        this.dialogRef.close(true);
       },
       error: (err) => {
         Swal.fire({
@@ -63,6 +75,36 @@ export class DelegatePurchaseDialogComponent implements OnInit {
     });
   }
 
+  updateData(){
+    this.suppliesService.updatePurchaseTask({
+      id: this.data.taskId!,
+      quantity: this.form.get('quantity')?.value
+    }).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.dataChanged = true
+        this.form.markAsPristine()
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("supplies.browse-supplies.update-purchase-success"),
+          icon: 'success',
+          showConfirmButton: false
+        })
+        this.dialogRef.close(true);
+      },
+      error: (err) => {
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("supplies.browse-supplies.update-purchase-error"),
+          text: err.error.message,
+          icon: 'error',
+          showConfirmButton: false
+        })
+      }
+    });
+  }
+
+  // TODO
   suggestQuantity() {
 
   }

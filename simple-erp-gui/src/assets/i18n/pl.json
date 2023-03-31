@@ -164,6 +164,7 @@
       "browse-title": "Stany magazynowe",
       "quantity": "Ilość",
       "purchase-task": "Zleć zakup",
+      "purchase-task-edit": "Aktualizuj zlecenie zakupu",
       "production-task": "Zleć produkcję",
       "edit-title": "Zmień stany magazynowe",
       "min-quantity": "Minimalna ilość",
@@ -179,8 +180,29 @@
       "suggestion": "Podaj liczbę dni na jaką ma wystarczyć zapas produktu i zasugerowana zostanie ilość zakupu.",
       "suggest-button": "Sugeruj",
       "delegate-purchase-success": "Pomyślnie dodano zadanie zakupu",
-      "delegate-purchase-error": "Nie udało się dodać zadania zakupu"
+      "delegate-purchase-error": "Nie udało się dodać zadania zakupu",
+      "update-purchase-success": "Pomyślnie zaktualizowano zadanie zakupu",
+      "update-purchase-error": "Nie udało się zaktualizować zadania zakupu"
+    },
+    "delegated-tasks": {
+      "browse-title": "Zlecone zadania uzupełnienia stanów magazynowych",
+      "task-count": "Liczba zadań",
+      "purchase": "Zakup",
+      "production": "Produkcja",
+      "id": "Id",
+      "status": "Status",
+      "date": "Data zlecenia",
+      "assigned-user": "Osoba przypisana",
+      "load-error": "Nie udało się załadować zadań",
+      "delete-error": "Nie udało się usunąć zadania",
+      "email": "E-mail: ",
+      "phone": "Numer telefonu: ",
+      "user-erro": "Nie udało się załadować użytkownika"
     }
+  },
+  "tasks": {
+    "waiting": "oczekuje",
+    "in-progress": "w trakcie"
   },
   "nav": {
     "my-account": "MOJE KONTO",

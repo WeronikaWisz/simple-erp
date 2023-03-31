@@ -87,13 +87,11 @@ export class BrowseSuppliesComponent implements OnInit {
     const dialogRef = this.dialog.open(DelegatePurchaseDialogComponent, {
       maxWidth: '650px',
       data: {
-        id: supplies.id,
+        stockLevelId: supplies.id,
         code: supplies.code,
         name: supplies.name,
         unit: supplies.unit,
-        quantity: supplies.quantity,
-        minQuantity: supplies.minQuantity,
-        days: supplies.days
+        stockQuantity: supplies.quantity
       }
     });
     dialogRef.afterClosed().subscribe(result => {

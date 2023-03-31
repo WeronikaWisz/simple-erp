@@ -1,12 +1,10 @@
 package com.simpleerp.simpleerpapp.services;
 
-import com.simpleerp.simpleerpapp.dtos.warehouse.PurchaseTaskRequest;
-import com.simpleerp.simpleerpapp.dtos.warehouse.SuppliesListItem;
-import com.simpleerp.simpleerpapp.dtos.warehouse.SuppliesResponse;
-import com.simpleerp.simpleerpapp.dtos.warehouse.UpdateSuppliesRequest;
+import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.ETask;
 import com.simpleerp.simpleerpapp.enums.EType;
+import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -125,5 +124,101 @@ public class WarehouseService {
         UserDetailsI userDetails = (UserDetailsI) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userDetails.getUsername();
+    }
+
+    public DelegatedTasksResponse loadDelegatedTasks(EType type, int page, int size) {
+        DelegatedTasksResponse delegatedTasksResponse = new DelegatedTasksResponse();
+        if(type.equals(EType.BOUGHT)){
+            loadDelegatedPurchaseTasks(delegatedTasksResponse, page, size);
+        } else if (type.equals(EType.PRODUCED)){
+            loadDelegatedProductionTasks(delegatedTasksResponse, page, size);
+        } else {
+            delegatedTasksResponse.setTasksList(Collections.emptyList());
+            delegatedTasksResponse.setTotalTasksLength(0);
+        }
+        return delegatedTasksResponse;
+    }
+
+    private void loadDelegatedPurchaseTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
+        List<PurchaseTask> purchaseTaskList = purchaseTaskRepository
+                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .orElse(Collections.emptyList());
+        int total = purchaseTaskList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            delegatedTasksResponse.setTasksList(purchaseTaskListToDelegatedTasksListItem(purchaseTaskList
+                    .stream().sorted(Comparator.comparing(PurchaseTask::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        delegatedTasksResponse.setTotalTasksLength(total);
+    }
+
+    private List<DelegatedTaskListItem> purchaseTaskListToDelegatedTasksListItem(List<PurchaseTask> purchaseTaskList){
+        List<DelegatedTaskListItem> delegatedTaskListItems = new ArrayList<>();
+        for(PurchaseTask purchaseTask: purchaseTaskList){
+            DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(purchaseTask.getId(),
+                    purchaseTask.getProduct().getCode(), purchaseTask.getProduct().getName(),
+                    purchaseTask.getProduct().getUnit(), purchaseTask.getQuantity().toString(), purchaseTask.getStatus(),
+                    purchaseTask.getAssignedUser().getName() + " " +  purchaseTask.getAssignedUser().getSurname(),
+                    purchaseTask.getAssignedUser().getId(),
+                    purchaseTask.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    findProductStockQuantity(purchaseTask.getProduct()).toString());
+            delegatedTaskListItems.add(delegatedTaskListItem);
+        }
+        return delegatedTaskListItems;
+    }
+
+    private BigDecimal findProductStockQuantity(Product product){
+        StockLevel stockLevel = stockLevelRepository.findByProduct(product)
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        return stockLevel.getQuantity();
+    }
+
+    // TODO
+    private void loadDelegatedProductionTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
+        delegatedTasksResponse.setTasksList(Collections.emptyList());
+        delegatedTasksResponse.setTotalTasksLength(0);
+    }
+
+    @Transactional
+    public void updatePurchaseTask(PurchaseTaskRequest purchaseTaskRequest) {
+        PurchaseTask purchaseTask = purchaseTaskRepository.findById(purchaseTaskRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        if(!purchaseTask.getStatus().equals(EStatus.WAITING)){
+            throw new ApiExpectationFailedException("exception.taskNotWaiting");
+        }
+        purchaseTask.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
+        purchaseTask.setUpdateDate(LocalDateTime.now());
+        purchaseTaskRepository.save(purchaseTask);
+    }
+
+    public void deleteTask(EType type, Long id) {
+        if(type.equals(EType.BOUGHT)){
+            deleteDelegatedPurchaseTasks(id);
+        } else if (type.equals(EType.PRODUCED)){
+            deleteDelegatedProductionTasks(id);
+        }
+    }
+
+    private void deleteDelegatedPurchaseTasks(Long id) {
+        PurchaseTask purchaseTask = purchaseTaskRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        if(!purchaseTask.getStatus().equals(EStatus.WAITING)){
+            throw new ApiExpectationFailedException("exception.taskNotWaiting");
+        }
+        purchaseTaskRepository.delete(purchaseTask);
+    }
+
+    // TODO
+    private void deleteDelegatedProductionTasks(Long id) {
+    }
+
+    public AssignedUser loadAssignedUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+        AssignedUser assignedUser = new AssignedUser(user.getId(), user.getName(),
+                user.getSurname(), user.getEmail(), user.getPhone());
+        return assignedUser;
     }
 }

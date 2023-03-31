@@ -164,6 +164,7 @@
       "browse-title": "Supplies levels",
       "quantity": "Quantity",
       "purchase-task": "Delegate purchase",
+      "purchase-task-edit": "Edit purchase task",
       "production-task": "Delegate production",
       "edit-title": "Edit supplies level",
       "min-quantity": "Minimum quantity",
@@ -179,8 +180,29 @@
       "suggestion": "Enter the number of days for which the stock of the product should suffice and the purchase quantity will be suggested.",
       "suggest-button": "Suggest",
       "delegate-purchase-success": "Successfully added purchase task",
-      "delegate-purchase-error": "Cannot add purchase task"
+      "delegate-purchase-error": "Cannot add purchase task",
+      "update-purchase-success": "Successfully updated purchase task",
+      "update-purchase-error": "Cannot update purchase task"
+    },
+    "delegated-tasks": {
+      "browse-title": "Delegated stock replenishment tasks",
+      "task-count": "Tasks count",
+      "purchase": "Purchase",
+      "production": "Production",
+      "id": "Id",
+      "status": "Status",
+      "date": "Delegation date",
+      "assigned-user": "Assigned user",
+      "load-error": "Cannot load tasks",
+      "delete-error": "Cannot delete task",
+      "email": "Email: ",
+      "phone": "Phone number: ",
+      "user-error": "Cannot load user"
     }
+  },
+  "tasks": {
+    "waiting": "waiting",
+    "in-progress": "in progress"
   },
   "nav": {
     "my-account": "MY ACCOUNT",

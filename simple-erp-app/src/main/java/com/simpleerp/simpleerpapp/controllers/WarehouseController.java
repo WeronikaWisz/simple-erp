@@ -1,9 +1,8 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
-import com.simpleerp.simpleerpapp.dtos.warehouse.PurchaseTaskRequest;
-import com.simpleerp.simpleerpapp.dtos.warehouse.SuppliesResponse;
-import com.simpleerp.simpleerpapp.dtos.warehouse.UpdateSuppliesRequest;
+import com.simpleerp.simpleerpapp.dtos.warehouse.*;
+import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.WarehouseService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/supplies")
+@RequestMapping("/warehouse")
 @CrossOrigin("http://localhost:4200")
 public class WarehouseController {
 
@@ -51,6 +50,38 @@ public class WarehouseController {
         warehouseService.delegatePurchaseTask(purchaseTaskRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.purchaseTypeCreated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/delegated-tasks/{type}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> loadDelegatedTasks(@PathVariable("type") EType type,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        DelegatedTasksResponse delegatedTasksResponse = warehouseService.loadDelegatedTasks(type, page, size);
+        return ResponseEntity.ok(delegatedTasksResponse);
+    }
+
+    @PutMapping("/purchase-task")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> updatePurchaseTask(@RequestBody PurchaseTaskRequest purchaseTaskRequest) {
+        warehouseService.updatePurchaseTask(purchaseTaskRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.taskUpdated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @DeleteMapping("/delete-task/{type}/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> deleteTask(@PathVariable("type") EType type, @PathVariable("id") Long id) {
+        warehouseService.deleteTask(type, id);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.taskDeleted", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/assigned-user/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> loadAssignedUser(@PathVariable("id") Long id) {
+        AssignedUser assignedUser = warehouseService.loadAssignedUser(id);
+        return ResponseEntity.ok(assignedUser);
     }
 
 }

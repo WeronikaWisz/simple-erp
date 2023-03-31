@@ -1,7 +1,8 @@
-<h2 mat-dialog-title>{{ 'supplies.browse-supplies.purchase-task' | translate}}</h2>
+<h2 *ngIf="!isEditView" mat-dialog-title>{{ 'supplies.browse-supplies.purchase-task' | translate}}</h2>
+<h2 *ngIf="isEditView" mat-dialog-title>{{ 'supplies.browse-supplies.purchase-task-edit' | translate}}</h2>
 <div mat-dialog-content>
   <h3>{{data.code}} - {{data.name}}</h3>
-  <h3>{{ 'supplies.browse-supplies.current-quantity' | translate}} <span class="thick">{{data.quantity}} {{getUnit()}}</span></h3>
+  <h3>{{ 'supplies.browse-supplies.current-quantity' | translate}} <span class="thick">{{data.stockQuantity}} {{getUnit()}}</span></h3>
   <form [formGroup]="form">
     <mat-form-field class="full-width-input" appearance="outline">
       <mat-label>{{ 'supplies.browse-supplies.quantity' | translate}}</mat-label>
@@ -23,7 +24,10 @@
   <button mat-button [mat-dialog-close]="dataChanged">
     {{ 'supplies.browse-supplies.close' | translate}}
   </button>
-  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid">
+  <button *ngIf="!isEditView" mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid">
+    {{ 'supplies.browse-supplies.save' | translate}}
+  </button>
+  <button *ngIf="isEditView" mat-raised-button color="primary" (click)="updateData()" [disabled]="form.invalid || !form.dirty">
     {{ 'supplies.browse-supplies.save' | translate}}
   </button>
 </div>
