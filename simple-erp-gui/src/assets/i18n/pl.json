@@ -200,6 +200,42 @@
       "user-erro": "Nie udało się załadować użytkownika"
     }
   },
+  "trade": {
+    "add-order": {
+      "add-title": "Dodaj zamówienie",
+      "number": "Numer zamówienia",
+      "number-error": "Podaj numer zamówienia",
+      "date": "Data zamówienia",
+      "date-error": "Podaj datę zamówienia",
+      "name": "Imię",
+      "name-error": "Podaj imię",
+      "surname": "Nazwisko",
+      "surname-error": "Podaj nazwisko",
+      "email": "Email",
+      "email-error": "Podaj poprawny adres email",
+      "phone": "Numer telefonu",
+      "phone-error": "Podaj poprawny numer telefonu",
+      "postal-code": "Kod pocztowy",
+      "postal-code-error": "Podaj poprawny kod pocztowy",
+      "post": "Poczta",
+      "post-error": "Podaj miejscowość poczty",
+      "city": "Miejscowość",
+      "city-error": "Podaj miejsce zamieszkania",
+      "street": "Ulica",
+      "street-error": "Podaj nazwę ulicy",
+      "building-number": "Numer domu",
+      "building-number-error": "Podaj numer domu",
+      "door-number": "Numer lokalu",
+      "door-number-error": "Podaj numer lokalu",
+      "user-data": "Dane klienta",
+      "product-data": "Zamówione produkty",
+      "discount": "Dodaj rabat",
+      "delivery": "Dodaj koszt przesyłki",
+      "price": "Zmień cenę zamówienia",
+      "add-success": "Pomyślnie dodano zamówienie",
+      "add-error": "Nie można dodać zamówienia"
+    }
+  },
   "tasks": {
     "waiting": "oczekuje",
     "in-progress": "w trakcie"
@@ -223,6 +259,9 @@
     "warehouse": "MAGAZYN",
     "warehouse-l": "Magazyn",
     "browse-supplies": "Przeglądaj zapasy",
-    "browse-delegated-tasks": "Zlecone zadania"
+    "browse-delegated-tasks": "Zlecone zadania",
+    "trade": "HANDEL",
+    "trade-l": "Handel",
+    "add-order": "Dodaj zamówienie"
   }
 }

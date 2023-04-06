@@ -160,7 +160,7 @@
     "type-set": "Products set"
   },
   "supplies": {
-    "browse-supplies" : {
+    "browse-supplies": {
       "browse-title": "Supplies levels",
       "quantity": "Quantity",
       "purchase-task": "Delegate purchase",
@@ -200,6 +200,42 @@
       "user-error": "Cannot load user"
     }
   },
+  "trade": {
+    "add-order": {
+      "add-title": "Add order",
+      "number": "Order number",
+      "number-error": "Enter order number",
+      "date": "Order date",
+      "date-error": "Enter order date",
+      "name": "Name",
+      "name-error": "Enter name",
+      "surname": "Surname",
+      "surname-error": "Enter surname",
+      "email": "Email",
+      "email-error": "Enter valid email",
+      "phone": "Phone number",
+      "phone-error": "Enter valid phone number",
+      "postal-code": "Postal code",
+      "postal-code-error": "Enter valid postal code",
+      "post": "Post",
+      "post-error": "Enter post",
+      "city": "City",
+      "city-error": "Enter city",
+      "street": "Street",
+      "street-error": "Enter street",
+      "building-number": "Building number",
+      "building-number-error": "Enter building number",
+      "door-number": "Door number",
+      "door-number-error": "Enter door number",
+      "user-data": "Customer data",
+      "product-data": "Ordered products",
+      "discount": "Add discount",
+      "delivery": "Add delivery cost",
+      "price": "Change price",
+      "add-success": "Successfully added order",
+      "add-error": "Cannot add order"
+    }
+  },
   "tasks": {
     "waiting": "waiting",
     "in-progress": "in progress"
@@ -223,6 +259,9 @@
     "warehouse": "WAREHOUSE",
     "warehouse-l": "Warehouse",
     "browse-supplies": "Browse supplies",
-    "browse-delegated-tasks": "Delegated tasks"
+    "browse-delegated-tasks": "Delegated tasks",
+    "trade": "TRADE",
+    "trade-l": "Trade",
+    "add-order": "Add order"
   }
 }

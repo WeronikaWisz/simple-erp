@@ -9,6 +9,7 @@ import {AddProductComponent} from "./views/products/add-product/add-product.comp
 import {BrowseProductsComponent} from "./views/products/browse-products/browse-products.component";
 import {BrowseSuppliesComponent} from "./views/warehouse/browse-supplies/browse-supplies.component";
 import {BrowseDelegatedTasksComponent} from "./views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component";
+import {AddOrderComponent} from "./views/trade/add-order/add-order.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'edit-product/:type/:id', component: AddProductComponent },
   { path: 'browse-supplies', component: BrowseSuppliesComponent },
   { path: 'browse-delegated-tasks', component: BrowseDelegatedTasksComponent },
+  { path: 'add-order', component: AddOrderComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

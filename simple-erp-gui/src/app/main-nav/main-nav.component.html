@@ -5,6 +5,10 @@
                [mode]="'over'">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
+      <h2 matSubheader *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade' | translate}}</h2>
+      <a mat-list-item href routerLink="add-order" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>note_add</mat-icon>
+        <span class="button-text">{{ 'nav.add-order' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse' | translate}}</h2>
       <a mat-list-item href routerLink="browse-supplies" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>storage</mat-icon>
         <span class="button-text">{{ 'nav.browse-supplies' | translate}}</span>
@@ -59,6 +63,12 @@
       </mat-menu>
       <span class="spacer"></span>
       <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="trade" *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade-l' | translate}}</button>
+        <mat-menu #trade="matMenu">
+          <button mat-menu-item routerLink="add-order">
+            <mat-icon>note_add</mat-icon> {{ 'nav.add-order' | translate}}
+          </button>
+        </mat-menu>
         <button mat-button [matMenuTriggerFor]="warehouse" *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse-l' | translate}}</button>
         <mat-menu #warehouse="matMenu">
           <button mat-menu-item routerLink="browse-supplies">

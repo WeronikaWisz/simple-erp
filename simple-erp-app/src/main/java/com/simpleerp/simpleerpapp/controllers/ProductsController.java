@@ -50,7 +50,7 @@ public class ProductsController {
 
     @PostMapping("/product")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addUser(@RequestBody AddProductRequest addProductRequest) {
+    public ResponseEntity<?> addOrder(@RequestBody AddProductRequest addProductRequest) {
         productsService.addProduct(addProductRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.productAdded", null, LocaleContextHolder.getLocale())));

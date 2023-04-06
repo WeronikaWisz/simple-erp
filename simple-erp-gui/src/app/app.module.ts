@@ -28,8 +28,7 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatSelectModule} from "@angular/material/select";
 import {MatDatepickerModule} from "@angular/material/datepicker";
-import { MatNativeDateModule } from '@angular/material/core';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import {MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule} from "@angular/material-moment-adapter"
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {UpdateProfileDialogComponent} from "./views/manage-users/profile/update-profile-dialog/update-profile-dialog.component";
 import {ProfileComponent} from "./views/manage-users/profile/profile.component";
@@ -47,6 +46,7 @@ import { DelegatePurchaseDialogComponent } from './views/warehouse/browse-suppli
 import {MatTooltipModule} from "@angular/material/tooltip";
 import { BrowseDelegatedTasksComponent } from './views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component';
 import { AssignedUsersDialogComponent } from './views/warehouse/browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component';
+import { AddOrderComponent } from './views/trade/add-order/add-order.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +66,8 @@ import { AssignedUsersDialogComponent } from './views/warehouse/browse-delegated
     UpdateSuppliesDialogComponent,
     DelegatePurchaseDialogComponent,
     BrowseDelegatedTasksComponent,
-    AssignedUsersDialogComponent
+    AssignedUsersDialogComponent,
+    AddOrderComponent
   ],
     imports: [
         BrowserModule,
@@ -99,13 +100,18 @@ import { AssignedUsersDialogComponent } from './views/warehouse/browse-delegated
         MatCheckboxModule,
         MatSelectModule,
         MatDatepickerModule,
-        MatNativeDateModule,
+        MatMomentDateModule,
         MatTableModule,
         MatChipsModule,
         MatTooltipModule
     ],
-  providers: [authInterceptorProviders,
-    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  providers: [
+    authInterceptorProviders,
+    {
+      provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+      useValue: { useUtc: true }
+    }
+    ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

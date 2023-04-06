@@ -1,0 +1,143 @@
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content>
+    <form *ngIf="isLoggedIn && hasPermissions" [formGroup]="form">
+      <h2>{{ formTitle }}</h2>
+      <mat-form-field class="full-width-input smaller-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.number' | translate}}</mat-label>
+        <input matInput formControlName="number" required>
+        <mat-error>
+          {{ 'trade.add-order.number-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.date' | translate}}</mat-label>
+        <input matInput formControlName="date" [matDatepicker]="picker" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error>
+          {{ 'trade.add-order.date-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.discount' | translate}}</mat-label>
+        <input type="number" matInput formControlName="discount">
+        <span matSuffix>%</span>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.delivery' | translate}}</mat-label>
+        <input type="number" matInput formControlName="delivery">
+        <span matSuffix>zł</span>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.price' | translate}}</mat-label>
+        <input type="number" matInput formControlName="price">
+        <span matSuffix>zł</span>
+      </mat-form-field>
+      <h2>{{ 'trade.add-order.user-data' | translate}}</h2>
+      <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+        <mat-label>{{ 'trade.add-order.name' | translate}}</mat-label>
+        <input matInput formControlName="name" required id="name">
+        <mat-error>
+          {{ 'trade.add-order.name-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.surname' | translate}}</mat-label>
+        <input matInput formControlName="surname" required id="surname">
+        <mat-error>
+          {{ 'trade.add-order.surname-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+        <mat-label>{{ 'trade.add-order.email' | translate}}</mat-label>
+        <input matInput formControlName="email" required id="email">
+        <mat-error>
+          {{ 'trade.add-order.email-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.phone' | translate}}</mat-label>
+        <input matInput placeholder="(+48) 123 456 789" formControlName="phone">
+        <mat-error>
+          {{ 'trade.add-order.phone-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+        <mat-label>{{ 'trade.add-order.postal-code' | translate}}</mat-label>
+        <input matInput placeholder="12-345" formControlName="postalCode" required>
+        <mat-error>
+          {{ 'trade.add-order.postal-code-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.post' | translate}}</mat-label>
+        <input matInput formControlName="post" required>
+        <mat-error>
+          {{ 'trade.add-order.post-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+        <mat-label>{{ 'trade.add-order.city' | translate}}</mat-label>
+        <input matInput formControlName="city" required>
+        <mat-error>
+          {{ 'trade.add-order.city-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.street' | translate}}</mat-label>
+        <input matInput formControlName="street" required>
+        <mat-error>
+          {{ 'trade.add-order.street-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+        <mat-label>{{ 'trade.add-order.building-number' | translate}}</mat-label>
+        <input matInput formControlName="buildingNumber" required>
+        <mat-error>
+          {{ 'trade.add-order.building-number-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="full-width-input" appearance="outline">
+        <mat-label>{{ 'trade.add-order.door-number' | translate}}</mat-label>
+        <input matInput formControlName="doorNumber">
+        <mat-error>
+          {{ 'trade.add-order.door-number-error' | translate}}
+        </mat-error>
+      </mat-form-field>
+      <div >
+        <h2>{{ 'trade.add-order.product-data' | translate}}</h2>
+        <div formArrayName="productSet" *ngFor="let product of productSet.controls; let i = index">
+          <ng-container [formGroupName]="i">
+            <mat-form-field class="full-width-input product-input" appearance="outline">
+              <mat-label>{{ 'products.add-product.product' | translate}}</mat-label>
+              <mat-select formControlName="product" (selectionChange)="changeUnitForProduct(i)">
+                <mat-option *ngFor="let product of productList" [value]="product.code">{{product.code}} - {{product.name}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>{{ 'products.add-product.quantity' | translate}}</mat-label>
+              <input matInput type="number" formControlName="quantity">
+              <span matSuffix>{{getUnit(i)}}</span>
+            </mat-form-field>
+            <button mat-icon-button color="warn" (click)="deleteProduct(i)"><mat-icon>clear</mat-icon></button>
+          </ng-container>
+        </div>
+        <div id="button-add-product">
+          <button mat-flat-button color="primary" (click)="addProduct()">{{ 'products.add-product.add' | translate}}</button>
+        </div>
+      </div>
+      <span class="save-button">
+      <button id="submit-button" mat-raised-button color="primary" *ngIf="!isEditOrderView" [disabled]="form.invalid" (click)="onSubmit()">
+        <mat-icon>save_alt</mat-icon>
+        <span class="submit-span">
+          {{ 'products.add-product.add-button' | translate}}
+        </span></button>
+<!--      <button mat-raised-button color="primary" *ngIf="isEditOrderView" [disabled]="form.invalid || !form.dirty"-->
+<!--              (click)="updateOrder()">-->
+<!--        <mat-icon>update</mat-icon>-->
+<!--        <span class="signup-button">{{ 'manage-users.register.button-edit' | translate}}</span>-->
+<!--      </button>-->
+      </span>
+    </form>
+  </mat-card-content>
+</mat-card>

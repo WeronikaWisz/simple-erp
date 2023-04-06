@@ -40,6 +40,9 @@ public class Product {
     @OneToOne
     private StockLevel stockLevel;
 
+    @OneToMany(mappedBy = "product")
+    List<OrderProducts> orderProductsSet = new ArrayList<>();
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
