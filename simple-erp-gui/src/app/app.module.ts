@@ -49,6 +49,7 @@ import { AssignedUsersDialogComponent } from './views/warehouse/browse-delegated
 import { AddOrderComponent } from './views/trade/add-order/add-order.component';
 import { BrowseOrdersComponent } from './views/trade/browse-orders/browse-orders.component';
 import { CustomerDialogComponent } from './views/trade/browse-orders/customer-dialog/customer-dialog.component';
+import { ChangeUserDialogComponent } from './views/trade/browse-orders/change-user-dialog/change-user-dialog.component';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { CustomerDialogComponent } from './views/trade/browse-orders/customer-di
     AssignedUsersDialogComponent,
     AddOrderComponent,
     BrowseOrdersComponent,
-    CustomerDialogComponent
+    CustomerDialogComponent,
+    ChangeUserDialogComponent
   ],
     imports: [
         BrowserModule,

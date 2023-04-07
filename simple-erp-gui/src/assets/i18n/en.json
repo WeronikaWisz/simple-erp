@@ -252,7 +252,10 @@
       "change-assigned-user": "Change assigned user",
       "customer-error": "Cannot load customer",
       "address-data": "Address data",
-      "street": "st"
+      "street": "st",
+      "edit-user": "Change assigned user",
+      "update-error": "Cannot change assigned user",
+      "update-success": "Successfully changed assigned user"
     }
   },
   "tasks": {

@@ -14,6 +14,8 @@ import {OrderListItem} from "../../../models/trade/OrderListItem";
 import {TradeService} from "../../../services/trade.service";
 import Swal from "sweetalert2";
 import {CustomerDialogComponent} from "./customer-dialog/customer-dialog.component";
+import {ChangeDefaultUserDialogComponent} from "../../manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component";
+import {ChangeUserDialogComponent} from "./change-user-dialog/change-user-dialog.component";
 
 @Component({
   selector: 'app-browse-orders',
@@ -104,7 +106,17 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   changeAssignedUser(){
-
+    const dialogRef = this.dialog.open(ChangeUserDialogComponent, {
+      maxWidth: '650px',
+      data: this.selection.selected.map(s => s.id)
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if(result){
+        this.selection.clear()
+        this.loadOrders();
+      }
+    });
   }
 
   pageChanged(event: PageEvent) {

@@ -1,10 +1,9 @@
 package com.simpleerp.simpleerpapp.services;
 
+import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
-import com.simpleerp.simpleerpapp.dtos.trade.OrderListItem;
-import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
-import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
+import com.simpleerp.simpleerpapp.dtos.trade.*;
+import com.simpleerp.simpleerpapp.enums.ERole;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.ETask;
 import com.simpleerp.simpleerpapp.enums.EUnit;
@@ -93,8 +92,12 @@ public class TradeService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("Cannot found user"));
 
+        OrderProductList orderProductList = new OrderProductList();
+        orderProductList.setOrderProductQuantityList(addOrderRequest.getProductSet());
+
         Order order = orderRepository.save(new Order(addOrderRequest.getNumber(), addOrderRequest.getOrderDate(),
-                EStatus.WAITING, customer, LocalDateTime.now(), user, task.getDefaultUser()));
+                EStatus.WAITING, customer, LocalDateTime.now(), user, task.getDefaultUser(),
+                orderProductList));
 
         BigDecimal calculatedPrice = new BigDecimal(0);
         Map<Product, BigDecimal> orderProductsMap = new HashMap<>();
@@ -248,5 +251,30 @@ public class TradeService {
         List<OrderProducts> orderProducts = order.getOrderProductsSet();
         orderProductsRepository.deleteAll(orderProducts);
         orderRepository.delete(order);
+    }
+
+    public List<UserName> loadUsers() {
+        List<User> userList = userRepository.findAll()
+                .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+                        .contains(ERole.ROLE_TRADE)).collect(Collectors.toList());
+        Optional<User> admin = userRepository.findByUsername("admin");
+        admin.ifPresent(userList::add);
+        List<UserName> userNameList = new ArrayList<>();
+        for (User user: userList){
+            userNameList.add(new UserName(user.getId(), user.getName() + " " + user.getSurname()));
+        }
+        return userNameList;
+    }
+
+    @Transactional
+    public void updateAssignedUser(UpdateAssignedUserRequest updateAssignedUserRequest) {
+        User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
+        for(Long id: updateAssignedUserRequest.getTaskIds()){
+            Order order = orderRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+            order.setAssignedUser(user);
+            orderRepository.save(order);
+        }
     }
 }

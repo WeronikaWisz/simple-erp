@@ -1,10 +1,13 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
+import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateDefaultUserRequest;
+import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
+import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.EType;
@@ -53,7 +56,7 @@ public class TradeController {
     }
 
     @GetMapping("/orders/{status}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> loadOrders(@PathVariable("status") EStatus status,
                                                 @RequestParam(defaultValue = "0") int page,
                                                 @RequestParam(defaultValue = "10") int size) {
@@ -62,11 +65,26 @@ public class TradeController {
     }
 
     @DeleteMapping("/order/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id) {
         tradeService.deleteOrder(id);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.orderDeleted", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> loadUsers() {
+        List<UserName> userNameList = tradeService.loadUsers();
+        return ResponseEntity.ok(userNameList);
+    }
+
+    @PutMapping("/assigned-user")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> updateAssignedUser(@RequestBody UpdateAssignedUserRequest updateAssignedUserRequest) {
+        tradeService.updateAssignedUser(updateAssignedUserRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.assignedUserUpdate", null, LocaleContextHolder.getLocale())));
     }
 
 }

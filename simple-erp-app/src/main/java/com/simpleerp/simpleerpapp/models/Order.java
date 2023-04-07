@@ -1,11 +1,14 @@
 package com.simpleerp.simpleerpapp.models;
 
+import com.simpleerp.simpleerpapp.dtos.trade.OrderProductList;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -52,13 +55,16 @@ public class Order {
     @JoinColumn(name = "assigned_user_id", nullable=false)
     private User assignedUser;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    private OrderProductList orderProducts;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
     private LocalDateTime executionDate;
 
     public Order(String number, LocalDateTime orderDate, EStatus status, Customer customer, LocalDateTime creationDate,
-                 User requestingUser, User assignedUser) {
+                 User requestingUser, User assignedUser, OrderProductList orderProducts) {
         this.number = number;
         this.orderDate = orderDate;
         this.status = status;
@@ -66,6 +72,7 @@ public class Order {
         this.creationDate = creationDate;
         this.requestingUser = requestingUser;
         this.assignedUser = assignedUser;
+        this.orderProducts = orderProducts;
     }
 
     public void addProduct(Product product, BigDecimal quantity){

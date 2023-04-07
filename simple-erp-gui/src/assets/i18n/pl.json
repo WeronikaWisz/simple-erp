@@ -252,7 +252,10 @@
       "change-assigned-user": "Zmień przypisaną osobę",
       "customer-error": "Nie udało załadować się danych osoby",
       "address-data": "Dane adresowe",
-      "street": "ul"
+      "street": "ul",
+      "edit-user": "Zmień przypisaną osobę",
+      "update-error": "Nie udało się zmienić przypisanej osoby",
+      "update-success": "Pomyślnie zmieniono przypisaną osobę"
     }
   },
   "tasks": {

@@ -7,6 +7,9 @@ import {AddOrderRequest} from "../models/trade/AddOrderRequest";
 import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
 import {OrdersResponse} from "../models/trade/OrdersResponse";
 import {OrderListItem} from "../models/trade/OrderListItem";
+import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
+import {UserName} from "../models/manage-users/UserName";
+import {UpdateDefaultUserRequest} from "../models/manage-users/UpdateDefaultUserRequest";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -37,4 +40,13 @@ export class TradeService {
   loadOrders(status: string, pageIndex: number, pageSize: number): Observable<OrdersResponse>{
     return this.http.get<OrdersResponse>(TRADE_API + `orders/${status}?page=${pageIndex}&size=${pageSize}`);
   }
+
+  loadUsers(): Observable<UserName[]> {
+    return this.http.get<UserName[]>(TRADE_API + `users`);
+  }
+
+  updateAssignedUsers(updateAssignedUserRequest: UpdateAssignedUserRequest): Observable<any> {
+    return this.http.put(TRADE_API + 'assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
+  }
+
 }

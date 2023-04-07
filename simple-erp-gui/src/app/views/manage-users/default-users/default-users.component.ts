@@ -9,7 +9,6 @@ import {PageEvent} from "@angular/material/paginator";
 import Swal from "sweetalert2";
 import {ETask} from "../../../enums/ETask";
 import {MatDialog} from "@angular/material/dialog";
-import {UpdateProfileDialogComponent} from "../profile/update-profile-dialog/update-profile-dialog.component";
 import {ChangeDefaultUserDialogComponent} from "./change-default-user-dialog/change-default-user-dialog.component";
 import {ERole} from "../../../enums/ERole";
 
