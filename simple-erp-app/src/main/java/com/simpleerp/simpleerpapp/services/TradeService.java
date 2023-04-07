@@ -2,22 +2,29 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
+import com.simpleerp.simpleerpapp.dtos.trade.OrderListItem;
 import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
+import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.ETask;
 import com.simpleerp.simpleerpapp.enums.EUnit;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
+import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TradeService {
@@ -27,16 +34,21 @@ public class TradeService {
     private final OrderRepository orderRepository;
     private final OrderProductsRepository orderProductsRepository;
     private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     @Autowired
     public TradeService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                         OrderRepository orderRepository, OrderProductsRepository orderProductsRepository,
-                        CustomerRepository customerRepository) {
+                        CustomerRepository customerRepository, UserRepository userRepository,
+                        TaskRepository taskRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.orderRepository = orderRepository;
         this.orderProductsRepository = orderProductsRepository;
         this.customerRepository = customerRepository;
+        this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
     }
 
     public List<ProductCode> loadProductList() {
@@ -74,8 +86,15 @@ public class TradeService {
 
         Customer customer = findOrCreateCustomer(addOrderRequest);
 
+        Task task = taskRepository.findByName(ETask.TASK_SALE)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+
+        String username = getCurrentUserUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+
         Order order = orderRepository.save(new Order(addOrderRequest.getNumber(), addOrderRequest.getOrderDate(),
-                EStatus.WAITING, customer, LocalDateTime.now()));
+                EStatus.WAITING, customer, LocalDateTime.now(), user, task.getDefaultUser()));
 
         BigDecimal calculatedPrice = new BigDecimal(0);
         Map<Product, BigDecimal> orderProductsMap = new HashMap<>();
@@ -127,6 +146,12 @@ public class TradeService {
         }
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
+    }
+
+    private String getCurrentUserUsername(){
+        UserDetailsI userDetails = (UserDetailsI) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        return userDetails.getUsername();
     }
 
     private Customer findOrCreateCustomer(AddOrderRequest addOrderRequest){
@@ -181,5 +206,47 @@ public class TradeService {
                     addOrderRequest.getPost(), addOrderRequest.getCity(), addOrderRequest.getStreet(),
                     addOrderRequest.getBuildingNumber(), addOrderRequest.getDoorNumber(), LocalDateTime.now()));
         }
+    }
+
+    public OrdersResponse loadOrders(EStatus status, int page, int size) {
+        OrdersResponse ordersResponse = new OrdersResponse();
+        List<Order> orderList = orderRepository.findByStatus(status).orElse(Collections.emptyList());
+        int total = orderList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            ordersResponse.setOrdersList(orderListToOrdersListItem(orderList.stream()
+                    .sorted(Comparator.comparing(Order::getOrderDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        ordersResponse.setTotalOrdersLength(total);
+        return ordersResponse;
+    }
+
+    // TODO - jak beda poloczenia z wydaniem to zmiana isIssued
+    private List<OrderListItem> orderListToOrdersListItem(List<Order> orders) {
+        List<OrderListItem> orderListItemList = new ArrayList<>();
+        for(Order order: orders){
+            OrderListItem orderListItem = new OrderListItem(order.getId(), order.getNumber(),
+                    order.getOrderDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    order.getTotalPrice().toString(), order.getCustomer().getId(),
+                    order.getCustomer().getName() + " " + order.getCustomer().getSurname(),
+                    order.getAssignedUser().getName() + " " + order.getAssignedUser().getSurname(),
+                    order.getAssignedUser().getId(), order.getStatus(), false);
+            orderListItemList.add(orderListItem);
+        }
+        return orderListItemList;
+    }
+
+    @Transactional
+    public void deleteOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+        if(!order.getStatus().equals(EStatus.WAITING)){
+            throw new ApiExpectationFailedException("exception.orderNotWaiting");
+        }
+        List<OrderProducts> orderProducts = order.getOrderProductsSet();
+        orderProductsRepository.deleteAll(orderProducts);
+        orderRepository.delete(order);
     }
 }

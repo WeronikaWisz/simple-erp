@@ -4,6 +4,9 @@ import {ProductCode} from "../models/products/ProductCode";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {AddProductRequest} from "../models/products/AddProductRequest";
 import {AddOrderRequest} from "../models/trade/AddOrderRequest";
+import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
+import {OrdersResponse} from "../models/trade/OrdersResponse";
+import {OrderListItem} from "../models/trade/OrderListItem";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -27,4 +30,11 @@ export class TradeService {
     return this.http.post(TRADE_API + 'order', JSON.stringify(addOrderRequest), httpOptions);
   }
 
+  deleteOrder(id: number): Observable<any> {
+    return this.http.delete(TRADE_API + 'order/' + id)
+  }
+
+  loadOrders(status: string, pageIndex: number, pageSize: number): Observable<OrdersResponse>{
+    return this.http.get<OrdersResponse>(TRADE_API + `orders/${status}?page=${pageIndex}&size=${pageSize}`);
+  }
 }

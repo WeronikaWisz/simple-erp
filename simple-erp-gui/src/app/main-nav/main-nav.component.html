@@ -6,6 +6,9 @@
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
       <h2 matSubheader *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade' | translate}}</h2>
+      <a mat-list-item href routerLink="browse-orders" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list</mat-icon>
+        <span class="button-text">{{ 'nav.browse-orders' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="add-order" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>note_add</mat-icon>
         <span class="button-text">{{ 'nav.add-order' | translate}}</span>
       </a>
@@ -65,6 +68,9 @@
       <span *ngIf="(isHandset$ | async) === false && isLoggedIn">
         <button mat-button [matMenuTriggerFor]="trade" *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade-l' | translate}}</button>
         <mat-menu #trade="matMenu">
+          <button mat-menu-item routerLink="browse-orders">
+            <mat-icon>list</mat-icon> {{ 'nav.browse-orders' | translate}}
+          </button>
           <button mat-menu-item routerLink="add-order">
             <mat-icon>note_add</mat-icon> {{ 'nav.add-order' | translate}}
           </button>

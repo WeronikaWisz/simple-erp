@@ -1,9 +1,9 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
-import {WarehouseService} from "../../../../services/warehouse.service";
 import {TranslateService} from "@ngx-translate/core";
 import {AssignedUser} from "../../../../models/warehouse/AssignedUser";
 import Swal from "sweetalert2";
+import {UsersService} from "../../../../services/manage-users/users.service";
 
 @Component({
   selector: 'app-assigned-users-dialog',
@@ -25,7 +25,7 @@ export class AssignedUsersDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<AssignedUsersDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: number,
-    private suppliesService: WarehouseService, private translate: TranslateService
+    private usersService: UsersService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
   }
@@ -35,7 +35,7 @@ export class AssignedUsersDialogComponent implements OnInit {
   }
 
   loadUser(){
-    this.suppliesService.loadAssignedUser(this.data)
+    this.usersService.loadAssignedUser(this.data)
       .subscribe({
         next: (data) => {
           this.user = data

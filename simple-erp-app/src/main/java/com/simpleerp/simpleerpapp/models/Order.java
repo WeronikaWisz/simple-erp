@@ -44,15 +44,28 @@ public class Order {
     @OneToMany(mappedBy = "order")
     List<OrderProducts> orderProductsSet = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requesting_user_id", nullable=false)
+    private User requestingUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_user_id", nullable=false)
+    private User assignedUser;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
-    public Order(String number, LocalDateTime orderDate, EStatus status, Customer customer, LocalDateTime creationDate) {
+    private LocalDateTime executionDate;
+
+    public Order(String number, LocalDateTime orderDate, EStatus status, Customer customer, LocalDateTime creationDate,
+                 User requestingUser, User assignedUser) {
         this.number = number;
         this.orderDate = orderDate;
         this.status = status;
         this.customer = customer;
         this.creationDate = creationDate;
+        this.requestingUser = requestingUser;
+        this.assignedUser = assignedUser;
     }
 
     public void addProduct(Product product, BigDecimal quantity){

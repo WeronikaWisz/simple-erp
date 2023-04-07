@@ -4,6 +4,10 @@ import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
+import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
+import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
+import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.TradeService;
 import com.simpleerp.simpleerpapp.services.WarehouseService;
 import org.modelmapper.ModelMapper;
@@ -46,6 +50,23 @@ public class TradeController {
         tradeService.addOrder(addOrderRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.orderAdded", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/orders/{status}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> loadOrders(@PathVariable("status") EStatus status,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        OrdersResponse ordersResponse = tradeService.loadOrders(status, page, size);
+        return ResponseEntity.ok(ordersResponse);
+    }
+
+    @DeleteMapping("/order/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id) {
+        tradeService.deleteOrder(id);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.orderDeleted", null, LocaleContextHolder.getLocale())));
     }
 
 }

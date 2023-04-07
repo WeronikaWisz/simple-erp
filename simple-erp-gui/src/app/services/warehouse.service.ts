@@ -38,14 +38,11 @@ export class WarehouseService {
   }
 
   deleteTask(id: number, type: string): Observable<any> {
-    return this.http.delete(SUPPLIES_API + 'delete-task/' + type + "/" + id)
+    return this.http.delete(SUPPLIES_API + 'task/' + type + "/" + id)
   }
 
   updatePurchaseTask(purchaseTaskRequest: PurchaseTaskRequest): Observable<any> {
     return this.http.put(SUPPLIES_API + 'purchase-task', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
-  loadAssignedUser(id: number): Observable<AssignedUser> {
-    return this.http.get<AssignedUser>(SUPPLIES_API + `assigned-user/${id}`);
-  }
 }

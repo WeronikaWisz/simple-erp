@@ -10,6 +10,7 @@ import {BrowseProductsComponent} from "./views/products/browse-products/browse-p
 import {BrowseSuppliesComponent} from "./views/warehouse/browse-supplies/browse-supplies.component";
 import {BrowseDelegatedTasksComponent} from "./views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component";
 import {AddOrderComponent} from "./views/trade/add-order/add-order.component";
+import {BrowseOrdersComponent} from "./views/trade/browse-orders/browse-orders.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'browse-supplies', component: BrowseSuppliesComponent },
   { path: 'browse-delegated-tasks', component: BrowseDelegatedTasksComponent },
   { path: 'add-order', component: AddOrderComponent },
+  { path: 'browse-orders', component: BrowseOrdersComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

@@ -4,6 +4,7 @@ import {ChangePassword} from "../../models/manage-users/ChangePassword";
 import { Observable } from 'rxjs';
 import {ProfileData} from "../../models/manage-users/ProfileData";
 import {UpdateUserData} from "../../models/manage-users/UpdateUserData";
+import {AssignedUser} from "../../models/warehouse/AssignedUser";
 
 const USERS_API = 'http://localhost:8080/users/';
 
@@ -29,6 +30,10 @@ export class UsersService {
 
   changePassword(changePassword: ChangePassword): Observable<any>{
     return this.http.put(USERS_API + 'user/password', JSON.stringify(changePassword), httpOptions);
+  }
+
+  loadAssignedUser(id: number): Observable<AssignedUser> {
+    return this.http.get<AssignedUser>(USERS_API + `assigned-user/${id}`);
   }
 
 }

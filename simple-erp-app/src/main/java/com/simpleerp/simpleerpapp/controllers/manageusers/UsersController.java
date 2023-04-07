@@ -4,6 +4,7 @@ import com.simpleerp.simpleerpapp.dtos.manageusers.ChangePassword;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.ProfileData;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateUserData;
+import com.simpleerp.simpleerpapp.dtos.warehouse.AssignedUser;
 import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.services.UsersService;
 import org.modelmapper.ModelMapper;
@@ -62,6 +63,13 @@ public class UsersController {
         usersService.changePassword(changePassword);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.passwordChange", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/assigned-user/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE') or hasRole('ROLE_PRODUCTION') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> loadAssignedUser(@PathVariable("id") Long id) {
+        AssignedUser assignedUser = usersService.loadAssignedUser(id);
+        return ResponseEntity.ok(assignedUser);
     }
 
     private ProfileData mapUserToProfileData(User user){

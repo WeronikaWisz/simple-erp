@@ -213,12 +213,4 @@ public class WarehouseService {
     // TODO
     private void deleteDelegatedProductionTasks(Long id) {
     }
-
-    public AssignedUser loadAssignedUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new UsernameNotFoundException("Cannot found user"));
-        AssignedUser assignedUser = new AssignedUser(user.getId(), user.getName(),
-                user.getSurname(), user.getEmail(), user.getPhone());
-        return assignedUser;
-    }
 }

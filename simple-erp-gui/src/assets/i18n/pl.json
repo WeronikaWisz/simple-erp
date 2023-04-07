@@ -234,6 +234,25 @@
       "price": "Zmień cenę zamówienia",
       "add-success": "Pomyślnie dodano zamówienie",
       "add-error": "Nie można dodać zamówienia"
+    },
+    "browse-orders": {
+      "browse-title": "Lista zamówień",
+      "order-count": "Liczba zamówień",
+      "waiting": "Oczekujące",
+      "in-progress": "W trakcie realizacji",
+      "done": "Zrobione",
+      "number": "Numer",
+      "customer": "Kupujący",
+      "date": "Data zamówienia",
+      "price": "Koszt",
+      "assigned-user": "Osoba przypisana",
+      "load-error": "Nie udało się załadować zamówień",
+      "delete-error": "Nie udało się usunąć zamówienia",
+      "add-external-release": "Zleć wydanie zewnętrzne",
+      "change-assigned-user": "Zmień przypisaną osobę",
+      "customer-error": "Nie udało załadować się danych osoby",
+      "address-data": "Dane adresowe",
+      "street": "ul"
     }
   },
   "tasks": {
@@ -262,6 +281,7 @@
     "browse-delegated-tasks": "Zlecone zadania",
     "trade": "HANDEL",
     "trade-l": "Handel",
-    "add-order": "Dodaj zamówienie"
+    "add-order": "Dodaj zamówienie",
+    "browse-orders": "Przegladaj zamówienia"
   }
 }

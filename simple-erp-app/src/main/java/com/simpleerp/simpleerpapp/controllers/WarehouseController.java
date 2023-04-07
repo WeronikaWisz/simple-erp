@@ -69,19 +69,12 @@ public class WarehouseController {
                 "success.taskUpdated", null, LocaleContextHolder.getLocale())));
     }
 
-    @DeleteMapping("/delete-task/{type}/{id}")
+    @DeleteMapping("/task/{type}/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
     public ResponseEntity<?> deleteTask(@PathVariable("type") EType type, @PathVariable("id") Long id) {
         warehouseService.deleteTask(type, id);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.taskDeleted", null, LocaleContextHolder.getLocale())));
-    }
-
-    @GetMapping("/assigned-user/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
-    public ResponseEntity<?> loadAssignedUser(@PathVariable("id") Long id) {
-        AssignedUser assignedUser = warehouseService.loadAssignedUser(id);
-        return ResponseEntity.ok(assignedUser);
     }
 
 }

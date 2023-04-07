@@ -2,6 +2,7 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.ChangePassword;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateUserData;
+import com.simpleerp.simpleerpapp.dtos.warehouse.AssignedUser;
 import com.simpleerp.simpleerpapp.exception.ApiBadRequestException;
 import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.repositories.UserRepository;
@@ -99,5 +100,12 @@ public class UsersService {
         UserDetailsI userDetails = (UserDetailsI) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userDetails.getUsername();
+    }
+
+    public AssignedUser loadAssignedUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+        return new AssignedUser(user.getId(), user.getName(),
+                user.getSurname(), user.getEmail(), user.getPhone());
     }
 }

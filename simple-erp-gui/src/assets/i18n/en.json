@@ -234,6 +234,25 @@
       "price": "Change price",
       "add-success": "Successfully added order",
       "add-error": "Cannot add order"
+    },
+    "browse-orders": {
+      "browse-title": "Orders list",
+      "order-count": "Orders count",
+      "waiting": "Waiting",
+      "in-progress": "In progress",
+      "done": "Done",
+      "number": "Number",
+      "customer": "Customer",
+      "date": "Order date",
+      "price": "Price",
+      "assigned-user": "Assigned user",
+      "load-error": "Cannot load orders",
+      "delete-error": "Cannot delete order",
+      "add-external-release": "Delegate external release",
+      "change-assigned-user": "Change assigned user",
+      "customer-error": "Cannot load customer",
+      "address-data": "Address data",
+      "street": "st"
     }
   },
   "tasks": {
@@ -262,6 +281,7 @@
     "browse-delegated-tasks": "Delegated tasks",
     "trade": "TRADE",
     "trade-l": "Trade",
-    "add-order": "Add order"
+    "add-order": "Add order",
+    "browse-orders": "Browse orders"
   }
 }
