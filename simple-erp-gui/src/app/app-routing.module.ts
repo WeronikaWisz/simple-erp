@@ -26,6 +26,7 @@ const routes: Routes = [
   { path: 'browse-delegated-tasks', component: BrowseDelegatedTasksComponent },
   { path: 'add-order', component: AddOrderComponent },
   { path: 'browse-orders', component: BrowseOrdersComponent },
+  { path: 'edit-order/:id', component: AddOrderComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

@@ -3,7 +3,6 @@ import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Unit} from "../../../models/products/Unit";
 import {Type} from "../../../models/products/Type";
 import {ProductCode} from "../../../models/products/ProductCode";
-import {EType} from "../../../enums/EType";
 import {TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TokenStorageService} from "../../../services/token-storage.service";
@@ -11,6 +10,7 @@ import {ERole} from "../../../enums/ERole";
 import Swal from "sweetalert2";
 import {EUnit} from "../../../enums/EUnit";
 import {TradeService} from "../../../services/trade.service";
+import {UpdateOrderRequest} from "../../../models/trade/UpdateOrderRequest";
 
 @Component({
   selector: 'app-add-order',
@@ -35,8 +35,7 @@ export class AddOrderComponent implements OnInit {
   unitsForProducts: string[] = [];
 
   isEditOrderView = false;
-  productId?: number;
-  productType?: EType;
+  orderId?: number;
 
   format = 'dd/MM/yyyy';
   locale = 'en-US';
@@ -46,7 +45,6 @@ export class AddOrderComponent implements OnInit {
               private router: Router, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
-    this.formTitle = this.getTranslateMessage("trade.add-order.add-title");
     this.form = this.formBuilder.group({
       number: ['', Validators.required],
       date: [new Date(), Validators.required],
@@ -76,8 +74,10 @@ export class AddOrderComponent implements OnInit {
     } else {
       this.router.navigate(['/profile']).then(() => this.reloadPage());
     }
+    this.loadUnits();
     this.addProduct();
     this.loadProductForSetList();
+    this.checkIfEditOrderView();
   }
 
   reloadPage(): void {
@@ -166,8 +166,8 @@ export class AddOrderComponent implements OnInit {
   }
 
   changeUnitForProduct(i: number) {
-    const id = this.productSet.get([i])!.get('product')?.value
-    const productUnit = this.productList.find(product => product.id === id)!.unit as unknown as string;
+    const code = this.productSet.get([i])!.get('product')?.value
+    const productUnit = this.productList.find(product => product.code === code)!.unit as unknown as string;
     this.unitsForProducts[i] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
   }
 
@@ -218,5 +218,105 @@ export class AddOrderComponent implements OnInit {
       showConfirmButton: false,
       timer: 6000
     })
+  }
+
+
+  checkIfEditOrderView(){
+    this.route.params
+      .subscribe(
+        params => {
+          console.log(params);
+          if (params['id'] ){
+            this.isEditOrderView = true;
+            this.orderId = params['id'];
+            this.formTitle = this.getTranslateMessage("trade.add-order.edit-title")
+            this.getOrder()
+          } else {
+            this.formTitle = this.getTranslateMessage("trade.add-order.add-title")
+          }
+        }
+      );
+  }
+
+  getOrder() {
+    this.tradeService.getOrder(this.orderId!).subscribe({
+      next: (data) => {
+        console.log(data)
+        this.fillFormWithEditedOrder(data);
+      },
+      error: (err) => {
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("trade.add-order.load-error"),
+          text: err.error.message,
+          icon: 'error',
+          showConfirmButton: false
+        })
+      }
+    })
+  }
+
+  fillFormWithEditedOrder(data: UpdateOrderRequest){
+    this.form.get('buildingNumber')?.setValue(data.buildingNumber);
+    this.form.get('city')?.setValue(data.city);
+    this.form.get('delivery')?.setValue(data.delivery);
+    this.form.get('discount')?.setValue(data.discount);
+    this.form.get('doorNumber')?.setValue(data.doorNumber);
+    this.form.get('email')?.setValue(data.email);
+    this.form.get('name')?.setValue(data.name);
+    this.form.get('number')?.setValue(data.number);
+    this.form.get('date')?.setValue(data.orderDate);
+    this.form.get('phone')?.setValue(data.phone);
+    this.form.get('post')?.setValue(data.post);
+    this.form.get('postalCode')?.setValue(data.postalCode);
+    this.form.get('price')?.setValue(data.price);
+    this.form.get('street')?.setValue(data.street);
+    this.form.get('surname')?.setValue(data.surname);
+    if(data.productSet) {
+      const productUnit = this.productList.find(product => product.code === data.productSet![0].product)!.unit as unknown as string;
+      this.unitsForProducts[0] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
+      for (let i= 1; i < data.productSet.length; i++){
+        this.addProduct();
+        const productUnit = this.productList.find(product => product.code === data.productSet![i].product)!.unit as unknown as string;
+        this.unitsForProducts[i] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
+      }
+    }
+    this.form.get('productSet')?.setValue(data.productSet)
+  }
+
+  updateOrder(): void {
+    this.tradeService.updateOrder({
+      id: this.orderId!,
+      buildingNumber: this.form.get('buildingNumber')?.value,
+      city: this.form.get('city')?.value,
+      delivery: this.form.get('delivery')?.value,
+      discount: this.form.get('discount')?.value,
+      doorNumber: this.form.get('doorNumber')?.value,
+      email: this.form.get('email')?.value,
+      name: this.form.get('name')?.value,
+      number: this.form.get('number')?.value,
+      orderDate: this.form.get('date')?.value,
+      phone: this.form.get('phone')?.value,
+      post: this.form.get('post')?.value,
+      postalCode: this.form.get('postalCode')?.value,
+      price: this.form.get('price')?.value,
+      productSet: this.form.get('productSet')?.value,
+      street: this.form.get('street')?.value,
+      surname: this.form.get('surname')?.value
+    }).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.router.navigate(['/browse-orders']).then(() => this.showSuccess("trade.add-order.update-success"));
+      },
+      error: (err) => {
+        Swal.fire({
+          position: 'top-end',
+          title: this.getTranslateMessage("trade.add-order.update-error"),
+          text: err.error.message,
+          icon: 'error',
+          showConfirmButton: false
+        })
+      }
+    });
   }
 }

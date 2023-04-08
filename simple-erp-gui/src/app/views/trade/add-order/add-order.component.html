@@ -132,11 +132,11 @@
         <span class="submit-span">
           {{ 'products.add-product.add-button' | translate}}
         </span></button>
-<!--      <button mat-raised-button color="primary" *ngIf="isEditOrderView" [disabled]="form.invalid || !form.dirty"-->
-<!--              (click)="updateOrder()">-->
-<!--        <mat-icon>update</mat-icon>-->
-<!--        <span class="signup-button">{{ 'manage-users.register.button-edit' | translate}}</span>-->
-<!--      </button>-->
+      <button mat-raised-button color="primary" *ngIf="isEditOrderView" [disabled]="form.invalid || !form.dirty"
+              (click)="updateOrder()">
+        <mat-icon>update</mat-icon>
+        <span class="signup-button">{{ 'manage-users.register.button-edit' | translate}}</span>
+      </button>
       </span>
     </form>
   </mat-card-content>

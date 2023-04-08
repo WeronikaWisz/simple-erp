@@ -233,7 +233,11 @@
       "delivery": "Add delivery cost",
       "price": "Change price",
       "add-success": "Successfully added order",
-      "add-error": "Cannot add order"
+      "add-error": "Cannot add order",
+      "load-error": "Cannot load order",
+      "edit-title": "Edit order",
+      "update-success": "Successfully updated order",
+      "update-error": "Cannot update order"
     },
     "browse-orders": {
       "browse-title": "Orders list",

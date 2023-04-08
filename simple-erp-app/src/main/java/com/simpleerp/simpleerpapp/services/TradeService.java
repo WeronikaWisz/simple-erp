@@ -83,7 +83,10 @@ public class TradeService {
             throw new ApiExpectationFailedException("exception.orderNumberAlreadyUsed");
         }
 
-        Customer customer = findOrCreateCustomer(addOrderRequest);
+        Customer customer = findOrCreateCustomer(new CustomerData(addOrderRequest.getName(), addOrderRequest.getSurname(),
+                addOrderRequest.getEmail(), addOrderRequest.getPhone(), addOrderRequest.getPostalCode(),
+                addOrderRequest.getPost(), addOrderRequest.getCity(), addOrderRequest.getStreet(),
+                addOrderRequest.getBuildingNumber(), addOrderRequest.getDoorNumber()));
 
         Task task = taskRepository.findByName(ETask.TASK_SALE)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
@@ -130,20 +133,20 @@ public class TradeService {
 
         order.setCalculatedPrice(calculatedPrice);
         BigDecimal totalPrice;
-        if(!addOrderRequest.getPrice().isEmpty()){
+        if(addOrderRequest.getPrice() != null && !addOrderRequest.getPrice().isEmpty()){
             totalPrice = new BigDecimal(addOrderRequest.getPrice());
             order.setPrice(new BigDecimal(addOrderRequest.getPrice()));
         } else {
             totalPrice = calculatedPrice;
             order.setPrice(calculatedPrice);
         }
-        if(!addOrderRequest.getDiscount().isEmpty()){
+        if(addOrderRequest.getDiscount() != null && !addOrderRequest.getDiscount().isEmpty()){
             totalPrice = totalPrice.subtract(totalPrice.multiply(
                     (new BigDecimal(addOrderRequest.getDiscount()))
                             .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
             order.setDiscount(new BigDecimal(addOrderRequest.getDiscount()));
         }
-        if(!addOrderRequest.getDelivery().isEmpty()){
+        if(addOrderRequest.getDelivery() != null && !addOrderRequest.getDelivery().isEmpty()){
             totalPrice = totalPrice.add(new BigDecimal(addOrderRequest.getDelivery()));
             order.setDelivery(new BigDecimal(addOrderRequest.getDelivery()));
         }
@@ -157,11 +160,10 @@ public class TradeService {
         return userDetails.getUsername();
     }
 
-    private Customer findOrCreateCustomer(AddOrderRequest addOrderRequest){
-        Optional<Customer> customer = customerRepository.findByNameAndSurnameAndEmail(addOrderRequest.getName(),
-                addOrderRequest.getSurname(), addOrderRequest.getEmail());
+    private Customer findOrCreateCustomer(CustomerData customerData){
+        Optional<Customer> customer = customerRepository.findByEmail(customerData.getEmail());
 
-        String phoneNumber = addOrderRequest.getPhone();
+        String phoneNumber = customerData.getPhone();
         if(!Objects.equals(phoneNumber, "")) {
             phoneNumber = phoneNumber.replaceAll("\\s+", "");
             if (!phoneNumber.startsWith("+48")) {
@@ -171,32 +173,40 @@ public class TradeService {
 
         if(customer.isPresent()){
             boolean hasChanged = false;
+            if(!Objects.equals(customer.get().getName(), customerData.getName())){
+                customer.get().setName(customerData.getName());
+                hasChanged = true;
+            }
+            if(!Objects.equals(customer.get().getSurname(), customerData.getSurname())){
+                customer.get().setSurname(customerData.getSurname());
+                hasChanged = true;
+            }
             if(!Objects.equals(customer.get().getPhone(), phoneNumber)){
                 customer.get().setPhone(phoneNumber);
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getPostalCode(), addOrderRequest.getPostalCode())){
-                customer.get().setPostalCode(addOrderRequest.getPostalCode());
+            if(!Objects.equals(customer.get().getPostalCode(), customerData.getPostalCode())){
+                customer.get().setPostalCode(customerData.getPostalCode());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getPost(), addOrderRequest.getPost())){
-                customer.get().setPost(addOrderRequest.getPost());
+            if(!Objects.equals(customer.get().getPost(), customerData.getPost())){
+                customer.get().setPost(customerData.getPost());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getCity(), addOrderRequest.getCity())){
-                customer.get().setCity(addOrderRequest.getCity());
+            if(!Objects.equals(customer.get().getCity(), customerData.getCity())){
+                customer.get().setCity(customerData.getCity());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getStreet(), addOrderRequest.getStreet())){
-                customer.get().setStreet(addOrderRequest.getStreet());
+            if(!Objects.equals(customer.get().getStreet(), customerData.getStreet())){
+                customer.get().setStreet(customerData.getStreet());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getBuildingNumber(), addOrderRequest.getBuildingNumber())){
-                customer.get().setBuildingNumber(addOrderRequest.getBuildingNumber());
+            if(!Objects.equals(customer.get().getBuildingNumber(), customerData.getBuildingNumber())){
+                customer.get().setBuildingNumber(customerData.getBuildingNumber());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getDoorNumber(), addOrderRequest.getDoorNumber())){
-                customer.get().setDoorNumber(addOrderRequest.getDoorNumber());
+            if(!Objects.equals(customer.get().getDoorNumber(), customerData.getDoorNumber())){
+                customer.get().setDoorNumber(customerData.getDoorNumber());
                 hasChanged = true;
             }
             if(hasChanged){
@@ -204,10 +214,10 @@ public class TradeService {
             }
             return customer.get();
         } else {
-            return customerRepository.save(new Customer(addOrderRequest.getName(), addOrderRequest.getSurname(),
-                    addOrderRequest.getEmail(), phoneNumber, addOrderRequest.getPostalCode(),
-                    addOrderRequest.getPost(), addOrderRequest.getCity(), addOrderRequest.getStreet(),
-                    addOrderRequest.getBuildingNumber(), addOrderRequest.getDoorNumber(), LocalDateTime.now()));
+            return customerRepository.save(new Customer(customerData.getName(), customerData.getSurname(),
+                    customerData.getEmail(), phoneNumber, customerData.getPostalCode(),
+                    customerData.getPost(), customerData.getCity(), customerData.getStreet(),
+                    customerData.getBuildingNumber(), customerData.getDoorNumber(), LocalDateTime.now()));
         }
     }
 
@@ -277,4 +287,117 @@ public class TradeService {
             orderRepository.save(order);
         }
     }
+
+    public UpdateOrderRequest getOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+        UpdateOrderRequest updateOrderRequest = new UpdateOrderRequest(order.getId(), order.getNumber(),
+                order.getOrderDate(), order.getDiscount() != null ? order.getDiscount().toString() : "",
+                order.getDelivery() != null ? order.getDelivery().toString() : "",
+                order.getPrice() != null ? order.getPrice().toString() : "",
+                order.getCustomer().getName(), order.getCustomer().getSurname(), order.getCustomer().getEmail(),
+                order.getCustomer().getPhone(), order.getCustomer().getPostalCode(), order.getCustomer().getPost(),
+                order.getCustomer().getCity(), order.getCustomer().getStreet(), order.getCustomer().getBuildingNumber(),
+                order.getCustomer().getDoorNumber());
+        updateOrderRequest.setProductSet(order.getOrderProducts().getOrderProductQuantityList());
+        return updateOrderRequest;
+    }
+
+    @Transactional
+    public void updateOrder(UpdateOrderRequest updateOrderRequest) {
+        Order order = orderRepository.findById(updateOrderRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+        if(!Objects.equals(order.getNumber(), updateOrderRequest.getNumber())){
+            Optional<Order> existingOrder = orderRepository.findByNumber(updateOrderRequest.getNumber());
+            if(existingOrder.isPresent()) {
+                throw new ApiExpectationFailedException("exception.orderNumberAlreadyUsed");
+            }
+            order.setNumber(updateOrderRequest.getNumber());
+        }
+        order.setOrderDate(updateOrderRequest.getOrderDate());
+
+        Customer customer = findOrCreateCustomer(new CustomerData(updateOrderRequest.getName(), updateOrderRequest.getSurname(),
+                updateOrderRequest.getEmail(), updateOrderRequest.getPhone(), updateOrderRequest.getPostalCode(),
+                updateOrderRequest.getPost(), updateOrderRequest.getCity(), updateOrderRequest.getStreet(),
+                updateOrderRequest.getBuildingNumber(), updateOrderRequest.getDoorNumber()));
+
+        order.setCustomer(customer);
+
+        OrderProductList orderProductList = new OrderProductList();
+        orderProductList.setOrderProductQuantityList(updateOrderRequest.getProductSet());
+        order.setOrderProducts(orderProductList);
+
+        BigDecimal calculatedPrice = new BigDecimal(0);
+
+        Map<Product, BigDecimal> orderProductsMap = new HashMap<>();
+        for(OrderProductQuantity orderProductQuantity: updateOrderRequest.getProductSet()){
+            Optional<Product> product = productRepository.findByCode(orderProductQuantity.getProduct());
+            Optional<ProductSet> productSet = productSetRepository.findByCode(orderProductQuantity.getProduct());
+            if(product.isEmpty() && productSet.isEmpty()){
+                throw new ApiExpectationFailedException("exception.productNotFound");
+            }
+            if(product.isPresent()){
+                orderProductsMap.put(product.get(), orderProductsMap.getOrDefault(product.get(), new BigDecimal(0))
+                        .add(new BigDecimal(orderProductQuantity.getQuantity())));
+                calculatedPrice = calculatedPrice.add(product.get().getSalePrice().multiply(
+                        new BigDecimal(orderProductQuantity.getQuantity())));
+            } else {
+                List<ProductSetProducts> productSetProducts = productSet.get().getProductsSets();
+                for(ProductSetProducts productSetProduct: productSetProducts){
+                    orderProductsMap.put(productSetProduct.getProduct(),
+                            orderProductsMap.getOrDefault(productSetProduct.getProduct(), new BigDecimal(0))
+                                    .add((new BigDecimal(orderProductQuantity.getQuantity()))
+                                            .multiply(productSetProduct.getQuantity())));
+                }
+                calculatedPrice = calculatedPrice.add(productSet.get().getSalePrice().multiply(
+                        new BigDecimal(orderProductQuantity.getQuantity())));
+            }
+        }
+
+        List<OrderProducts> orderProducts = order.getOrderProductsSet();
+
+        orderProductsMap.forEach((k,v) -> {
+            Optional<OrderProducts> productAlreadyInList = orderProducts.stream()
+                    .filter(currentProduct -> currentProduct.getProduct().getId().equals(k.getId())).findFirst();
+            if(productAlreadyInList.isPresent()){
+                productAlreadyInList.get().setQuantity(v);
+                orderProductsRepository.save(productAlreadyInList.get());
+            } else {
+                orderProductsRepository.save(new OrderProducts(order, k, v));
+            }
+        });
+
+        List<OrderProducts> orderProductsToDelete = new ArrayList<>();
+        for(OrderProducts orderProduct: orderProducts){
+            if(!orderProductsMap.containsKey(orderProduct.getProduct())){
+                orderProductsToDelete.add(orderProduct);
+            }
+        }
+        orderProductsRepository.deleteAll(orderProductsToDelete);
+
+        order.setCalculatedPrice(calculatedPrice);
+        BigDecimal totalPrice;
+        if(updateOrderRequest.getPrice() != null && !updateOrderRequest.getPrice().isEmpty()){
+            totalPrice = new BigDecimal(updateOrderRequest.getPrice());
+            order.setPrice(new BigDecimal(updateOrderRequest.getPrice()));
+        } else {
+            totalPrice = calculatedPrice;
+            order.setPrice(calculatedPrice);
+        }
+        if(updateOrderRequest.getDiscount() != null && !updateOrderRequest.getDiscount().isEmpty()){
+            totalPrice = totalPrice.subtract(totalPrice.multiply(
+                    (new BigDecimal(updateOrderRequest.getDiscount()))
+                            .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)));
+            order.setDiscount(new BigDecimal(updateOrderRequest.getDiscount()));
+        }
+        if(updateOrderRequest.getDelivery() != null && !updateOrderRequest.getDelivery().isEmpty()){
+            totalPrice = totalPrice.add(new BigDecimal(updateOrderRequest.getDelivery()));
+            order.setDelivery(new BigDecimal(updateOrderRequest.getDelivery()));
+        }
+        order.setTotalPrice(totalPrice);
+        order.setUpdateDate(LocalDateTime.now());
+        orderRepository.save(order);
+    }
+
+
 }

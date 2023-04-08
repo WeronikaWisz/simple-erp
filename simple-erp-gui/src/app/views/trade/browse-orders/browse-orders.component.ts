@@ -156,7 +156,7 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   goToEditOrder(id: number) {
-
+    this.router.navigate(['/edit-order', id]);
   }
 
   goToOrderInfo(id: number) {

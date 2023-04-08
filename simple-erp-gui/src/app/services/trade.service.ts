@@ -10,6 +10,10 @@ import {OrderListItem} from "../models/trade/OrderListItem";
 import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
 import {UserName} from "../models/manage-users/UserName";
 import {UpdateDefaultUserRequest} from "../models/manage-users/UpdateDefaultUserRequest";
+import {EType} from "../enums/EType";
+import {ProductListItem} from "../models/products/ProductListItem";
+import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
+import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -49,4 +53,11 @@ export class TradeService {
     return this.http.put(TRADE_API + 'assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
   }
 
+  getOrder(id: number): Observable<UpdateOrderRequest> {
+    return this.http.get<UpdateOrderRequest>(TRADE_API + 'order/' + id, httpOptions);
+  }
+
+  updateOrder(updateOrderRequest: UpdateOrderRequest): Observable<any> {
+    return this.http.put(TRADE_API + 'order', JSON.stringify(updateOrderRequest), httpOptions);
+  }
 }

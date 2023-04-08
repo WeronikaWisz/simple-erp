@@ -5,9 +5,12 @@ import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateDefaultUserRequest;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.ProductListItem;
+import com.simpleerp.simpleerpapp.dtos.products.UpdateProductRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
+import com.simpleerp.simpleerpapp.dtos.trade.UpdateOrderRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.EType;
@@ -85,6 +88,21 @@ public class TradeController {
         tradeService.updateAssignedUser(updateAssignedUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.assignedUserUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/order/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> getOrder(@PathVariable("id") Long id) {
+        UpdateOrderRequest order = tradeService.getOrder(id);
+        return ResponseEntity.ok(order);
+    }
+
+    @PutMapping("/order")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> updateOrder(@RequestBody UpdateOrderRequest updateOrderRequest) {
+        tradeService.updateOrder(updateOrderRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.orderUpdate", null, LocaleContextHolder.getLocale())));
     }
 
 }

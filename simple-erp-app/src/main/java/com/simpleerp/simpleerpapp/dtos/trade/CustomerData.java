@@ -1,5 +1,6 @@
 package com.simpleerp.simpleerpapp.dtos.trade;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,20 @@ public class CustomerData {
     private String street;
     private String buildingNumber;
     private String doorNumber;
+
+    public CustomerData(String name, String surname, String email, String phone, String postalCode, String post,
+                        String city, String street, String buildingNumber, String doorNumber) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.phone = phone;
+        this.postalCode = postalCode;
+        this.post = post;
+        this.city = city;
+        this.street = street;
+        this.buildingNumber = buildingNumber;
+        this.doorNumber = doorNumber;
+    }
 
     @Override
     public boolean equals(Object o) {

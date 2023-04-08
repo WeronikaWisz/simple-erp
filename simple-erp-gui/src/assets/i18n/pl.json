@@ -233,7 +233,11 @@
       "delivery": "Dodaj koszt przesyłki",
       "price": "Zmień cenę zamówienia",
       "add-success": "Pomyślnie dodano zamówienie",
-      "add-error": "Nie można dodać zamówienia"
+      "add-error": "Nie można dodać zamówienia",
+      "load-error": "Nie udało się załadować zamówienia",
+      "edit-title": "Edytuj zamówienie",
+      "update-success": "Pomyśnie zaktualizowano zamówienie",
+      "update-error": "Nie udało się zaktualizować zamówienia"
     },
     "browse-orders": {
       "browse-title": "Lista zamówień",
