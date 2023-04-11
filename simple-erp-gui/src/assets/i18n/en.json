@@ -263,7 +263,12 @@
       "info-title": "Order details",
       "delivery": "Delivery cost",
       "discount": "Discount",
-      "products": "Products"
+      "products": "Products",
+      "delegate-error": "Cannot delegate release",
+      "mark-as-received": "Receipt confirmed",
+      "not-issued": "Waiting for release",
+      "issued": "Released",
+      "mark-error": "Cannot mark orders as received"
     }
   },
   "tasks": {

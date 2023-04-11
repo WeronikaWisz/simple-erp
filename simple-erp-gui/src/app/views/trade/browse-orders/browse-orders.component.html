@@ -1,6 +1,15 @@
 <div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
-  <h2>{{ 'trade.browse-orders.browse-title' | translate}}</h2>
-  <p>{{ 'trade.browse-orders.order-count' | translate}}: {{orderCount}}</p>
+  <div class="product-list-header">
+    <div>
+      <h2>{{ 'trade.browse-orders.browse-title' | translate}}</h2>
+      <p>{{ 'trade.browse-orders.order-count' | translate}}: {{orderCount}}</p>
+    </div>
+    <div>
+      <button mat-raised-button (click)="goToAddOrder()">
+        {{ 'nav.add-order' | translate}}
+      </button>
+    </div>
+  </div>
   <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
     <mat-tab label="{{ 'trade.browse-orders.waiting' | translate}}">
       <ng-template *ngTemplateOutlet="orderListTemplate; context: {$implicit: dataSource}"></ng-template>
@@ -26,7 +35,10 @@
     <button mat-raised-button color="accent" *ngIf="isStatusWaiting()" [disabled]="isNothingSelected()" (click)="delegateExternalRelease()">
       {{ 'trade.browse-orders.add-external-release' | translate}}
     </button>
-    <button mat-raised-button color="accent" *ngIf="isStatusWaiting()" [disabled]="isNothingSelected()" (click)="changeAssignedUser()">
+    <button mat-raised-button color="accent" *ngIf="isStatusInProgress()" [disabled]="isNothingSelected() || selectedAreNotIssued()" (click)="markAsReceived()">
+      {{ 'trade.browse-orders.mark-as-received' | translate}}
+    </button>
+    <button mat-raised-button color="accent" *ngIf="isStatusNotDone()" [disabled]="isNothingSelected()" (click)="changeAssignedUser()">
       {{ 'trade.browse-orders.change-assigned-user' | translate}}
     </button>
   </div>
@@ -77,6 +89,16 @@
       <mat-cell *matCellDef="let row">
         <mat-chip-list>
           <mat-chip (click)="showUserData(row.assignedUserId)"> {{row.assignedUserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="message">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list *ngIf="isStatusInProgress()">
+          <mat-chip class="chip-waiting" *ngIf="!row.isIssued"> {{ 'trade.browse-orders.not-issued' | translate}} </mat-chip>
+          <mat-chip class="chip-in-progress" *ngIf="row.isIssued"> {{ 'trade.browse-orders.issued' | translate}} </mat-chip>
         </mat-chip-list>
       </mat-cell>
     </ng-container>

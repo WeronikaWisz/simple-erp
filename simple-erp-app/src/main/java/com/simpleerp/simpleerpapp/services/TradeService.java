@@ -3,10 +3,7 @@ package com.simpleerp.simpleerpapp.services;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
-import com.simpleerp.simpleerpapp.enums.ERole;
-import com.simpleerp.simpleerpapp.enums.EStatus;
-import com.simpleerp.simpleerpapp.enums.ETask;
-import com.simpleerp.simpleerpapp.enums.EUnit;
+import com.simpleerp.simpleerpapp.enums.*;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
@@ -28,6 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class TradeService {
 
+    private static final String RELEASE_PREFIX = "WZ";
+    private static final String RELEASE_SEPARATOR = "/";
+
     private final ProductRepository productRepository;
     private final ProductSetRepository productSetRepository;
     private final OrderRepository orderRepository;
@@ -35,12 +35,13 @@ public class TradeService {
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
+    private final ReleaseRepository releaseRepository;
 
     @Autowired
     public TradeService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                         OrderRepository orderRepository, OrderProductsRepository orderProductsRepository,
                         CustomerRepository customerRepository, UserRepository userRepository,
-                        TaskRepository taskRepository) {
+                        TaskRepository taskRepository, ReleaseRepository releaseRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.orderRepository = orderRepository;
@@ -48,6 +49,7 @@ public class TradeService {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
+        this.releaseRepository = releaseRepository;
     }
 
     public List<ProductCode> loadProductList() {
@@ -236,19 +238,24 @@ public class TradeService {
         return ordersResponse;
     }
 
-    // TODO - jak beda poloczenia z wydaniem to zmiana isIssued
     private List<OrderListItem> orderListToOrdersListItem(List<Order> orders) {
         List<OrderListItem> orderListItemList = new ArrayList<>();
         for(Order order: orders){
+            boolean isIssued = checkIfOrderIssued(order);
             OrderListItem orderListItem = new OrderListItem(order.getId(), order.getNumber(),
                     order.getOrderDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     order.getTotalPrice().toString(), order.getCustomer().getId(),
                     order.getCustomer().getName() + " " + order.getCustomer().getSurname(),
                     order.getAssignedUser().getName() + " " + order.getAssignedUser().getSurname(),
-                    order.getAssignedUser().getId(), order.getStatus(), false);
+                    order.getAssignedUser().getId(), order.getStatus(), isIssued);
             orderListItemList.add(orderListItem);
         }
         return orderListItemList;
+    }
+
+    private boolean checkIfOrderIssued(Order order) {
+        Optional<Release> release = releaseRepository.findByOrder(order);
+        return release.isPresent() && release.get().getStatus().equals(EStatus.DONE);
     }
 
     @Transactional
@@ -284,6 +291,7 @@ public class TradeService {
             Order order = orderRepository.findById(id)
                     .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
             order.setAssignedUser(user);
+            order.setUpdateDate(LocalDateTime.now());
             orderRepository.save(order);
         }
     }
@@ -400,4 +408,52 @@ public class TradeService {
     }
 
 
+    @Transactional
+    public void delegateExternalRelease(List<Long> ids) {
+        for(Long id: ids){
+            Order order = orderRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+            this.createExternalRelease(order);
+            order.setStatus(EStatus.IN_PROGRESS);
+            order.setUpdateDate(LocalDateTime.now());
+            orderRepository.save(order);
+        }
+    }
+
+    private void createExternalRelease(Order order) {
+        Task task = taskRepository.findByName(ETask.TASK_EXTERNAL_RELEASE)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+
+        String username = getCurrentUserUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        Release release = releaseRepository.save(new Release(order, user, task.getDefaultUser(),
+                EDirection.EXTERNAL, currentDate, EStatus.WAITING));
+
+        String releaseNumber = RELEASE_PREFIX + RELEASE_SEPARATOR + currentDate.getDayOfMonth()
+                + RELEASE_SEPARATOR + currentDate.getMonthValue()
+                + RELEASE_SEPARATOR + currentDate.getYear()
+                + RELEASE_SEPARATOR + release.getId();
+
+        release.setNumber(releaseNumber);
+        releaseRepository.save(release);
+    }
+
+    @Transactional
+    public void markOrderAsReceived(List<Long> ids) {
+        for(Long id: ids){
+            Order order = orderRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+            Optional<Release> release = releaseRepository.findByOrder(order);
+            if(release.isEmpty() || !release.get().getStatus().equals(EStatus.DONE)){
+                throw new ApiExpectationFailedException("exception.releaseNotDone");
+            }
+            order.setStatus(EStatus.DONE);
+            order.setUpdateDate(LocalDateTime.now());
+            orderRepository.save(order);
+        }
+    }
 }

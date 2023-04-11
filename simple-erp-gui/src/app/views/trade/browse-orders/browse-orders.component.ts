@@ -14,7 +14,6 @@ import {OrderListItem} from "../../../models/trade/OrderListItem";
 import {TradeService} from "../../../services/trade.service";
 import Swal from "sweetalert2";
 import {CustomerDialogComponent} from "./customer-dialog/customer-dialog.component";
-import {ChangeDefaultUserDialogComponent} from "../../manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component";
 import {ChangeUserDialogComponent} from "./change-user-dialog/change-user-dialog.component";
 import {OrderInfoDialogComponent} from "./order-info-dialog/order-info-dialog.component";
 
@@ -28,7 +27,7 @@ export class BrowseOrdersComponent implements OnInit {
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['select', 'number', 'customer', 'date', 'price', 'assigned-user', 'actions'];
+  displayedColumns = ['select', 'number', 'customer', 'date', 'price', 'assigned-user', 'message', 'actions'];
   dataSource: MatTableDataSource<OrderListItem> = new MatTableDataSource<OrderListItem>([]);
   selection = new SelectionModel<OrderListItem>(true, []);
 
@@ -103,7 +102,23 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   delegateExternalRelease() {
-    this.selection.selected.forEach(s => console.log(s.id));
+    this.tradeService.delegateExternalRelease(this.selection.selected.map(s => s.id))
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.selection.clear()
+          this.loadOrders();
+        },
+        error: (err) => {
+          Swal.fire({
+            position: 'top-end',
+            title: this.getTranslateMessage("trade.browse-orders.delegate-error"),
+            text: err.error.message,
+            icon: 'error',
+            showConfirmButton: false
+          })
+        }
+      });
   }
 
   changeAssignedUser(){
@@ -129,6 +144,7 @@ export class BrowseOrdersComponent implements OnInit {
   onTabChange(event: any) {
     this.orderStatus = event.index;
     this.pageIndex = 0;
+    this.selection.clear()
     this.loadOrders();
   }
 
@@ -197,7 +213,43 @@ export class BrowseOrdersComponent implements OnInit {
     return this.orderStatus === EStatus.WAITING;
   }
 
+  isStatusNotDone(): boolean {
+    return this.orderStatus !== EStatus.DONE;
+  }
+
   isNothingSelected(): boolean {
     return this.selection.selected.length === 0;
+  }
+
+  isStatusInProgress() {
+    return this.orderStatus === EStatus.IN_PROGRESS;
+  }
+
+  markAsReceived() {
+    this.tradeService.markAsReceived(this.selection.selected.map(s => s.id))
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.selection.clear()
+          this.loadOrders();
+        },
+        error: (err) => {
+          Swal.fire({
+            position: 'top-end',
+            title: this.getTranslateMessage("trade.browse-orders.mark-error"),
+            text: err.error.message,
+            icon: 'error',
+            showConfirmButton: false
+          })
+        }
+      });
+  }
+
+  selectedAreNotIssued(): boolean {
+    return this.selection.selected.find(s => !s.isIssued) != undefined;
+  }
+
+  goToAddOrder() {
+    this.router.navigate(['/add-order']);
   }
 }

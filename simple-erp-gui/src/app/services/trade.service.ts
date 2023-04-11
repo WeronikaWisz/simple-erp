@@ -60,4 +60,12 @@ export class TradeService {
   updateOrder(updateOrderRequest: UpdateOrderRequest): Observable<any> {
     return this.http.put(TRADE_API + 'order', JSON.stringify(updateOrderRequest), httpOptions);
   }
+
+  delegateExternalRelease(ids: number[]): Observable<any> {
+    return this.http.post(TRADE_API + 'external-release', JSON.stringify(ids), httpOptions);
+  }
+
+  markAsReceived(ids: number[]): Observable<any> {
+    return this.http.post(TRADE_API + 'mark-received', JSON.stringify(ids), httpOptions);
+  }
 }

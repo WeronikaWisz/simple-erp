@@ -1,21 +1,14 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
-import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateDefaultUserRequest;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
-import com.simpleerp.simpleerpapp.dtos.products.AddProductRequest;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.products.ProductListItem;
-import com.simpleerp.simpleerpapp.dtos.products.UpdateProductRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateOrderRequest;
-import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
-import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.TradeService;
-import com.simpleerp.simpleerpapp.services.WarehouseService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -25,7 +18,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/trade")
@@ -103,6 +95,22 @@ public class TradeController {
         tradeService.updateOrder(updateOrderRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.orderUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("/external-release")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> delegateExternalRelease(@RequestBody List<Long> ids) {
+        tradeService.delegateExternalRelease(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.releaseDelegated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("/mark-received")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> markAsReceived(@RequestBody List<Long> ids) {
+        tradeService.markOrderAsReceived(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.markReceived", null, LocaleContextHolder.getLocale())));
     }
 
 }

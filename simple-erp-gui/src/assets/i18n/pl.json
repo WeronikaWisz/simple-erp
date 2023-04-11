@@ -263,7 +263,12 @@
       "info-title": "Szczegóły zamówienia",
       "delivery": "Koszt dostawy",
       "discount": "Rabat",
-      "products": "Produkty"
+      "products": "Produkty",
+      "delegate-error": "Nie udało się zlecić wydania",
+      "mark-as-received": "Potwierdzono odbiór",
+      "not-issued": "Oczekuje na wydanie",
+      "issued": "Wydane",
+      "mark-error": "Nie udało się oznaczyć zamówień jako odebrane"
     }
   },
   "tasks": {

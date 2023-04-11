@@ -51,7 +51,6 @@
       <mat-header-cell *matHeaderCellDef> {{ 'supplies.delegated-tasks.status' | translate}} </mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-chip-list>
-<!--          <mat-chip> {{getStatus(row.status)}} </mat-chip>-->
           <mat-chip class="chip-waiting" *ngIf="isWaiting(row.status)"> {{getStatus(row.status)}} </mat-chip>
           <mat-chip class="chip-in-progress" *ngIf="!isWaiting(row.status)"> {{getStatus(row.status)}} </mat-chip>
         </mat-chip-list>
