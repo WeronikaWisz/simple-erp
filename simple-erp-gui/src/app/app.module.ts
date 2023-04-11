@@ -50,6 +50,7 @@ import { AddOrderComponent } from './views/trade/add-order/add-order.component';
 import { BrowseOrdersComponent } from './views/trade/browse-orders/browse-orders.component';
 import { CustomerDialogComponent } from './views/trade/browse-orders/customer-dialog/customer-dialog.component';
 import { ChangeUserDialogComponent } from './views/trade/browse-orders/change-user-dialog/change-user-dialog.component';
+import { OrderInfoDialogComponent } from './views/trade/browse-orders/order-info-dialog/order-info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { ChangeUserDialogComponent } from './views/trade/browse-orders/change-us
     AddOrderComponent,
     BrowseOrdersComponent,
     CustomerDialogComponent,
-    ChangeUserDialogComponent
+    ChangeUserDialogComponent,
+    OrderInfoDialogComponent
   ],
     imports: [
         BrowserModule,

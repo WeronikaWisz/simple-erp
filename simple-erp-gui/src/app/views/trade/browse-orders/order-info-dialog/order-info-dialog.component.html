@@ -1,0 +1,33 @@
+<h2 mat-dialog-title>{{ 'trade.browse-orders.info-title' | translate}} {{order.number}}</h2>
+<div mat-dialog-content>
+  <div class="order-data">
+  <h3>{{ 'trade.browse-orders.date' | translate}} <span class="thick">{{order.orderDate  | date: 'dd.MM.yyyy'}}</span></h3>
+  <h3>{{ 'trade.browse-orders.price' | translate}} <span class="thick">{{order.price}} zł</span></h3>
+  <h3 *ngIf="order.delivery">{{ 'trade.browse-orders.delivery' | translate}} <span class="thick">{{order.delivery}} zł</span></h3>
+  <h3 *ngIf="order.discount">{{ 'trade.browse-orders.discount' | translate}} <span class="thick">{{order.discount}} %</span></h3>
+  <hr>
+  <h2>{{ 'trade.browse-orders.products' | translate}}</h2>
+  <div *ngFor="let product of order.productSet">
+    <h3>{{ product.product }} <span class="thick">{{product.quantity}} {{getUnit(product.product)}}</span></h3>
+  </div>
+  <hr>
+  </div>
+  <div class="customer-data">
+  <h2 class="customer-title">{{ 'trade.browse-orders.customer' | translate}}</h2>
+  <h3>{{order.name}} {{order.surname}}</h3>
+  <h3><span class="thick">{{ 'supplies.delegated-tasks.email' | translate}}</span> {{order.email}}</h3>
+  <h3 *ngIf="order.phone"><span class="thick">{{ 'supplies.delegated-tasks.phone' | translate}}</span> {{order.phone}}</h3>
+  <h3>{{ 'trade.browse-orders.address-data' | translate}}:</h3>
+  <p><span class="description-titles">{{order.city}} <span *ngIf="order.street">
+    {{ 'trade.browse-orders.street' | translate}}. {{order.street}}</span>
+    {{order.buildingNumber}}<span *ngIf="order.doorNumber">/{{order.doorNumber}}</span> </span>
+  </p>
+  <p><span class="description-titles">{{order.postalCode}} {{order.post}}</span></p>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+</div>
+

@@ -259,7 +259,11 @@
       "street": "ul",
       "edit-user": "Zmień przypisaną osobę",
       "update-error": "Nie udało się zmienić przypisanej osoby",
-      "update-success": "Pomyślnie zmieniono przypisaną osobę"
+      "update-success": "Pomyślnie zmieniono przypisaną osobę",
+      "info-title": "Szczegóły zamówienia",
+      "delivery": "Koszt dostawy",
+      "discount": "Rabat",
+      "products": "Produkty"
     }
   },
   "tasks": {

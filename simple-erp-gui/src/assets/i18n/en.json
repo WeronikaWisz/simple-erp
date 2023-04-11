@@ -259,7 +259,11 @@
       "street": "st",
       "edit-user": "Change assigned user",
       "update-error": "Cannot change assigned user",
-      "update-success": "Successfully changed assigned user"
+      "update-success": "Successfully changed assigned user",
+      "info-title": "Order details",
+      "delivery": "Delivery cost",
+      "discount": "Discount",
+      "products": "Products"
     }
   },
   "tasks": {

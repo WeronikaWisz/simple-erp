@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import {CustomerDialogComponent} from "./customer-dialog/customer-dialog.component";
 import {ChangeDefaultUserDialogComponent} from "../../manage-users/default-users/change-default-user-dialog/change-default-user-dialog.component";
 import {ChangeUserDialogComponent} from "./change-user-dialog/change-user-dialog.component";
+import {OrderInfoDialogComponent} from "./order-info-dialog/order-info-dialog.component";
 
 @Component({
   selector: 'app-browse-orders',
@@ -160,7 +161,10 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   goToOrderInfo(id: number) {
-
+    this.dialog.open(OrderInfoDialogComponent, {
+      maxWidth: '650px',
+      data: id
+    });
   }
 
   deleteOrder(id: number) {
