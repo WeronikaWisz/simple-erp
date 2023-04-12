@@ -198,6 +198,25 @@
       "email": "Email: ",
       "phone": "Phone number: ",
       "user-error": "Cannot load user"
+    },
+    "browse-release": {
+      "browse-title": "Releases tasks",
+      "task-count": "Releases count",
+      "mark-as-in-progress": "Mark as in progress",
+      "mark-as-done": "Mark as done",
+      "number": "Number",
+      "association": "Associated with",
+      "external": "external",
+      "internal": "internal",
+      "purchaser": "Purchaser",
+      "direction": "Direction",
+      "load-error": "Cannot load releases",
+      "date": "Purchase date",
+      "mark-error": "Cannot change releases status",
+      "execution-date": "Execution date",
+      "customer": "Customer",
+      "info-title-internal": "Internal release",
+      "info-title-external": "External release"
     }
   },
   "trade": {
@@ -298,6 +317,8 @@
     "trade": "TRADE",
     "trade-l": "Trade",
     "add-order": "Add order",
-    "browse-orders": "Browse orders"
+    "browse-orders": "Browse orders",
+    "browse-release": "Browse release",
+    "browse-acceptance": "Browse acceptance"
   }
 }

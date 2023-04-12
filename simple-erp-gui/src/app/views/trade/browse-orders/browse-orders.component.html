@@ -97,8 +97,8 @@
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row">
         <mat-chip-list *ngIf="isStatusInProgress()">
-          <mat-chip class="chip-waiting" *ngIf="!row.isIssued"> {{ 'trade.browse-orders.not-issued' | translate}} </mat-chip>
-          <mat-chip class="chip-in-progress" *ngIf="row.isIssued"> {{ 'trade.browse-orders.issued' | translate}} </mat-chip>
+          <mat-chip class="chip-waiting" *ngIf="!row.issued"> {{ 'trade.browse-orders.not-issued' | translate}} </mat-chip>
+          <mat-chip class="chip-in-progress" *ngIf="row.issued"> {{ 'trade.browse-orders.issued' | translate}} </mat-chip>
         </mat-chip-list>
       </mat-cell>
     </ng-container>

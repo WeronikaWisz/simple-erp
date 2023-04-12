@@ -452,7 +452,9 @@ public class TradeService {
                 throw new ApiExpectationFailedException("exception.releaseNotDone");
             }
             order.setStatus(EStatus.DONE);
-            order.setUpdateDate(LocalDateTime.now());
+            LocalDateTime currentDate = LocalDateTime.now();
+            order.setUpdateDate(currentDate);
+            order.setExecutionDate(currentDate);
             orderRepository.save(order);
         }
     }

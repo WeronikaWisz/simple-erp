@@ -16,6 +16,12 @@
       <a mat-list-item href routerLink="browse-supplies" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>storage</mat-icon>
         <span class="button-text">{{ 'nav.browse-supplies' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-release" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>arrow_back</mat-icon>
+        <span class="button-text">{{ 'nav.browse-release' | translate}}</span>
+      </a>
+      <a mat-list-item href routerLink="browse-acceptance" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>arrow_forward</mat-icon>
+        <span class="button-text">{{ 'nav.browse-acceptance' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="browse-delegated-tasks" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>filter_frames</mat-icon>
         <span class="button-text">{{ 'nav.browse-delegated-tasks' | translate}}</span>
       </a>
@@ -79,6 +85,12 @@
         <mat-menu #warehouse="matMenu">
           <button mat-menu-item routerLink="browse-supplies">
             <mat-icon>storage</mat-icon> {{ 'nav.browse-supplies' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-release">
+            <mat-icon>arrow_back</mat-icon> {{ 'nav.browse-release' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-acceptance">
+            <mat-icon>arrow_forward</mat-icon> {{ 'nav.browse-acceptance' | translate}}
           </button>
           <button mat-menu-item routerLink="browse-delegated-tasks">
             <mat-icon>filter_frames</mat-icon> {{ 'nav.browse-delegated-tasks' | translate}}

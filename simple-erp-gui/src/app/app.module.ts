@@ -51,6 +51,10 @@ import { BrowseOrdersComponent } from './views/trade/browse-orders/browse-orders
 import { CustomerDialogComponent } from './views/trade/browse-orders/customer-dialog/customer-dialog.component';
 import { ChangeUserDialogComponent } from './views/trade/browse-orders/change-user-dialog/change-user-dialog.component';
 import { OrderInfoDialogComponent } from './views/trade/browse-orders/order-info-dialog/order-info-dialog.component';
+import { BrowseReleaseComponent } from './views/warehouse/browse-release/browse-release.component';
+import { BrowseAcceptanceComponent } from './views/warehouse/browse-acceptance/browse-acceptance.component';
+import { ChangeUserReleaseDialogComponent } from './views/warehouse/browse-release/change-user-release-dialog/change-user-release-dialog.component';
+import { ReleaseInfoDialogComponent } from './views/warehouse/browse-release/release-info-dialog/release-info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +79,11 @@ import { OrderInfoDialogComponent } from './views/trade/browse-orders/order-info
     BrowseOrdersComponent,
     CustomerDialogComponent,
     ChangeUserDialogComponent,
-    OrderInfoDialogComponent
+    OrderInfoDialogComponent,
+    BrowseReleaseComponent,
+    BrowseAcceptanceComponent,
+    ChangeUserReleaseDialogComponent,
+    ReleaseInfoDialogComponent
   ],
     imports: [
         BrowserModule,

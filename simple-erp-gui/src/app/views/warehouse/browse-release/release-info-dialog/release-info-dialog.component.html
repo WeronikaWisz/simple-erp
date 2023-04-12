@@ -1,0 +1,36 @@
+<h2 mat-dialog-title *ngIf="isExternal(release.direction)">{{ 'supplies.browse-release.info-title-external' | translate}} {{release.number}}</h2>
+<h2 mat-dialog-title  *ngIf="!isExternal(release.direction)">{{ 'supplies.browse-release.info-title-internal' | translate}} {{release.number}}</h2>
+<div mat-dialog-content>
+  <div class="order-data">
+    <h3>{{ 'trade.browse-orders.date' | translate}} <span class="thick">{{release.orderDate  | date: 'dd.MM.yyyy'}}</span></h3>
+    <h3 *ngIf="release.executionDate">{{ 'supplies.browse-release.execution-date' | translate}} <span class="thick">{{release.executionDate  | date: 'dd.MM.yyyy'}}</span></h3>
+    <h3>{{ 'supplies.browse-release.association' | translate}} <span class="thick">{{release.association}}</span></h3>
+    <hr>
+    <h2>{{ 'trade.browse-orders.products' | translate}}</h2>
+    <div *ngFor="let product of release.productSet">
+      <h3>{{ product.product }}
+        <span *ngIf="product.isInStock || isStatusDone()" class="thick">{{product.quantity}} {{getUnit(product.product)}}</span>
+        <span *ngIf="!product.isInStock && !isStatusDone()" class="thick not-in-stock">{{product.quantity}} {{getUnit(product.product)}}</span>
+      </h3>
+    </div>
+    <hr>
+  </div>
+  <div class="customer-data">
+    <h2 class="customer-title">{{ 'supplies.browse-release.customer' | translate}}</h2>
+    <h3>{{release.name}} {{release.surname}}</h3>
+    <h3><span class="thick">{{ 'supplies.delegated-tasks.email' | translate}}</span> {{release.email}}</h3>
+    <h3 *ngIf="release.phone"><span class="thick">{{ 'supplies.delegated-tasks.phone' | translate}}</span> {{release.phone}}</h3>
+    <h3 *ngIf="isExternal(release.direction)">{{ 'trade.browse-orders.address-data' | translate}}:</h3>
+    <p *ngIf="isExternal(release.direction)"><span class="description-titles">{{release.city}} <span *ngIf="release.street">
+    {{ 'trade.browse-orders.street' | translate}}. {{release.street}}</span>
+      {{release.buildingNumber}}<span *ngIf="release.doorNumber">/{{release.doorNumber}}</span> </span>
+    </p>
+    <p *ngIf="isExternal(release.direction)"><span class="description-titles">{{release.postalCode}} {{release.post}}</span></p>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+</div>
+

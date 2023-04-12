@@ -11,6 +11,8 @@ import {BrowseSuppliesComponent} from "./views/warehouse/browse-supplies/browse-
 import {BrowseDelegatedTasksComponent} from "./views/warehouse/browse-delegated-tasks/browse-delegated-tasks.component";
 import {AddOrderComponent} from "./views/trade/add-order/add-order.component";
 import {BrowseOrdersComponent} from "./views/trade/browse-orders/browse-orders.component";
+import {BrowseAcceptanceComponent} from "./views/warehouse/browse-acceptance/browse-acceptance.component";
+import {BrowseReleaseComponent} from "./views/warehouse/browse-release/browse-release.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -27,6 +29,8 @@ const routes: Routes = [
   { path: 'add-order', component: AddOrderComponent },
   { path: 'browse-orders', component: BrowseOrdersComponent },
   { path: 'edit-order/:id', component: AddOrderComponent },
+  { path: 'browse-acceptance', component: BrowseAcceptanceComponent },
+  { path: 'browse-release', component: BrowseReleaseComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

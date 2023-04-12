@@ -13,32 +13,20 @@
   display: flex
   justify-content: flex-end
 
-.product-list-header
+.task-list-header
   display: flex
   flex-direction: row
   justify-content: space-between
 
-.chip-waiting
-  background-color: lightsteelblue
+.chip-external
+  background-color: burlywood
 
-.chip-in-progress
+.chip-internal
   background-color: darkseagreen
 
 mat-cell:nth-child(1),
 mat-header-cell:nth-child(1)
   flex: 0 0 5%
-
-mat-cell:nth-child(4),
-mat-header-cell:nth-child(4)
-  flex: 0 0 12%
-
-mat-cell:nth-child(5),
-mat-header-cell:nth-child(5)
-  flex: 0 0 10%
-
-mat-cell:nth-child(2),
-mat-header-cell:nth-child(2)
-  flex: 0 0 11%
 
 .table-buttons
   display: flex
@@ -48,8 +36,3 @@ mat-header-cell:nth-child(2)
 
 .mat-raised-button
   margin-left: 10px
-
-.product-list-header
-  display: flex
-  flex-direction: row
-  justify-content: space-between

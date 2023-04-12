@@ -246,7 +246,7 @@ export class BrowseOrdersComponent implements OnInit {
   }
 
   selectedAreNotIssued(): boolean {
-    return this.selection.selected.find(s => !s.isIssued) != undefined;
+    return this.selection.selected.find(s => !s.issued) != undefined;
   }
 
   goToAddOrder() {

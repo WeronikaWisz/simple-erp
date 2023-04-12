@@ -198,6 +198,25 @@
       "email": "E-mail: ",
       "phone": "Numer telefonu: ",
       "user-erro": "Nie udało się załadować użytkownika"
+    },
+    "browse-release": {
+      "browse-title": "Wydania magazynowe",
+      "task-count": "Liczba wydań",
+      "mark-as-in-progress": "Rozpocznij realizację",
+      "mark-as-done": "Zakończone",
+      "number": "Numer",
+      "association": "Związane z",
+      "external": "zewnętrzne",
+      "internal": "wewnętrzne",
+      "purchaser": "Zlecający",
+      "direction": "Kierunek",
+      "load-error": "Nie udało się załadować wydań",
+      "date": "Data zlecenia",
+      "mark-error": "Nie udało się zmienić statusu wydań",
+      "execution-date": "Data realizacji",
+      "customer": "Odbiorca",
+      "info-title-internal": "Wydanie wewnętrzne",
+      "info-title-external": "Wydanie zewnętrzne"
     }
   },
   "trade": {
@@ -298,6 +317,8 @@
     "trade": "HANDEL",
     "trade-l": "Handel",
     "add-order": "Dodaj zamówienie",
-    "browse-orders": "Przegladaj zamówienia"
+    "browse-orders": "Przegladaj zamówienia",
+    "browse-release": "Przeglądaj wydania",
+    "browse-acceptance": "Przeglądaj przyjęcia"
   }
 }

@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>{{ 'trade.browse-orders.edit-user' | translate}}</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+      <mat-label>{{ 'manage-users.default-users.user-name' | translate}}</mat-label>
+      <mat-select formControlName="assignedUser" required>
+        <mat-option *ngFor="let user of users" [value]="user.id">
+          {{user.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'manage-users.default-users.close' | translate}}
+  </button>
+  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid || !form.dirty">
+    {{ 'manage-users.default-users.save' | translate}}
+  </button>
+</div>
+

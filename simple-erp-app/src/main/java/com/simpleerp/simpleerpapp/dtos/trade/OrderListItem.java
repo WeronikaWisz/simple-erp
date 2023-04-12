@@ -20,10 +20,10 @@ public class OrderListItem {
     private String assignedUserName;
     private Long assignedUserId;
     private EStatus status;
-    private boolean isIssued;
+    private boolean issued;
 
     public OrderListItem(Long id, String number, String orderDate, String price, Long customerId, String customerName,
-                         String assignedUserName, Long assignedUserId, EStatus status, boolean isIssued) {
+                         String assignedUserName, Long assignedUserId, EStatus status, boolean issued) {
         this.id = id;
         this.number = number;
         this.orderDate = orderDate;
@@ -33,7 +33,7 @@ public class OrderListItem {
         this.assignedUserName = assignedUserName;
         this.assignedUserId = assignedUserId;
         this.status = status;
-        this.isIssued = isIssued;
+        this.issued = issued;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class OrderListItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderListItem that = (OrderListItem) o;
-        return isIssued == that.isIssued && Objects.equals(id, that.id) && Objects.equals(number, that.number)
+        return issued == that.issued && Objects.equals(id, that.id) && Objects.equals(number, that.number)
                 && Objects.equals(orderDate, that.orderDate) && Objects.equals(price, that.price)
                 && Objects.equals(customerId, that.customerId) && Objects.equals(customerName, that.customerName)
                 && Objects.equals(assignedUserName, that.assignedUserName)
@@ -50,6 +50,6 @@ public class OrderListItem {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, number, orderDate, price, customerId, customerName, assignedUserName, assignedUserId, status, isIssued);
+        return Objects.hash(id, number, orderDate, price, customerId, customerName, assignedUserName, assignedUserId, status, issued);
     }
 }

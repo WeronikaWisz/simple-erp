@@ -10,5 +10,5 @@ export interface OrderListItem{
   assignedUserName: string;
   assignedUserId: number;
   status: EStatus;
-  isIssued: boolean;
+  issued: boolean;
 }

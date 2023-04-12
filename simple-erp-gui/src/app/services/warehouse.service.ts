@@ -5,8 +5,12 @@ import {SuppliesResponse} from "../models/warehouse/SuppliesResponse";
 import {UpdateSuppliesRequest} from "../models/warehouse/UpdateSuppliesRequest";
 import {PurchaseTaskRequest} from "../models/warehouse/PurchaseTaskRequest";
 import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
-import {EType} from "../enums/EType";
-import {AssignedUser} from "../models/warehouse/AssignedUser";
+import {ReleasesResponse} from "../models/warehouse/ReleasesResponse";
+import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
+import {UserName} from "../models/manage-users/UserName";
+import {ProductCode} from "../models/products/ProductCode";
+import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
+import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 
 const SUPPLIES_API = 'http://localhost:8080/warehouse/';
 
@@ -45,4 +49,36 @@ export class WarehouseService {
     return this.http.put(SUPPLIES_API + 'purchase-task', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
+  loadReleases(status: string, direction: string, pageIndex: number, pageSize: number): Observable<ReleasesResponse>{
+    console.log(direction)
+    if(direction != null) {
+      return this.http.get<ReleasesResponse>(SUPPLIES_API + `releases/${status}/${direction}?page=${pageIndex}&size=${pageSize}`);
+    } else {
+      return this.http.get<ReleasesResponse>(SUPPLIES_API + `releases/${status}?page=${pageIndex}&size=${pageSize}`);
+    }
+  }
+
+  loadUsers(): Observable<UserName[]> {
+    return this.http.get<UserName[]>(SUPPLIES_API + `users`);
+  }
+
+  updateReleaseAssignedUsers(updateAssignedUserRequest: UpdateAssignedUserRequest): Observable<any> {
+    return this.http.put(SUPPLIES_API + 'releases/assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
+  }
+
+  markReleaseAsInProgress(ids: number[]): Observable<any> {
+    return this.http.post(SUPPLIES_API+ 'releases/mark-in-progress', JSON.stringify(ids), httpOptions);
+  }
+
+  markReleaseAsDone(ids: number[]): Observable<any> {
+    return this.http.post(SUPPLIES_API + 'releases/mark-done', JSON.stringify(ids), httpOptions);
+  }
+
+  getRelease(id: number): Observable<ReleaseDetails> {
+    return this.http.get<ReleaseDetails>(SUPPLIES_API + 'release/' + id, httpOptions);
+  }
+
+  loadProductList(): Observable<ProductCode[]> {
+    return this.http.get<ProductCode[]>(SUPPLIES_API + 'products');
+  }
 }
