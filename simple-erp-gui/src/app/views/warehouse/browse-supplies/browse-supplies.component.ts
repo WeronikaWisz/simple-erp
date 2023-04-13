@@ -192,6 +192,6 @@ export class BrowseSuppliesComponent implements OnInit {
   }
 
   isLessThatMin(element: SuppliesListItem): boolean {
-    return element.quantity < element.minQuantity;
+    return +element.quantity < +element.minQuantity;
   }
 }

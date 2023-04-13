@@ -13,7 +13,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReleaseListItem {
+public class ReleaseAcceptanceListItem {
     private Long id;
     private String number;
     private String association;
@@ -29,7 +29,7 @@ public class ReleaseListItem {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReleaseListItem that = (ReleaseListItem) o;
+        ReleaseAcceptanceListItem that = (ReleaseAcceptanceListItem) o;
         return Objects.equals(id, that.id) && Objects.equals(number, that.number)
                 && Objects.equals(association, that.association) && Objects.equals(orderDate, that.orderDate)
                 && direction == that.direction && Objects.equals(purchaserId, that.purchaserId)

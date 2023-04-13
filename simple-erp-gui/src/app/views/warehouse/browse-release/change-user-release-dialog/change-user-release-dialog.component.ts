@@ -54,7 +54,7 @@ export class ChangeUserReleaseDialogComponent implements OnInit {
   }
 
   saveData(){
-    this.warehouseService.updateReleaseAssignedUsers({
+    this.warehouseService.updateAssignedUsers({
       "taskIds": this.data.taskIds,
       "employeeId": this.form.get('assignedUser')?.value,
       "task": this.data.task

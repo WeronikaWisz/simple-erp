@@ -1,5 +1,6 @@
 package com.simpleerp.simpleerpapp.repositories;
 
+import com.simpleerp.simpleerpapp.enums.EDirection;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.models.Acceptance;
 import com.simpleerp.simpleerpapp.models.Purchase;
@@ -10,9 +11,11 @@ import java.util.Optional;
 
 public interface AcceptanceRepository extends JpaRepository<Acceptance, Long> {
 
-    Optional<Acceptance> findByPurchaseAndStatusNotIn(Purchase purchase, List<EStatus> statuses);
+    Optional<Acceptance> findByPurchase(Purchase purchase);
 
     Optional<List<Acceptance>> findByStatusIn(List<EStatus> statuses);
 
     Optional<List<Acceptance>> findByStatus(EStatus statuse);
+
+    Optional<List<Acceptance>> findByStatusAndDirection(EStatus status, EDirection direction);
 }

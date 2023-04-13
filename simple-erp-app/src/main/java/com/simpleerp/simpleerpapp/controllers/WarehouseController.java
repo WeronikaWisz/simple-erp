@@ -3,9 +3,7 @@ package com.simpleerp.simpleerpapp.controllers;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
-import com.simpleerp.simpleerpapp.dtos.trade.UpdateOrderRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.EDirection;
 import com.simpleerp.simpleerpapp.enums.EStatus;
@@ -91,8 +89,8 @@ public class WarehouseController {
     public ResponseEntity<?> loadReleases(@PathVariable("status") EStatus status,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size) {
-        ReleasesResponse releasesResponse = warehouseService.loadReleases(status, page, size);
-        return ResponseEntity.ok(releasesResponse);
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = warehouseService.loadReleases(status, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
     }
 
     @GetMapping("/releases/{status}/{direction}")
@@ -101,8 +99,8 @@ public class WarehouseController {
                                           @PathVariable("direction")EDirection direction,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size) {
-        ReleasesResponse releasesResponse = warehouseService.loadReleases(status, direction, page, size);
-        return ResponseEntity.ok(releasesResponse);
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = warehouseService.loadReleases(status, direction, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
     }
 
     @GetMapping("/users")
@@ -112,10 +110,10 @@ public class WarehouseController {
         return ResponseEntity.ok(userNameList);
     }
 
-    @PutMapping("/releases/assigned-user")
+    @PutMapping("/assigned-user")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
     public ResponseEntity<?> updateReleaseAssignedUsers(@RequestBody UpdateAssignedUserRequest updateAssignedUserRequest) {
-        warehouseService.updateReleaseAssignedUsers(updateAssignedUserRequest);
+        warehouseService.updateAssignedUsers(updateAssignedUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.assignedUserUpdate", null, LocaleContextHolder.getLocale())));
     }
@@ -148,6 +146,41 @@ public class WarehouseController {
     public ResponseEntity<?> getRelease(@PathVariable("id") Long id) {
         ReleaseDetails release = warehouseService.getRelease(id);
         return ResponseEntity.ok(release);
+    }
+
+    @GetMapping("/acceptances/{status}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> loadAcceptances(@PathVariable("status") EStatus status,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = warehouseService.loadAcceptances(status, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
+    }
+
+    @GetMapping("/acceptances/{status}/{direction}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> loadAcceptances(@PathVariable("status") EStatus status,
+                                          @PathVariable("direction") EDirection direction,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = warehouseService.loadAcceptances(status, direction, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
+    }
+
+    @PostMapping("acceptances/mark-in-progress")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> markAcceptanceAsInProgress(@RequestBody List<Long> ids) {
+        warehouseService.markAcceptanceAsInProgress(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.markAcceptance", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("acceptances/mark-done")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> markAcceptanceAsDone(@RequestBody List<Long> ids) {
+        warehouseService.markAcceptanceAsDone(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.markAcceptance", null, LocaleContextHolder.getLocale())));
     }
 
 }

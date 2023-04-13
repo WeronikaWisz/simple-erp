@@ -5,7 +5,7 @@ import {SuppliesResponse} from "../models/warehouse/SuppliesResponse";
 import {UpdateSuppliesRequest} from "../models/warehouse/UpdateSuppliesRequest";
 import {PurchaseTaskRequest} from "../models/warehouse/PurchaseTaskRequest";
 import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
-import {ReleasesResponse} from "../models/warehouse/ReleasesResponse";
+import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptancesResponse";
 import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
 import {UserName} from "../models/manage-users/UserName";
 import {ProductCode} from "../models/products/ProductCode";
@@ -49,12 +49,12 @@ export class WarehouseService {
     return this.http.put(SUPPLIES_API + 'purchase-task', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
-  loadReleases(status: string, direction: string, pageIndex: number, pageSize: number): Observable<ReleasesResponse>{
+  loadReleases(status: string, direction: string, pageIndex: number, pageSize: number): Observable<ReleasesAcceptancesResponse>{
     console.log(direction)
     if(direction != null) {
-      return this.http.get<ReleasesResponse>(SUPPLIES_API + `releases/${status}/${direction}?page=${pageIndex}&size=${pageSize}`);
+      return this.http.get<ReleasesAcceptancesResponse>(SUPPLIES_API + `releases/${status}/${direction}?page=${pageIndex}&size=${pageSize}`);
     } else {
-      return this.http.get<ReleasesResponse>(SUPPLIES_API + `releases/${status}?page=${pageIndex}&size=${pageSize}`);
+      return this.http.get<ReleasesAcceptancesResponse>(SUPPLIES_API + `releases/${status}?page=${pageIndex}&size=${pageSize}`);
     }
   }
 
@@ -62,8 +62,8 @@ export class WarehouseService {
     return this.http.get<UserName[]>(SUPPLIES_API + `users`);
   }
 
-  updateReleaseAssignedUsers(updateAssignedUserRequest: UpdateAssignedUserRequest): Observable<any> {
-    return this.http.put(SUPPLIES_API + 'releases/assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
+  updateAssignedUsers(updateAssignedUserRequest: UpdateAssignedUserRequest): Observable<any> {
+    return this.http.put(SUPPLIES_API + 'assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
   }
 
   markReleaseAsInProgress(ids: number[]): Observable<any> {
@@ -81,4 +81,25 @@ export class WarehouseService {
   loadProductList(): Observable<ProductCode[]> {
     return this.http.get<ProductCode[]>(SUPPLIES_API + 'products');
   }
+
+  loadAcceptances(status: string, direction: string, pageIndex: number, pageSize: number): Observable<ReleasesAcceptancesResponse>{
+    console.log(direction)
+    if(direction != null) {
+      return this.http.get<ReleasesAcceptancesResponse>(SUPPLIES_API + `acceptances/${status}/${direction}?page=${pageIndex}&size=${pageSize}`);
+    } else {
+      return this.http.get<ReleasesAcceptancesResponse>(SUPPLIES_API + `acceptances/${status}?page=${pageIndex}&size=${pageSize}`);
+    }
+  }
+
+  markAcceptanceAsInProgress(ids: number[]): Observable<any> {
+    return this.http.post(SUPPLIES_API+ 'acceptances/mark-in-progress', JSON.stringify(ids), httpOptions);
+  }
+
+  markAcceptanceAsDone(ids: number[]): Observable<any> {
+    return this.http.post(SUPPLIES_API + 'acceptances/mark-done', JSON.stringify(ids), httpOptions);
+  }
+
+  // getAcceptance(id: number): Observable<ReleaseDetails> {
+  //   return this.http.get<ReleaseDetails>(SUPPLIES_API + 'release/' + id, httpOptions);
+  // }
 }

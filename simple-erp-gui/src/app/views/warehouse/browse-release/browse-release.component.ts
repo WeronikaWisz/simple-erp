@@ -13,9 +13,8 @@ import {PageEvent} from "@angular/material/paginator";
 import {AssignedUsersDialogComponent} from "../browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component";
 import {EDirection} from "../../../enums/EDirection";
 import {WarehouseService} from "../../../services/warehouse.service";
-import {ReleaseListItem} from "../../../models/warehouse/ReleaseListItem";
+import {ReleaseAcceptanceListItem} from "../../../models/warehouse/ReleaseAcceptanceListItem";
 import {Direction} from "../../../models/warehouse/Direction";
-import {EUnit} from "../../../enums/EUnit";
 import {ChangeUserReleaseDialogComponent} from "./change-user-release-dialog/change-user-release-dialog.component";
 import {ReleaseInfoDialogComponent} from "./release-info-dialog/release-info-dialog.component";
 import {ETask} from "../../../enums/ETask";
@@ -31,10 +30,10 @@ export class BrowseReleaseComponent implements OnInit {
   hasPermissions = false;
 
   displayedColumns = ['select', 'number', 'direction', 'association', 'purchaser', 'date', 'assigned-user', 'actions'];
-  dataSource: MatTableDataSource<ReleaseListItem> = new MatTableDataSource<ReleaseListItem>([]);
-  selection = new SelectionModel<ReleaseListItem>(true, []);
+  dataSource: MatTableDataSource<ReleaseAcceptanceListItem> = new MatTableDataSource<ReleaseAcceptanceListItem>([]);
+  selection = new SelectionModel<ReleaseAcceptanceListItem>(true, []);
 
-  tasks: ReleaseListItem[] = [];
+  tasks: ReleaseAcceptanceListItem[] = [];
   taskCount: number = 0;
 
   totalTasksLength = 0;

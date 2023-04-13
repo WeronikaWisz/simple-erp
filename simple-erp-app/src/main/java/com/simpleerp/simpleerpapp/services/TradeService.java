@@ -498,8 +498,7 @@ public class TradeService {
         List<DelegatedTaskListItem> delegatedTaskListItems = new ArrayList<>();
         for(Purchase purchase : purchaseList){
 
-            Optional<Acceptance> acceptance = acceptanceRepository.findByPurchaseAndStatusNotIn(purchase,
-                    List.of(EStatus.DONE,EStatus.CANCELED));
+            Optional<Acceptance> acceptance = acceptanceRepository.findByPurchase(purchase);
 
             String orderNumber = "";
             boolean accepted = false;
@@ -535,8 +534,7 @@ public class TradeService {
         Task task = taskRepository.findByName(ETask.TASK_EXTERNAL_ACCEPTANCE)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
 
-        Optional<Acceptance> currentAcceptance = acceptanceRepository.findByPurchaseAndStatusNotIn(purchase,
-                List.of(EStatus.DONE,EStatus.CANCELED));
+        Optional<Acceptance> currentAcceptance = acceptanceRepository.findByPurchase(purchase);
 
         if(currentAcceptance.isPresent()){
             currentAcceptance.get().setOrderNumber(orderNumber);

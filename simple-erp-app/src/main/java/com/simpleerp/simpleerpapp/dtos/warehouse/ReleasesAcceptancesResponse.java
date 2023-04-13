@@ -10,15 +10,15 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ReleasesResponse {
-    private List<ReleaseListItem> releasesList;
+public class ReleasesAcceptancesResponse {
+    private List<ReleaseAcceptanceListItem> releasesList;
     private Integer totalTasksLength;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReleasesResponse that = (ReleasesResponse) o;
+        ReleasesAcceptancesResponse that = (ReleasesAcceptancesResponse) o;
         return Objects.equals(releasesList, that.releasesList) && Objects.equals(totalTasksLength, that.totalTasksLength);
     }
 

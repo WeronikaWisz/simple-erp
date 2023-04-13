@@ -1,7 +1,7 @@
 import {EStatus} from "../../enums/EStatus";
 import {EDirection} from "../../enums/EDirection";
 
-export interface ReleaseListItem{
+export interface ReleaseAcceptanceListItem {
   id: number;
   number: string;
   association: string;

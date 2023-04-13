@@ -217,6 +217,12 @@
       "customer": "Customer",
       "info-title-internal": "Internal release",
       "info-title-external": "External release"
+    },
+    "browse-acceptance": {
+      "browse-title": "Acceptances tasks",
+      "task-count": "Acceptances count",
+      "load-error": "Cannot load acceptances",
+      "mark-error": "Cannot change acceptances status"
     }
   },
   "trade": {

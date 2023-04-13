@@ -217,6 +217,12 @@
       "customer": "Odbiorca",
       "info-title-internal": "Wydanie wewnętrzne",
       "info-title-external": "Wydanie zewnętrzne"
+    },
+    "browse-acceptance": {
+      "browse-title": "Przyjęcia magazynowe",
+      "task-count": "Liczba przyjęć",
+      "load-error": "Nie udało się załadować przyjęć",
+      "mark-error": "Nie udało się zmienić statusu przyjęć"
     }
   },
   "trade": {

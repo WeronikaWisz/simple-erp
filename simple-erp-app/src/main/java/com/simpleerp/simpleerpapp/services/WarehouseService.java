@@ -36,12 +36,14 @@ public class WarehouseService {
     private final TaskRepository taskRepository;
     private final ReleaseRepository releaseRepository;
     private final ProductRepository productRepository;
+    private final AcceptanceRepository acceptanceRepository;
     private MessageSource messageSource;
 
     @Autowired
     public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseRepository purchaseRepository,
                             UserRepository userRepository, TaskRepository taskRepository, MessageSource messageSource,
-                            ReleaseRepository releaseRepository, ProductRepository productRepository) {
+                            ReleaseRepository releaseRepository, ProductRepository productRepository,
+                            AcceptanceRepository acceptanceRepository) {
         this.stockLevelRepository = stockLevelRepository;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
@@ -49,6 +51,7 @@ public class WarehouseService {
         this.releaseRepository = releaseRepository;
         this.messageSource = messageSource;
         this.productRepository = productRepository;
+        this.acceptanceRepository = acceptanceRepository;
     }
 
 
@@ -230,62 +233,73 @@ public class WarehouseService {
     private void deleteDelegatedProductionTasks(Long id) {
     }
 
-    public ReleasesResponse loadReleases(EStatus status, int page, int size) {
-        ReleasesResponse releasesResponse = new ReleasesResponse();
+    public ReleasesAcceptancesResponse loadReleases(EStatus status, int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Release> releaseList = this.releaseRepository.findByStatus(status).orElse(Collections.emptyList());
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
         if(end >= start) {
-            releasesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
+            releasesAcceptancesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
                     .sorted(Comparator.comparing(Release::getCreationDate)).collect(Collectors.toList())
                     .subList(start, end)));
         }
-        releasesResponse.setTotalTasksLength(total);
-        return releasesResponse;
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
     }
 
-    public ReleasesResponse loadReleases(EStatus status, EDirection direction, int page, int size) {
-        ReleasesResponse releasesResponse = new ReleasesResponse();
+    public ReleasesAcceptancesResponse loadReleases(EStatus status, EDirection direction, int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Release> releaseList = this.releaseRepository.findByStatusAndDirection(status, direction)
                 .orElse(Collections.emptyList());
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
         if(end >= start) {
-            releasesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
+            releasesAcceptancesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
                     .sorted(Comparator.comparing(Release::getCreationDate)).collect(Collectors.toList())
                     .subList(start, end)));
         }
-        releasesResponse.setTotalTasksLength(total);
-        return releasesResponse;
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
     }
 
-    private List<ReleaseListItem> releaseListToReleaseListItem(List<Release> releases){
-        List<ReleaseListItem> releaseListItemList = new ArrayList<>();
+    private List<ReleaseAcceptanceListItem> releaseListToReleaseListItem(List<Release> releases){
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
         for(Release release: releases){
-            ReleaseListItem releaseListItem = new ReleaseListItem(release.getId(), release.getNumber(),
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(), release.getNumber(),
                     release.getOrder().getNumber(),
                     release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     release.getDirection(), release.getRequestingUser().getId(),
                     release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
                     release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
                     release.getAssignedUser().getId(), release.getStatus());
-            releaseListItemList.add(releaseListItem);
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
         }
-        return releaseListItemList;
+        return releaseListItemAcceptanceList;
     }
 
     @Transactional
-    public void updateReleaseAssignedUsers(UpdateAssignedUserRequest updateAssignedUserRequest) {
+    public void updateAssignedUsers(UpdateAssignedUserRequest updateAssignedUserRequest) {
         User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
-        for(Long id: updateAssignedUserRequest.getTaskIds()){
-            Release release = releaseRepository.findById(id)
-                    .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
-            release.setAssignedUser(user);
-            release.setUpdateDate(LocalDateTime.now());
-            releaseRepository.save(release);
+        if(updateAssignedUserRequest.getTask().equals(ETask.TASK_EXTERNAL_RELEASE)
+                || updateAssignedUserRequest.getTask().equals(ETask.TASK_INTERNAL_RELEASE)) {
+            for (Long id : updateAssignedUserRequest.getTaskIds()) {
+                Release release = releaseRepository.findById(id)
+                        .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
+                release.setAssignedUser(user);
+                release.setUpdateDate(LocalDateTime.now());
+                releaseRepository.save(release);
+            }
+        } else {
+            for (Long id : updateAssignedUserRequest.getTaskIds()) {
+                Acceptance acceptance = acceptanceRepository.findById(id)
+                        .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+                acceptance.setAssignedUser(user);
+                acceptance.setUpdateDate(LocalDateTime.now());
+                acceptanceRepository.save(acceptance);
+            }
         }
     }
 
@@ -386,5 +400,84 @@ public class WarehouseService {
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
         BigDecimal quantity = stockLevel.getQuantity().subtract(orderProduct.getQuantity());
         return (quantity.compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    @Transactional
+    public void markAcceptanceAsInProgress(List<Long> ids) {
+        for(Long id: ids){
+            Acceptance acceptance = acceptanceRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+            acceptance.setStatus(EStatus.IN_PROGRESS);
+            acceptance.setUpdateDate(LocalDateTime.now());
+            acceptanceRepository.save(acceptance);
+        }
+    }
+
+    @Transactional
+    public void markAcceptanceAsDone(List<Long> ids) {
+        for(Long id: ids){
+            Acceptance acceptance = acceptanceRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+            increaseStockLevel(acceptance);
+            acceptance.setStatus(EStatus.DONE);
+            LocalDateTime currentDate = LocalDateTime.now();
+            acceptance.setUpdateDate(currentDate);
+            acceptance.setExecutionDate(currentDate);
+            acceptanceRepository.save(acceptance);
+        }
+    }
+
+    private void increaseStockLevel(Acceptance acceptance){
+        StockLevel stockLevel = stockLevelRepository.findByProduct(acceptance.getPurchase().getProduct())
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        BigDecimal newQuantity = stockLevel.getQuantity().add(acceptance.getPurchase().getQuantity());
+        stockLevel.setQuantity(newQuantity);
+        stockLevelRepository.save(stockLevel);
+    }
+
+    public ReleasesAcceptancesResponse loadAcceptances(EStatus status, int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatus(status).orElse(Collections.emptyList());
+        int total = acceptanceList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(acceptanceListToAcceptanceListItem(acceptanceList.stream()
+                    .sorted(Comparator.comparing(Acceptance::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    public ReleasesAcceptancesResponse loadAcceptances(EStatus status, EDirection direction, int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusAndDirection(status, direction)
+                .orElse(Collections.emptyList());
+        int total = acceptanceList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(acceptanceListToAcceptanceListItem(acceptanceList.stream()
+                    .sorted(Comparator.comparing(Acceptance::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    private List<ReleaseAcceptanceListItem> acceptanceListToAcceptanceListItem(List<Acceptance> acceptances) {
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
+        for(Acceptance acceptance: acceptances){
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
+                    acceptance.getNumber(), acceptance.getPurchase().getNumber(),
+                    acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getDirection(), acceptance.getRequestingUser().getId(),
+                    acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
+                    acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
+                    acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
+        }
+        return releaseListItemAcceptanceList;
     }
 }
