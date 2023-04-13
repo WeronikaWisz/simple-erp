@@ -3,6 +3,8 @@ import {EStatus} from "../../enums/EStatus";
 
 export interface DelegatedTaskListItem {
   id: number;
+  number: string;
+  orderNumber: string;
   code: string;
   name: string;
   unit: EUnit;
@@ -12,4 +14,5 @@ export interface DelegatedTaskListItem {
   assignedUserId: number;
   creationDate: string;
   stockQuantity: number;
+  accepted: boolean;
 }

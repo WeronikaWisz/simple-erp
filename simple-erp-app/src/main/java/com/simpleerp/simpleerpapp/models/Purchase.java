@@ -1,6 +1,8 @@
 package com.simpleerp.simpleerpapp.models;
 
+import com.simpleerp.simpleerpapp.enums.EDirection;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +16,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PurchaseTask {
+public class Purchase {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+
+    @Nonnull
+    private String number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable=false)

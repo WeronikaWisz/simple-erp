@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>{{ 'trade.browse-purchases.order-number-title' | translate}}</h2>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+      <mat-label>{{ 'trade.browse-purchases.order-number' | translate}}</mat-label>
+      <input matInput formControlName="number" required>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid || !form.dirty">
+    {{ 'supplies.browse-supplies.save' | translate}}
+  </button>
+</div>

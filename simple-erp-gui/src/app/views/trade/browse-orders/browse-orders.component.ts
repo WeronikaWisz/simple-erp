@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import {CustomerDialogComponent} from "./customer-dialog/customer-dialog.component";
 import {ChangeUserDialogComponent} from "./change-user-dialog/change-user-dialog.component";
 import {OrderInfoDialogComponent} from "./order-info-dialog/order-info-dialog.component";
+import {ETask} from "../../../enums/ETask";
 
 @Component({
   selector: 'app-browse-orders',
@@ -124,7 +125,10 @@ export class BrowseOrdersComponent implements OnInit {
   changeAssignedUser(){
     const dialogRef = this.dialog.open(ChangeUserDialogComponent, {
       maxWidth: '650px',
-      data: this.selection.selected.map(s => s.id)
+      data: {
+        taskIds: this.selection.selected.map(s => s.id),
+        task: ETask.TASK_SALE
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);

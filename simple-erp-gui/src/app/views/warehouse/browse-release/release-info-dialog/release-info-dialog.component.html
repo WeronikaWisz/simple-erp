@@ -2,8 +2,8 @@
 <h2 mat-dialog-title  *ngIf="!isExternal(release.direction)">{{ 'supplies.browse-release.info-title-internal' | translate}} {{release.number}}</h2>
 <div mat-dialog-content>
   <div class="order-data">
-    <h3>{{ 'trade.browse-orders.date' | translate}} <span class="thick">{{release.orderDate  | date: 'dd.MM.yyyy'}}</span></h3>
-    <h3 *ngIf="release.executionDate">{{ 'supplies.browse-release.execution-date' | translate}} <span class="thick">{{release.executionDate  | date: 'dd.MM.yyyy'}}</span></h3>
+    <h3>{{ 'supplies.browse-release.date' | translate}} <span class="thick">{{release.orderDate}}</span></h3>
+    <h3 *ngIf="release.executionDate">{{ 'supplies.browse-release.execution-date' | translate}} <span class="thick">{{release.executionDate}}</span></h3>
     <h3>{{ 'supplies.browse-release.association' | translate}} <span class="thick">{{release.association}}</span></h3>
     <hr>
     <h2>{{ 'trade.browse-orders.products' | translate}}</h2>

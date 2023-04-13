@@ -55,6 +55,9 @@ import { BrowseReleaseComponent } from './views/warehouse/browse-release/browse-
 import { BrowseAcceptanceComponent } from './views/warehouse/browse-acceptance/browse-acceptance.component';
 import { ChangeUserReleaseDialogComponent } from './views/warehouse/browse-release/change-user-release-dialog/change-user-release-dialog.component';
 import { ReleaseInfoDialogComponent } from './views/warehouse/browse-release/release-info-dialog/release-info-dialog.component';
+import { BrowseDelegatedWarehouseTaskComponent } from './views/trade/browse-delegated-warehouse-task/browse-delegated-warehouse-task.component';
+import { BrowsePurchasesComponent } from './views/trade/browse-purchases/browse-purchases.component';
+import { PurchaseOrderNumberDialogComponent } from './views/trade/browse-purchases/purchase-order-number-dialog/purchase-order-number-dialog.component';
 
 @NgModule({
   declarations: [
@@ -83,7 +86,10 @@ import { ReleaseInfoDialogComponent } from './views/warehouse/browse-release/rel
     BrowseReleaseComponent,
     BrowseAcceptanceComponent,
     ChangeUserReleaseDialogComponent,
-    ReleaseInfoDialogComponent
+    ReleaseInfoDialogComponent,
+    BrowseDelegatedWarehouseTaskComponent,
+    BrowsePurchasesComponent,
+    PurchaseOrderNumberDialogComponent
   ],
     imports: [
         BrowserModule,

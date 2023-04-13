@@ -27,8 +27,11 @@ import java.util.stream.Collectors;
 @Service
 public class WarehouseService {
 
+    private static final String PURCHASE_PREFIX = "ZZ";
+    private static final String PURCHASE_SEPARATOR = "/";
+
     private final StockLevelRepository stockLevelRepository;
-    private final PurchaseTaskRepository purchaseTaskRepository;
+    private final PurchaseRepository purchaseRepository;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final ReleaseRepository releaseRepository;
@@ -36,11 +39,11 @@ public class WarehouseService {
     private MessageSource messageSource;
 
     @Autowired
-    public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseTaskRepository purchaseTaskRepository,
+    public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseRepository purchaseRepository,
                             UserRepository userRepository, TaskRepository taskRepository, MessageSource messageSource,
                             ReleaseRepository releaseRepository, ProductRepository productRepository) {
         this.stockLevelRepository = stockLevelRepository;
-        this.purchaseTaskRepository = purchaseTaskRepository;
+        this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.releaseRepository = releaseRepository;
@@ -85,10 +88,10 @@ public class WarehouseService {
     }
 
     private boolean purchaseTaskDelegated(Product product){
-        List<PurchaseTask> purchaseTaskList = purchaseTaskRepository
+        List<Purchase> purchaseList = purchaseRepository
                 .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED))
                 .orElse(Collections.emptyList());
-        return !purchaseTaskList.isEmpty();
+        return !purchaseList.isEmpty();
     }
 
     @Transactional
@@ -105,22 +108,32 @@ public class WarehouseService {
     public void delegatePurchaseTask(PurchaseTaskRequest purchaseTaskRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(purchaseTaskRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
-        PurchaseTask purchaseTask = new PurchaseTask();
-        purchaseTask.setProduct(stockLevel.getProduct());
-        purchaseTask.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
-        purchaseTask.setStatus(EStatus.WAITING);
+        Purchase purchase = new Purchase();
+        purchase.setProduct(stockLevel.getProduct());
+        purchase.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
+        purchase.setStatus(EStatus.WAITING);
 
         Task task = taskRepository.findByName(ETask.TASK_PURCHASE)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
-        purchaseTask.setAssignedUser(task.getDefaultUser());
+        purchase.setAssignedUser(task.getDefaultUser());
 
         String username = getCurrentUserUsername();
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("Cannot found user"));
-        purchaseTask.setRequestingUser(user);
+        purchase.setRequestingUser(user);
 
-        purchaseTask.setCreationDate(LocalDateTime.now());
-        purchaseTaskRepository.save(purchaseTask);
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        purchase.setCreationDate(currentDate);
+        purchaseRepository.save(purchase);
+
+        String purchaseNumber = PURCHASE_PREFIX + PURCHASE_SEPARATOR + currentDate.getDayOfMonth()
+                + PURCHASE_SEPARATOR + currentDate.getMonthValue()
+                + PURCHASE_SEPARATOR + currentDate.getYear()
+                + PURCHASE_SEPARATOR + purchase.getId();
+
+        purchase.setNumber(purchaseNumber);
+        purchaseRepository.save(purchase);
     }
 
     private String getCurrentUserUsername(){
@@ -143,30 +156,30 @@ public class WarehouseService {
     }
 
     private void loadDelegatedPurchaseTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
-        List<PurchaseTask> purchaseTaskList = purchaseTaskRepository
+        List<Purchase> purchaseList = purchaseRepository
                 .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
                 .orElse(Collections.emptyList());
-        int total = purchaseTaskList.size();
+        int total = purchaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
         if(end >= start) {
-            delegatedTasksResponse.setTasksList(purchaseTaskListToDelegatedTasksListItem(purchaseTaskList
-                    .stream().sorted(Comparator.comparing(PurchaseTask::getCreationDate)).collect(Collectors.toList())
+            delegatedTasksResponse.setTasksList(purchaseTaskListToDelegatedTasksListItem(purchaseList
+                    .stream().sorted(Comparator.comparing(Purchase::getCreationDate)).collect(Collectors.toList())
                     .subList(start, end)));
         }
         delegatedTasksResponse.setTotalTasksLength(total);
     }
 
-    private List<DelegatedTaskListItem> purchaseTaskListToDelegatedTasksListItem(List<PurchaseTask> purchaseTaskList){
+    private List<DelegatedTaskListItem> purchaseTaskListToDelegatedTasksListItem(List<Purchase> purchaseList){
         List<DelegatedTaskListItem> delegatedTaskListItems = new ArrayList<>();
-        for(PurchaseTask purchaseTask: purchaseTaskList){
-            DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(purchaseTask.getId(),
-                    purchaseTask.getProduct().getCode(), purchaseTask.getProduct().getName(),
-                    purchaseTask.getProduct().getUnit(), purchaseTask.getQuantity().toString(), purchaseTask.getStatus(),
-                    purchaseTask.getAssignedUser().getName() + " " +  purchaseTask.getAssignedUser().getSurname(),
-                    purchaseTask.getAssignedUser().getId(),
-                    purchaseTask.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                    findProductStockQuantity(purchaseTask.getProduct()).toString());
+        for(Purchase purchase : purchaseList){
+            DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(purchase.getId(),
+                    purchase.getNumber(), purchase.getProduct().getCode(), purchase.getProduct().getName(),
+                    purchase.getProduct().getUnit(), purchase.getQuantity().toString(), purchase.getStatus(),
+                    purchase.getAssignedUser().getName() + " " +  purchase.getAssignedUser().getSurname(),
+                    purchase.getAssignedUser().getId(),
+                    purchase.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    findProductStockQuantity(purchase.getProduct()).toString());
             delegatedTaskListItems.add(delegatedTaskListItem);
         }
         return delegatedTaskListItems;
@@ -186,14 +199,14 @@ public class WarehouseService {
 
     @Transactional
     public void updatePurchaseTask(PurchaseTaskRequest purchaseTaskRequest) {
-        PurchaseTask purchaseTask = purchaseTaskRepository.findById(purchaseTaskRequest.getId())
+        Purchase purchase = purchaseRepository.findById(purchaseTaskRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
-        if(!purchaseTask.getStatus().equals(EStatus.WAITING)){
+        if(!purchase.getStatus().equals(EStatus.WAITING)){
             throw new ApiExpectationFailedException("exception.taskNotWaiting");
         }
-        purchaseTask.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
-        purchaseTask.setUpdateDate(LocalDateTime.now());
-        purchaseTaskRepository.save(purchaseTask);
+        purchase.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
+        purchase.setUpdateDate(LocalDateTime.now());
+        purchaseRepository.save(purchase);
     }
 
     public void deleteTask(EType type, Long id) {
@@ -205,12 +218,12 @@ public class WarehouseService {
     }
 
     private void deleteDelegatedPurchaseTasks(Long id) {
-        PurchaseTask purchaseTask = purchaseTaskRepository.findById(id)
+        Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
-        if(!purchaseTask.getStatus().equals(EStatus.WAITING)){
+        if(!purchase.getStatus().equals(EStatus.WAITING)){
             throw new ApiExpectationFailedException("exception.taskNotWaiting");
         }
-        purchaseTaskRepository.delete(purchaseTask);
+        purchaseRepository.delete(purchase);
     }
 
     // TODO

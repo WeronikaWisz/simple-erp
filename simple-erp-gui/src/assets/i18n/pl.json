@@ -189,7 +189,7 @@
       "task-count": "Liczba zadań",
       "purchase": "Zakup",
       "production": "Produkcja",
-      "id": "Id",
+      "number": "Number",
       "status": "Status",
       "date": "Data zlecenia",
       "assigned-user": "Osoba przypisana",
@@ -288,6 +288,19 @@
       "not-issued": "Oczekuje na wydanie",
       "issued": "Wydane",
       "mark-error": "Nie udało się oznaczyć zamówień jako odebrane"
+    },
+    "browse-purchases": {
+      "browse-title": "Lista zleceń zakupów",
+      "task-count": "Liczba zleceń",
+      "number": "Numer",
+      "accepted": "Przyjęto",
+      "load-error": "Nie udało się załadować zleceń zakupów",
+      "add-external-acceptance": "Zleć przyjęcie zewnętrzne",
+      "mark-error": "Nie udało się zamienić statusu zakupów",
+      "delegate-error": "Nie udało się zlecić przyjęcia",
+      "order-number-title": "Numer zamówienia zakupów",
+      "order-number": "Numer zamówienia",
+      "delegate-acceptance-success": "Pomyślnie zlecono zadanie przyjęcia"
     }
   },
   "tasks": {
@@ -319,6 +332,7 @@
     "add-order": "Dodaj zamówienie",
     "browse-orders": "Przegladaj zamówienia",
     "browse-release": "Przeglądaj wydania",
-    "browse-acceptance": "Przeglądaj przyjęcia"
+    "browse-acceptance": "Przeglądaj przyjęcia",
+    "browse-purchases": "Przeglądaj zakupy"
   }
 }

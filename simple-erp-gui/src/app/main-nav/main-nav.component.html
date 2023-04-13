@@ -12,6 +12,12 @@
       <a mat-list-item href routerLink="add-order" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>note_add</mat-icon>
         <span class="button-text">{{ 'nav.add-order' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-purchases" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list_alt</mat-icon>
+        <span class="button-text">{{ 'nav.browse-purchases' | translate}}</span>
+      </a>
+      <a mat-list-item href routerLink="browse-delegated-warehouse-task" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>filter_frames</mat-icon>
+        <span class="button-text">{{ 'nav.browse-delegated-tasks' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse' | translate}}</h2>
       <a mat-list-item href routerLink="browse-supplies" *ngIf="hasAdminRole() || hasWarehouseRole()"><mat-icon>storage</mat-icon>
         <span class="button-text">{{ 'nav.browse-supplies' | translate}}</span>
@@ -79,6 +85,12 @@
           </button>
           <button mat-menu-item routerLink="add-order">
             <mat-icon>note_add</mat-icon> {{ 'nav.add-order' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-purchases">
+            <mat-icon>list_alt</mat-icon> {{ 'nav.browse-purchases' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-delegated-warehouse-task">
+            <mat-icon>filter_frames</mat-icon> {{ 'nav.browse-delegated-tasks' | translate}}
           </button>
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="warehouse" *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse-l' | translate}}</button>

@@ -1,40 +1,39 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {MatTableDataSource} from "@angular/material/table";
 import {SelectionModel} from "@angular/cdk/collections";
 import {EStatus} from "../../../enums/EStatus";
 import {FormBuilder} from "@angular/forms";
+import {TradeService} from "../../../services/trade.service";
 import {TranslateService} from "@ngx-translate/core";
 import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
 import {TokenStorageService} from "../../../services/token-storage.service";
 import {ERole} from "../../../enums/ERole";
 import Swal from "sweetalert2";
+import {ChangeUserDialogComponent} from "../browse-orders/change-user-dialog/change-user-dialog.component";
 import {PageEvent} from "@angular/material/paginator";
-import {AssignedUsersDialogComponent} from "../browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component";
-import {EDirection} from "../../../enums/EDirection";
-import {WarehouseService} from "../../../services/warehouse.service";
-import {ReleaseListItem} from "../../../models/warehouse/ReleaseListItem";
-import {Direction} from "../../../models/warehouse/Direction";
+import {AssignedUsersDialogComponent} from "../../warehouse/browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component";
+import {DelegatedTaskListItem} from "../../../models/warehouse/DelegatedTaskListItem";
 import {EUnit} from "../../../enums/EUnit";
-import {ChangeUserReleaseDialogComponent} from "./change-user-release-dialog/change-user-release-dialog.component";
-import {ReleaseInfoDialogComponent} from "./release-info-dialog/release-info-dialog.component";
 import {ETask} from "../../../enums/ETask";
+import {PurchaseOrderNumberDialogComponent} from "./purchase-order-number-dialog/purchase-order-number-dialog.component";
 
 @Component({
-  selector: 'app-browse-release',
-  templateUrl: './browse-release.component.html',
-  styleUrls: ['./browse-release.component.sass']
+  selector: 'app-browse-purchases',
+  templateUrl: './browse-purchases.component.html',
+  styleUrls: ['./browse-purchases.component.sass']
 })
-export class BrowseReleaseComponent implements OnInit {
+export class BrowsePurchasesComponent implements OnInit {
+
 
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['select', 'number', 'direction', 'association', 'purchaser', 'date', 'assigned-user', 'actions'];
-  dataSource: MatTableDataSource<ReleaseListItem> = new MatTableDataSource<ReleaseListItem>([]);
-  selection = new SelectionModel<ReleaseListItem>(true, []);
+  displayedColumns = ['select', 'number', 'code', 'name', 'quantity', 'unit', 'date', 'assigned-user', 'message'];
+  dataSource: MatTableDataSource<DelegatedTaskListItem> = new MatTableDataSource<DelegatedTaskListItem>([]);
+  selection = new SelectionModel<DelegatedTaskListItem>(true, []);
 
-  tasks: ReleaseListItem[] = [];
+  tasks: DelegatedTaskListItem[] = [];
   taskCount: number = 0;
 
   totalTasksLength = 0;
@@ -47,24 +46,9 @@ export class BrowseReleaseComponent implements OnInit {
 
   taskStatus: EStatus = EStatus.WAITING;
 
-  taskDirection?: EDirection;
-
-  directions: Direction[] = []
-
-  constructor(private formBuilder: FormBuilder, private warehouseService: WarehouseService,
+  constructor(private formBuilder: FormBuilder, private tradeService: TradeService,
               private translate: TranslateService, public dialog: MatDialog,
-              private router: Router, private tokenStorage: TokenStorageService) {
-    this.directions = [
-      {
-        direction: EDirection.INTERNAL,
-        name: this.getTranslateMessage("supplies.browse-release.internal")
-      },
-      {
-        direction: EDirection.EXTERNAL,
-        name: this.getTranslateMessage("supplies.browse-release.external")
-      }
-    ]
-  }
+              private router: Router, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -73,22 +57,21 @@ export class BrowseReleaseComponent implements OnInit {
       this.router.navigate(['/login']).then(() => this.reloadPage());
     }
     if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN])
-      || this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_WAREHOUSE]))){
+      || this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_TRADE]))){
       this.hasPermissions = true;
     } else {
       this.router.navigate(['/profile']).then(() => this.reloadPage());
     }
-    this.loadReleases();
+    this.loadTasks();
   }
 
-  loadReleases(){
+  loadTasks(){
     this.emptySearchList = false;
-    this.warehouseService.loadReleases(EStatus[this.taskStatus],
-      this.taskDirection != undefined ? EDirection[this.taskDirection] : null!, this.pageIndex, this.pageSize)
+    this.tradeService.loadPurchaseTasks(EStatus[this.taskStatus], this.pageIndex, this.pageSize)
       .subscribe({
         next: (data) => {
           console.log(data);
-          this.tasks = data.releasesList
+          this.tasks = data.tasksList
           this.taskCount = data.totalTasksLength
           this.totalTasksLength = data.totalTasksLength
           if (this.tasks.length == 0) {
@@ -99,7 +82,7 @@ export class BrowseReleaseComponent implements OnInit {
         error: (err) => {
           Swal.fire({
             position: 'top-end',
-            title: this.getTranslateMessage("supplies.browse-release.load-error"),
+            title: this.getTranslateMessage("trade.browse-purchases.load-error"),
             text: err.error.message,
             icon: 'error',
             showConfirmButton: false
@@ -120,19 +103,33 @@ export class BrowseReleaseComponent implements OnInit {
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
 
+  delegateExternalAcceptance() {
+    const dialogRef = this.dialog.open(PurchaseOrderNumberDialogComponent, {
+      maxWidth: '650px',
+      data: this.selection.selected.map(s => s.id)
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if(result){
+        this.selection.clear();
+        this.loadTasks();
+      }
+    });
+  }
+
   changeAssignedUser(){
-    const dialogRef = this.dialog.open(ChangeUserReleaseDialogComponent, {
+    const dialogRef = this.dialog.open(ChangeUserDialogComponent, {
       maxWidth: '650px',
       data: {
         taskIds: this.selection.selected.map(s => s.id),
-        task: ETask.TASK_EXTERNAL_RELEASE
+        task: ETask.TASK_PURCHASE
       }
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
       if(result){
         this.selection.clear()
-        this.loadReleases();
+        this.loadTasks();
       }
     });
   }
@@ -140,14 +137,14 @@ export class BrowseReleaseComponent implements OnInit {
   pageChanged(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
-    this.loadReleases();
+    this.loadTasks();
   }
 
   onTabChange(event: any) {
     this.taskStatus = event.index;
     this.pageIndex = 0;
     this.selection.clear()
-    this.loadReleases();
+    this.loadTasks();
   }
 
   reloadPage(): void {
@@ -169,12 +166,12 @@ export class BrowseReleaseComponent implements OnInit {
     });
   }
 
-  goToTaskInfo(id: number) {
-    this.dialog.open(ReleaseInfoDialogComponent, {
-      maxWidth: '650px',
-      data: id
-    });
-  }
+  // showCustomerData(id: number) {
+  //   this.dialog.open(CustomerDialogComponent, {
+  //     maxWidth: '650px',
+  //     data: id
+  //   });
+  // }
 
   isStatusWaiting(): boolean {
     return this.taskStatus === EStatus.WAITING;
@@ -193,17 +190,17 @@ export class BrowseReleaseComponent implements OnInit {
   }
 
   markAsDone() {
-    this.warehouseService.markReleaseAsDone(this.selection.selected.map(s => s.id))
+    this.tradeService.markPurchaseAsDone(this.selection.selected.map(s => s.id))
       .subscribe({
         next: (data) => {
           console.log(data);
           this.selection.clear()
-          this.loadReleases();
+          this.loadTasks()
         },
         error: (err) => {
           Swal.fire({
             position: 'top-end',
-            title: this.getTranslateMessage("supplies.browse-release.mark-error"),
+            title: this.getTranslateMessage("trade.browse-purchases.mark-error"),
             text: err.error.message,
             icon: 'error',
             showConfirmButton: false
@@ -212,19 +209,26 @@ export class BrowseReleaseComponent implements OnInit {
       });
   }
 
+  selectedAreNotAccepted(): boolean {
+    return this.selection.selected.find(s => !s.accepted) != undefined;
+  }
+
+  selectedAreAccepted(): boolean {
+    return this.selection.selected.find(s => s.accepted || s.orderNumber) != undefined;
+  }
 
   markAsInProgress() {
-    this.warehouseService.markReleaseAsInProgress(this.selection.selected.map(s => s.id))
+    this.tradeService.markPurchaseAsInProgress(this.selection.selected.map(s => s.id))
       .subscribe({
         next: (data) => {
           console.log(data);
           this.selection.clear()
-          this.loadReleases();
+          this.loadTasks();
         },
         error: (err) => {
           Swal.fire({
             position: 'top-end',
-            title: this.getTranslateMessage("supplies.browse-release.mark-error"),
+            title: this.getTranslateMessage("trade.browse-purchases.mark-error"),
             text: err.error.message,
             icon: 'error',
             showConfirmButton: false
@@ -233,8 +237,23 @@ export class BrowseReleaseComponent implements OnInit {
       });
   }
 
-  isExternal(eDirection: EDirection): boolean {
-    let direction = eDirection as unknown as string;
-    return direction === EDirection[EDirection.EXTERNAL];
+  getUnit(eUnit: EUnit): string{
+    let unit = eUnit as unknown as string;
+    if(unit === EUnit[EUnit.PIECES]){
+      return this.getTranslateMessage("products.unit-pieces-s")
+    }
+    if(unit === EUnit[EUnit.LITERS]){
+      return this.getTranslateMessage("products.unit-l-s")
+    }
+    if(unit === EUnit[EUnit.METERS]){
+      return this.getTranslateMessage("products.unit-m-s")
+    }
+    if(unit === EUnit[EUnit.SQUARE_METERS]){
+      return this.getTranslateMessage("products.unit-m2-s")
+    }
+    if(unit === EUnit[EUnit.KILOGRAMS]){
+      return this.getTranslateMessage("products.unit-kg-s")
+    }
+    return ''
   }
 }

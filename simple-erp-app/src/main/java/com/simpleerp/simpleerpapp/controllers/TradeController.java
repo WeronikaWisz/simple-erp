@@ -3,11 +3,10 @@ package com.simpleerp.simpleerpapp.controllers;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.trade.AddOrderRequest;
-import com.simpleerp.simpleerpapp.dtos.trade.OrdersResponse;
-import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
-import com.simpleerp.simpleerpapp.dtos.trade.UpdateOrderRequest;
+import com.simpleerp.simpleerpapp.dtos.trade.*;
+import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.TradeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +110,39 @@ public class TradeController {
         tradeService.markOrderAsReceived(ids);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.markReceived", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/purchase-tasks/{status}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> loadPurchaseTasks(@PathVariable("status") EStatus status,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        DelegatedTasksResponse delegatedTasksResponse = tradeService.loadPurchaseTasks(status, page, size);
+        return ResponseEntity.ok(delegatedTasksResponse);
+    }
+
+    @PostMapping("/external-acceptance")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> delegateExternalAcceptance(@RequestBody DelegateExternalAcceptance delegateExternalAcceptance) {
+        tradeService.delegateExternalAcceptance(delegateExternalAcceptance);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.acceptanceDelegated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("purchases/mark-in-progress")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> markPurchaseAsInProgress(@RequestBody List<Long> ids) {
+        tradeService.markPurchaseAsInProgress(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.markPurchase", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("purchases/mark-done")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> markPurchaseAsDone(@RequestBody List<Long> ids) {
+        tradeService.markPurchaseAsDone(ids);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.markPurchase", null, LocaleContextHolder.getLocale())));
     }
 
 }

@@ -14,6 +14,7 @@ import {EType} from "../enums/EType";
 import {ProductListItem} from "../models/products/ProductListItem";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
+import {DelegateExternalAcceptance} from "../models/trade/DelegateExternalAcceptance";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -68,4 +69,21 @@ export class TradeService {
   markAsReceived(ids: number[]): Observable<any> {
     return this.http.post(TRADE_API + 'mark-received', JSON.stringify(ids), httpOptions);
   }
+
+  loadPurchaseTasks(status: string, pageIndex: number, pageSize: number): Observable<DelegatedTasksResponse>{
+    return this.http.get<DelegatedTasksResponse>(TRADE_API + `purchase-tasks/${status}?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  markPurchaseAsInProgress(ids: number[]): Observable<any> {
+    return this.http.post(TRADE_API + 'purchases/mark-in-progress', JSON.stringify(ids), httpOptions);
+  }
+
+  markPurchaseAsDone(ids: number[]): Observable<any> {
+    return this.http.post(TRADE_API + 'purchases/mark-done', JSON.stringify(ids), httpOptions);
+  }
+
+  delegateExternalAcceptance(delegateExternalAcceptance: DelegateExternalAcceptance): Observable<any> {
+    return this.http.post(TRADE_API + 'external-acceptance', JSON.stringify(delegateExternalAcceptance), httpOptions);
+  }
+
 }

@@ -26,7 +26,7 @@ export class BrowseDelegatedTasksComponent implements OnInit {
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['id', 'code', 'name', 'quantity', 'unit', 'status', 'date', 'assigned-user', 'actions'];
+  displayedColumns = ['number', 'code', 'name', 'quantity', 'unit', 'status', 'date', 'assigned-user', 'actions'];
   dataSource: MatTableDataSource<DelegatedTaskListItem> = new MatTableDataSource<DelegatedTaskListItem>([]);
 
   tasks: DelegatedTaskListItem[] = [];

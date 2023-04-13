@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {TranslateService} from "@ngx-translate/core";
 import Swal from "sweetalert2";
 import {TradeService} from "../../../../services/trade.service";
+import {TaskNumberType} from "../../../../models/trade/TaskNumberType";
 
 @Component({
   selector: 'app-change-user-dialog',
@@ -20,7 +21,7 @@ export class ChangeUserDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<ChangeUserDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number[], private formBuilder: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: TaskNumberType, private formBuilder: FormBuilder,
     private tradeService: TradeService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
@@ -53,8 +54,9 @@ export class ChangeUserDialogComponent implements OnInit {
 
   saveData(){
     this.tradeService.updateAssignedUsers({
-      "taskIds": this.data,
+      "taskIds": this.data.taskIds,
       "employeeId": this.form.get('assignedUser')?.value,
+      "task": this.data.task
     }).subscribe({
       next: (data) => {
         console.log(data);

@@ -3,6 +3,8 @@ package com.simpleerp.simpleerpapp.services;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
+import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTaskListItem;
+import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.enums.*;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
@@ -26,7 +28,8 @@ import java.util.stream.Collectors;
 public class TradeService {
 
     private static final String RELEASE_PREFIX = "WZ";
-    private static final String RELEASE_SEPARATOR = "/";
+    private static final String ACCEPTANCE_PREFIX = "PZ";
+    private static final String SEPARATOR = "/";
 
     private final ProductRepository productRepository;
     private final ProductSetRepository productSetRepository;
@@ -36,12 +39,15 @@ public class TradeService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final ReleaseRepository releaseRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final AcceptanceRepository acceptanceRepository;
 
     @Autowired
     public TradeService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                         OrderRepository orderRepository, OrderProductsRepository orderProductsRepository,
                         CustomerRepository customerRepository, UserRepository userRepository,
-                        TaskRepository taskRepository, ReleaseRepository releaseRepository) {
+                        TaskRepository taskRepository, ReleaseRepository releaseRepository,
+                        PurchaseRepository purchaseRepository, AcceptanceRepository acceptanceRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.orderRepository = orderRepository;
@@ -50,6 +56,8 @@ public class TradeService {
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.releaseRepository = releaseRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.acceptanceRepository = acceptanceRepository;
     }
 
     public List<ProductCode> loadProductList() {
@@ -287,12 +295,23 @@ public class TradeService {
     public void updateAssignedUser(UpdateAssignedUserRequest updateAssignedUserRequest) {
         User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
-        for(Long id: updateAssignedUserRequest.getTaskIds()){
-            Order order = orderRepository.findById(id)
-                    .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
-            order.setAssignedUser(user);
-            order.setUpdateDate(LocalDateTime.now());
-            orderRepository.save(order);
+        if(updateAssignedUserRequest.getTask().equals(ETask.TASK_SALE)) {
+            for (Long id : updateAssignedUserRequest.getTaskIds()) {
+                Order order = orderRepository.findById(id)
+                        .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+                order.setAssignedUser(user);
+                order.setUpdateDate(LocalDateTime.now());
+                orderRepository.save(order);
+            }
+        }
+        if(updateAssignedUserRequest.getTask().equals(ETask.TASK_PURCHASE)) {
+            for (Long id : updateAssignedUserRequest.getTaskIds()) {
+                Purchase purchase = purchaseRepository.findById(id)
+                        .orElseThrow(() -> new ApiNotFoundException("exception.purchaseNotFound"));
+                purchase.setAssignedUser(user);
+                purchase.setUpdateDate(LocalDateTime.now());
+                purchaseRepository.save(purchase);
+            }
         }
     }
 
@@ -433,10 +452,10 @@ public class TradeService {
         Release release = releaseRepository.save(new Release(order, user, task.getDefaultUser(),
                 EDirection.EXTERNAL, currentDate, EStatus.WAITING));
 
-        String releaseNumber = RELEASE_PREFIX + RELEASE_SEPARATOR + currentDate.getDayOfMonth()
-                + RELEASE_SEPARATOR + currentDate.getMonthValue()
-                + RELEASE_SEPARATOR + currentDate.getYear()
-                + RELEASE_SEPARATOR + release.getId();
+        String releaseNumber = RELEASE_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
+                + SEPARATOR + currentDate.getMonthValue()
+                + SEPARATOR + currentDate.getYear()
+                + SEPARATOR + release.getId();
 
         release.setNumber(releaseNumber);
         releaseRepository.save(release);
@@ -456,6 +475,105 @@ public class TradeService {
             order.setUpdateDate(currentDate);
             order.setExecutionDate(currentDate);
             orderRepository.save(order);
+        }
+    }
+
+    public DelegatedTasksResponse loadPurchaseTasks(EStatus status, int page, int size) {
+        DelegatedTasksResponse delegatedTasksResponse = new DelegatedTasksResponse();
+        List<Purchase> purchaseList = purchaseRepository.findByStatus(status)
+                .orElse(Collections.emptyList());
+        int total = purchaseList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            delegatedTasksResponse.setTasksList(purchaseTaskListToDelegatedTasksListItem(purchaseList
+                    .stream().sorted(Comparator.comparing(Purchase::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        delegatedTasksResponse.setTotalTasksLength(total);
+        return delegatedTasksResponse;
+    }
+
+    private List<DelegatedTaskListItem> purchaseTaskListToDelegatedTasksListItem(List<Purchase> purchaseList){
+        List<DelegatedTaskListItem> delegatedTaskListItems = new ArrayList<>();
+        for(Purchase purchase : purchaseList){
+
+            Optional<Acceptance> acceptance = acceptanceRepository.findByPurchaseAndStatusNotIn(purchase,
+                    List.of(EStatus.DONE,EStatus.CANCELED));
+
+            String orderNumber = "";
+            boolean accepted = false;
+            if(acceptance.isPresent() && acceptance.get().getOrderNumber() != null){
+                orderNumber = acceptance.get().getOrderNumber();
+                accepted = acceptance.get().getStatus().equals(EStatus.DONE);
+            }
+
+            DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(purchase.getId(),
+                    purchase.getNumber(), purchase.getProduct().getCode(), purchase.getProduct().getName(),
+                    purchase.getProduct().getUnit(), purchase.getQuantity().toString(), purchase.getStatus(),
+                    purchase.getAssignedUser().getName() + " " +  purchase.getAssignedUser().getSurname(),
+                    purchase.getAssignedUser().getId(),
+                    purchase.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    orderNumber, accepted);
+            delegatedTaskListItems.add(delegatedTaskListItem);
+        }
+        return delegatedTaskListItems;
+    }
+
+    @Transactional
+    public void delegateExternalAcceptance(DelegateExternalAcceptance delegateExternalAcceptance) {
+        for(Long id: delegateExternalAcceptance.getIds()){
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.purchaseNotFound"));
+            this.createExternalAcceptance(purchase, delegateExternalAcceptance.getOrderNumber());
+            purchase.setUpdateDate(LocalDateTime.now());
+            purchaseRepository.save(purchase);
+        }
+    }
+
+    private void createExternalAcceptance(Purchase purchase, String orderNumber) {
+        Task task = taskRepository.findByName(ETask.TASK_EXTERNAL_ACCEPTANCE)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+
+        String username = getCurrentUserUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        Acceptance acceptance = acceptanceRepository.save(new Acceptance(purchase, orderNumber, user,
+                task.getDefaultUser(), EDirection.EXTERNAL, currentDate, EStatus.WAITING));
+
+        String acceptanceNumber = ACCEPTANCE_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
+                + SEPARATOR + currentDate.getMonthValue()
+                + SEPARATOR + currentDate.getYear()
+                + SEPARATOR + acceptance.getId();
+
+        acceptance.setNumber(acceptanceNumber);
+        acceptanceRepository.save(acceptance);
+    }
+
+    @Transactional
+    public void markPurchaseAsInProgress(List<Long> ids) {
+        for(Long id: ids){
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.purchaseNotFound"));
+            purchase.setStatus(EStatus.IN_PROGRESS);
+            purchase.setUpdateDate(LocalDateTime.now());
+            purchaseRepository.save(purchase);
+        }
+    }
+
+    @Transactional
+    public void markPurchaseAsDone(List<Long> ids) {
+        for(Long id: ids){
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.purchaseNotFound"));
+            purchase.setStatus(EStatus.DONE);
+            LocalDateTime currentDate = LocalDateTime.now();
+            purchase.setUpdateDate(currentDate);
+            purchase.setExecutionDate(currentDate);
+            purchaseRepository.save(purchase);
         }
     }
 }

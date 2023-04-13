@@ -189,7 +189,7 @@
       "task-count": "Tasks count",
       "purchase": "Purchase",
       "production": "Production",
-      "id": "Id",
+      "number": "Number",
       "status": "Status",
       "date": "Delegation date",
       "assigned-user": "Assigned user",
@@ -288,6 +288,19 @@
       "not-issued": "Waiting for release",
       "issued": "Released",
       "mark-error": "Cannot mark orders as received"
+    },
+    "browse-purchases": {
+      "browse-title": "Purchase tasks list",
+      "task-count": "Tasks count",
+      "number": "Number",
+      "accepted": "Accepted",
+      "load-error": "Cannot load purchase tasks",
+      "add-external-acceptance": "Delegate external acceptance",
+      "mark-error": "Cannot change purchases status",
+      "delegate-error": "Cannot delegate external acceptance",
+      "order-number-title": "Purchase order number",
+      "order-number": "Order number",
+      "delegate-acceptance-success": "Successfully delegated acceptance task"
     }
   },
   "tasks": {
@@ -319,6 +332,7 @@
     "add-order": "Add order",
     "browse-orders": "Browse orders",
     "browse-release": "Browse release",
-    "browse-acceptance": "Browse acceptance"
+    "browse-acceptance": "Browse acceptance",
+    "browse-purchases": "Browse purchases"
   }
 }

@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {TranslateService} from "@ngx-translate/core";
 import Swal from "sweetalert2";
 import {WarehouseService} from "../../../../services/warehouse.service";
+import {TaskNumberType} from "../../../../models/trade/TaskNumberType";
 
 @Component({
   selector: 'app-change-user-release-dialog',
@@ -21,7 +22,7 @@ export class ChangeUserReleaseDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<ChangeUserReleaseDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number[], private formBuilder: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: TaskNumberType, private formBuilder: FormBuilder,
     private warehouseService: WarehouseService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
@@ -54,8 +55,9 @@ export class ChangeUserReleaseDialogComponent implements OnInit {
 
   saveData(){
     this.warehouseService.updateReleaseAssignedUsers({
-      "taskIds": this.data,
+      "taskIds": this.data.taskIds,
       "employeeId": this.form.get('assignedUser')?.value,
+      "task": this.data.task
     }).subscribe({
       next: (data) => {
         console.log(data);

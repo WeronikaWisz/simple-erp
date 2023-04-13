@@ -13,6 +13,8 @@ import {AddOrderComponent} from "./views/trade/add-order/add-order.component";
 import {BrowseOrdersComponent} from "./views/trade/browse-orders/browse-orders.component";
 import {BrowseAcceptanceComponent} from "./views/warehouse/browse-acceptance/browse-acceptance.component";
 import {BrowseReleaseComponent} from "./views/warehouse/browse-release/browse-release.component";
+import {BrowsePurchasesComponent} from "./views/trade/browse-purchases/browse-purchases.component";
+import {BrowseDelegatedWarehouseTaskComponent} from "./views/trade/browse-delegated-warehouse-task/browse-delegated-warehouse-task.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -31,6 +33,8 @@ const routes: Routes = [
   { path: 'edit-order/:id', component: AddOrderComponent },
   { path: 'browse-acceptance', component: BrowseAcceptanceComponent },
   { path: 'browse-release', component: BrowseReleaseComponent },
+  { path: 'browse-purchases', component: BrowsePurchasesComponent },
+  { path: 'browse-delegated-warehouse-task', component: BrowseDelegatedWarehouseTaskComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 
