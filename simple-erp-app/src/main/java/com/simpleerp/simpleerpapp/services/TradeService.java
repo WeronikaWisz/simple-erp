@@ -535,22 +535,30 @@ public class TradeService {
         Task task = taskRepository.findByName(ETask.TASK_EXTERNAL_ACCEPTANCE)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
 
-        String username = getCurrentUserUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("Cannot found user"));
+        Optional<Acceptance> currentAcceptance = acceptanceRepository.findByPurchaseAndStatusNotIn(purchase,
+                List.of(EStatus.DONE,EStatus.CANCELED));
 
-        LocalDateTime currentDate = LocalDateTime.now();
+        if(currentAcceptance.isPresent()){
+            currentAcceptance.get().setOrderNumber(orderNumber);
+            currentAcceptance.get().setUpdateDate(LocalDateTime.now());
+            acceptanceRepository.save(currentAcceptance.get());
+        } else {
+            String username = getCurrentUserUsername();
+            User user = userRepository.findByUsername(username).orElseThrow(
+                    () -> new UsernameNotFoundException("Cannot found user"));
 
-        Acceptance acceptance = acceptanceRepository.save(new Acceptance(purchase, orderNumber, user,
-                task.getDefaultUser(), EDirection.EXTERNAL, currentDate, EStatus.WAITING));
+            LocalDateTime currentDate = LocalDateTime.now();
 
-        String acceptanceNumber = ACCEPTANCE_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
-                + SEPARATOR + currentDate.getMonthValue()
-                + SEPARATOR + currentDate.getYear()
-                + SEPARATOR + acceptance.getId();
+            Acceptance acceptance = acceptanceRepository.save(new Acceptance(purchase, orderNumber, user,
+                    task.getDefaultUser(), EDirection.EXTERNAL, currentDate, EStatus.WAITING));
 
-        acceptance.setNumber(acceptanceNumber);
-        acceptanceRepository.save(acceptance);
+            String acceptanceNumber = ACCEPTANCE_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
+                    + SEPARATOR + currentDate.getMonthValue()
+                    + SEPARATOR + currentDate.getYear()
+                    + SEPARATOR + acceptance.getId();
+            acceptance.setNumber(acceptanceNumber);
+            acceptanceRepository.save(acceptance);
+        }
     }
 
     @Transactional

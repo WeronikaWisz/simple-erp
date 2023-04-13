@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {TranslateService} from "@ngx-translate/core";
 import Swal from "sweetalert2";
 import {TradeService} from "../../../../services/trade.service";
+import {DelegateExternalAcceptance} from "../../../../models/trade/DelegateExternalAcceptance";
 
 @Component({
   selector: 'app-purchase-order-number-dialog',
@@ -20,7 +21,7 @@ export class PurchaseOrderNumberDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<PurchaseOrderNumberDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number[], private formBuilder: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: DelegateExternalAcceptance, private formBuilder: FormBuilder,
     private tradeService: TradeService, private translate: TranslateService
   ) {
     dialogRef.disableClose = true;
@@ -28,13 +29,13 @@ export class PurchaseOrderNumberDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      number: ['', Validators.required],
+      number: [this.data.orderNumber, Validators.required],
     })
   }
 
   saveData(){
     this.tradeService.delegateExternalAcceptance({
-      ids: this.data,
+      ids: this.data.ids,
       orderNumber: this.form.get('number')?.value
     }).subscribe({
       next: (data) => {
@@ -58,33 +59,6 @@ export class PurchaseOrderNumberDialogComponent implements OnInit {
         })
       }
     });
-    // this.suppliesService.updateSupplies({
-    //   id: this.data.id,
-    //   quantity: this.form.get('quantity')?.value,
-    //   minQuantity: this.form.get('minQuantity')?.value,
-    //   days: this.form.get('days')?.value
-    // }).subscribe({
-    //   next: (data) => {
-    //     console.log(data);
-    //     this.dataChanged = true
-    //     this.form.markAsPristine();
-    //     Swal.fire({
-    //       position: 'top-end',
-    //       title: this.getTranslateMessage("supplies.browse-supplies.update-success"),
-    //       icon: 'success',
-    //       showConfirmButton: false
-    //     })
-    //   },
-    //   error: (err) => {
-    //     Swal.fire({
-    //       position: 'top-end',
-    //       title: this.getTranslateMessage("supplies.browse-supplies.update-error"),
-    //       text: err.error.message,
-    //       icon: 'error',
-    //       showConfirmButton: false
-    //     })
-    //   }
-    // });
   }
 
   getTranslateMessage(key: string): string{

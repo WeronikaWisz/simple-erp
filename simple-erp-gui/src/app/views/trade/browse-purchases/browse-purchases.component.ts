@@ -106,7 +106,10 @@ export class BrowsePurchasesComponent implements OnInit {
   delegateExternalAcceptance() {
     const dialogRef = this.dialog.open(PurchaseOrderNumberDialogComponent, {
       maxWidth: '650px',
-      data: this.selection.selected.map(s => s.id)
+      data: {
+        ids: this.selection.selected.map(s => s.id),
+        orderNumber: undefined
+      }
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
@@ -255,5 +258,22 @@ export class BrowsePurchasesComponent implements OnInit {
       return this.getTranslateMessage("products.unit-kg-s")
     }
     return ''
+  }
+
+  editOrderNumber(delegatedTaskListItem: DelegatedTaskListItem) {
+    const dialogRef = this.dialog.open(PurchaseOrderNumberDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        ids: [delegatedTaskListItem.id],
+        orderNumber: delegatedTaskListItem.orderNumber
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if(result){
+        this.selection.clear();
+        this.loadTasks();
+      }
+    });
   }
 }
