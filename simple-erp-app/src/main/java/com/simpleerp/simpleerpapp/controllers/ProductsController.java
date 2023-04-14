@@ -50,7 +50,7 @@ public class ProductsController {
 
     @PostMapping("/product")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addOrder(@RequestBody AddProductRequest addProductRequest) {
+    public ResponseEntity<?> addProduct(@RequestBody AddProductRequest addProductRequest) {
         productsService.addProduct(addProductRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.productAdded", null, LocaleContextHolder.getLocale())));
@@ -77,6 +77,14 @@ public class ProductsController {
         productsService.updateProduct(updateProductRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.productUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("/contractor")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> addContractor(@RequestBody AddContractorRequest addContractorRequest) {
+        productsService.addContractor(addContractorRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.contractorAdded", null, LocaleContextHolder.getLocale())));
     }
 
     private ProductCode mapProductToProductCode(Product product){

@@ -43,6 +43,10 @@ public class Product {
     @OneToMany(mappedBy = "product")
     List<OrderProducts> orderProductsSet = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contractor_id")
+    Contractor contractor;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 

@@ -7,6 +7,7 @@ import {ProductListItem} from "../models/products/ProductListItem";
 import {ProductsResponse} from "../models/products/ProductsResponse";
 import {EType} from "../enums/EType";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
+import {AddContractorRequest} from "../models/products/AddContractorRequest";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -43,5 +44,9 @@ export class ProductsService {
 
   updateProduct(updateProductRequest: UpdateProductRequest): Observable<any> {
     return this.http.put(PRODUCTS_API + 'product', JSON.stringify(updateProductRequest), httpOptions);
+  }
+
+  addContractor(addContractorRequest: AddContractorRequest): Observable<any> {
+    return this.http.post(PRODUCTS_API + 'contractor', JSON.stringify(addContractorRequest), httpOptions);
   }
 }

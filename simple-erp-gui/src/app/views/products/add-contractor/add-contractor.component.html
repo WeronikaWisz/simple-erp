@@ -1,0 +1,124 @@
+<mat-card class="example-card mat-elevation-z8">
+  <mat-card-content>
+    <form *ngIf="isLoggedIn && isAdmin" [formGroup]="form">
+      <h2>{{ 'products.add-contractor.register-title' | translate}}</h2>
+      <mat-vertical-stepper formArrayName="formArray" [linear]="false" #stepper>
+        <mat-step formGroupName="0" [stepControl]="formArray?.get([0])!">
+          <ng-template matStepLabel>{{ 'products.add-contractor.user-data' | translate}}</ng-template>
+          <mat-form-field class="full-width-input wider-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.name' | translate}}</mat-label>
+            <input matInput formControlName="name" required>
+            <mat-error>
+              {{ 'products.add-contractor.name-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <br>
+          <mat-form-field class="full-width-input left-mat-field country-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.country' | translate}}</mat-label>
+            <input matInput formControlName="country" placeholder="PL" required>
+            <mat-error>
+              {{ 'products.add-contractor.country-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input nip-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.nip' | translate}}</mat-label>
+            <input matInput formControlName="nip" required>
+            <mat-error>
+              {{ 'products.add-contractor.nip-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.email' | translate}}</mat-label>
+            <input matInput formControlName="email">
+            <mat-error>
+              {{ 'products.add-contractor.email-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.phone' | translate}}</mat-label>
+            <input matInput placeholder="(+48) 123 456 789" formControlName="phone">
+            <mat-error>
+              {{ 'products.add-contractor.phone-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input wider-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.url' | translate}}</mat-label>
+            <input matInput formControlName="url">
+          </mat-form-field>
+          <div class="buttons-section">
+            <button mat-button matStepperNext>{{ 'products.add-contractor.next' | translate}}</button>
+          </div>
+        </mat-step>
+        <mat-step formGroupName="1" [stepControl]="formArray?.get([1])!">
+          <ng-template matStepLabel>{{ 'products.add-contractor.user-address' | translate}}</ng-template>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.postal-code' | translate}}</mat-label>
+            <input matInput placeholder="12-345" formControlName="postalCode" required>
+            <mat-error>
+              {{ 'products.add-contractor.postal-code-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.post' | translate}}</mat-label>
+            <input matInput formControlName="post" required>
+            <mat-error>
+              {{ 'products.add-contractor.post-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.city' | translate}}</mat-label>
+            <input matInput formControlName="city" required>
+            <mat-error>
+              {{ 'products.add-contractor.city-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.street' | translate}}</mat-label>
+            <input matInput formControlName="street" required>
+            <mat-error>
+              {{ 'products.add-contractor.street-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input left-mat-field" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.building-number' | translate}}</mat-label>
+            <input matInput formControlName="buildingNumber" required>
+            <mat-error>
+              {{ 'products.add-contractor.building-number-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.door-number' | translate}}</mat-label>
+            <input matInput formControlName="doorNumber">
+            <mat-error>
+              {{ 'products.add-contractor.door-number-error' | translate}}
+            </mat-error>
+          </mat-form-field>
+          <div class="buttons-section">
+            <button mat-button matStepperPrevious>{{ 'products.add-contractor.back' | translate}}</button>
+            <button mat-button matStepperNext>{{ 'products.add-contractor.next' | translate}}</button>
+          </div>
+        </mat-step>
+        <mat-step formGroupName="2" [stepControl]="formArray?.get([2])!">
+          <ng-template matStepLabel>{{ 'products.add-contractor.bank-data' | translate}}</ng-template>
+          <mat-form-field class="full-width-input wider-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.bank-account' | translate}}</mat-label>
+            <input matInput formControlName="bankAccount">
+          </mat-form-field>
+          <mat-form-field class="full-width-input wider-input" appearance="outline">
+            <mat-label>{{ 'products.add-contractor.account-number' | translate}}</mat-label>
+            <input matInput formControlName="accountNumber">
+          </mat-form-field>
+          <div class="buttons-section">
+            <button mat-button matStepperPrevious>{{ 'products.add-contractor.back' | translate}}</button>
+          </div>
+        </mat-step>
+      </mat-vertical-stepper>
+      <span class="register-button">
+        <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">
+          <mat-icon>how_to_reg</mat-icon>
+          <span class="signup-button">{{ 'products.add-contractor.register-button' | translate}}</span>
+        </button>
+      </span>
+    </form>
+  </mat-card-content>
+</mat-card>

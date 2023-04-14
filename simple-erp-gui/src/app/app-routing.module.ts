@@ -15,6 +15,7 @@ import {BrowseAcceptanceComponent} from "./views/warehouse/browse-acceptance/bro
 import {BrowseReleaseComponent} from "./views/warehouse/browse-release/browse-release.component";
 import {BrowsePurchasesComponent} from "./views/trade/browse-purchases/browse-purchases.component";
 import {BrowseDelegatedWarehouseTaskComponent} from "./views/trade/browse-delegated-warehouse-task/browse-delegated-warehouse-task.component";
+import {AddContractorComponent} from "./views/products/add-contractor/add-contractor.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
   { path: 'add-product', component: AddProductComponent },
   { path: 'browse-products', component: BrowseProductsComponent },
   { path: 'edit-product/:type/:id', component: AddProductComponent },
+  { path: 'add-contractor', component: AddContractorComponent },
   { path: 'browse-supplies', component: BrowseSuppliesComponent },
   { path: 'browse-delegated-tasks', component: BrowseDelegatedTasksComponent },
   { path: 'add-order', component: AddOrderComponent },

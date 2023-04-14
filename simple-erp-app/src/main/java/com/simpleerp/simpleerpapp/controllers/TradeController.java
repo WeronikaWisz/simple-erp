@@ -9,7 +9,6 @@ import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.ReleasesAcceptancesResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.ETask;
-import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.TradeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

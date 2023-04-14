@@ -23,15 +23,17 @@ public class ProductsService {
     private final ProductSetRepository productSetRepository;
     private final ProductSetProductsRepository productSetProductsRepository;
     private final StockLevelRepository stockLevelRepository;
+    private final ContractorRepository contractorRepository;
 
     @Autowired
     public ProductsService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                            ProductSetProductsRepository productSetProductsRepository,
-                           StockLevelRepository stockLevelRepository) {
+                           StockLevelRepository stockLevelRepository, ContractorRepository contractorRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.productSetProductsRepository = productSetProductsRepository;
         this.stockLevelRepository = stockLevelRepository;
+        this.contractorRepository = contractorRepository;
     }
 
     @Transactional
@@ -225,5 +227,30 @@ public class ProductsService {
         }
         product.setUpdateDate(LocalDateTime.now());
         productRepository.save(product);
+    }
+
+    public void addContractor(AddContractorRequest addContractorRequest) {
+        Optional<Contractor> contractor = contractorRepository.findByEmail(addContractorRequest.getEmail());
+
+        if(contractor.isPresent()){
+            throw new ApiExpectationFailedException("exception.emailUsed");
+        }
+
+        String phoneNumber = addContractorRequest.getPhone();
+        if(!Objects.equals(phoneNumber, "")) {
+            phoneNumber = phoneNumber.replaceAll("\\s+", "");
+            if (!phoneNumber.startsWith("+48")) {
+                phoneNumber = "+48" + phoneNumber;
+            }
+        }
+
+        contractorRepository.save(new Contractor(addContractorRequest.getName(),
+                addContractorRequest.getCountry().toUpperCase(Locale.ROOT),
+                addContractorRequest.getNip(), addContractorRequest.getBankAccount(),
+                addContractorRequest.getAccountNumber(), addContractorRequest.getUrl(),
+                addContractorRequest.getEmail(), phoneNumber, addContractorRequest.getPostalCode(),
+                addContractorRequest.getPost(), addContractorRequest.getCity(), addContractorRequest.getStreet(),
+                addContractorRequest.getBuildingNumber(), addContractorRequest.getDoorNumber(), LocalDateTime.now()));
+
     }
 }
