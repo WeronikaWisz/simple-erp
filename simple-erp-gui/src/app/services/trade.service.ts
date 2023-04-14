@@ -15,6 +15,8 @@ import {ProductListItem} from "../models/products/ProductListItem";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 import {DelegateExternalAcceptance} from "../models/trade/DelegateExternalAcceptance";
+import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptancesResponse";
+import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -86,4 +88,11 @@ export class TradeService {
     return this.http.post(TRADE_API + 'external-acceptance', JSON.stringify(delegateExternalAcceptance), httpOptions);
   }
 
+  loadDelegatedTasks(task: string, pageIndex: number, pageSize: number): Observable<ReleasesAcceptancesResponse>{
+    return this.http.get<ReleasesAcceptancesResponse>(TRADE_API + `delegated-tasks/${task}?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  getRelease(id: number): Observable<ReleaseDetails> {
+    return this.http.get<ReleaseDetails>(TRADE_API + 'release/' + id, httpOptions);
+  }
 }

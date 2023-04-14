@@ -9,6 +9,9 @@ import {ReleaseDetails} from "../../../../models/warehouse/ReleaseDetails";
 import {EDirection} from "../../../../enums/EDirection";
 import {WarehouseService} from "../../../../services/warehouse.service";
 import {EStatus} from "../../../../enums/EStatus";
+import {TradeService} from "../../../../services/trade.service";
+import {TokenStorageService} from "../../../../services/token-storage.service";
+import {ERole} from "../../../../enums/ERole";
 
 @Component({
   selector: 'app-release-info-dialog',
@@ -18,6 +21,9 @@ import {EStatus} from "../../../../enums/EStatus";
 export class ReleaseInfoDialogComponent implements OnInit {
 
   dataChanged = false;
+
+  hasWarehouseRole = false;
+  hasTradeRole = false;
 
   productList: ProductCode[] = [];
   units: Unit[] = [];
@@ -43,35 +49,64 @@ export class ReleaseInfoDialogComponent implements OnInit {
   }
   constructor(
     public dialogRef: MatDialogRef<ReleaseInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number,
-    private warehouseService: WarehouseService, private translate: TranslateService
+    @Inject(MAT_DIALOG_DATA) public data: number, private tradeService: TradeService,
+    private warehouseService: WarehouseService, private translate: TranslateService,
+    private tokenStorage: TokenStorageService
   ) {
     dialogRef.disableClose = true;
 
   }
 
   ngOnInit(): void {
+    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN]))){
+      this.hasWarehouseRole = true;
+      this.hasTradeRole = true;
+    }
+    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_WAREHOUSE]))){
+      this.hasWarehouseRole = true;
+    }
+    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_TRADE]))){
+      this.hasTradeRole = true;
+    }
     this.loadUnits();
     this.loadProductForSetList();
     this.loadRelease();
   }
 
   loadRelease(){
-    this.warehouseService.getRelease(this.data)
-      .subscribe({
-        next: (data) => {
-          this.release = data
-        },
-        error: (err) => {
-          Swal.fire({
-            position: 'top-end',
-            title: this.getTranslateMessage("trade.add-order.load-error"),
-            text: err.error.message,
-            icon: 'error',
-            showConfirmButton: false
-          })
-        }
-      })
+    if(this.hasWarehouseRole) {
+      this.warehouseService.getRelease(this.data)
+        .subscribe({
+          next: (data) => {
+            this.release = data
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("trade.add-order.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.hasTradeRole) {
+      this.tradeService.getRelease(this.data)
+        .subscribe({
+          next: (data) => {
+            this.release = data
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("trade.add-order.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    }
   }
 
   getTranslateMessage(key: string): string{
@@ -112,22 +147,41 @@ export class ReleaseInfoDialogComponent implements OnInit {
   }
 
   loadProductForSetList(){
-    this.warehouseService.loadProductList()
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          this.productList = data;
-        },
-        error: (err) => {
-          Swal.fire({
-            position: 'top-end',
-            title: this.getTranslateMessage("products.add-product.load-error"),
-            text: err.error.message,
-            icon: 'error',
-            showConfirmButton: false
-          })
-        }
-      })
+    if(this.hasWarehouseRole) {
+      this.warehouseService.loadProductList()
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.productList = data;
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("products.add-product.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.hasTradeRole) {
+      this.tradeService.loadProductList()
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.productList = data;
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("products.add-product.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    }
   }
 
   getUnit(code: string) {

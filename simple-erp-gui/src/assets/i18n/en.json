@@ -307,6 +307,13 @@
       "order-number-title": "Purchase order number",
       "order-number": "Order number",
       "delegate-acceptance-success": "Successfully delegated acceptance task"
+    },
+    "browse-delegated-warehouse-task": {
+      "browse-title": "Delegated warehouse tasks",
+      "task-count": "Tasks count",
+      "releases": "Releases",
+      "acceptances": "Acceptances",
+      "load-error": "Cannot load delegated tasks"
     }
   },
   "tasks": {

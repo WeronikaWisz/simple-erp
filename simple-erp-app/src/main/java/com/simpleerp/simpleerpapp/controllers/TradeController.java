@@ -5,7 +5,10 @@ import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
+import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseDetails;
+import com.simpleerp.simpleerpapp.dtos.warehouse.ReleasesAcceptancesResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.ETask;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.services.TradeService;
 import org.modelmapper.ModelMapper;
@@ -145,4 +148,19 @@ public class TradeController {
                 "success.markPurchase", null, LocaleContextHolder.getLocale())));
     }
 
+    @GetMapping("/delegated-tasks/{task}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> loadDelegatedTasks(@PathVariable("task") ETask task,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = tradeService.loadDelegatedTasks(task, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
+    }
+
+    @GetMapping("/release/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> getRelease(@PathVariable("id") Long id) {
+        ReleaseDetails release = tradeService.getRelease(id);
+        return ResponseEntity.ok(release);
+    }
 }

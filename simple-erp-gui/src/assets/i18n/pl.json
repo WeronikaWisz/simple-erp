@@ -307,6 +307,13 @@
       "order-number-title": "Numer zamówienia zakupów",
       "order-number": "Numer zamówienia",
       "delegate-acceptance-success": "Pomyślnie zlecono zadanie przyjęcia"
+    },
+    "browse-delegated-warehouse-task": {
+      "browse-title": "Zlecone zadania magazynowe",
+      "task-count": "Liczba zadań",
+      "releases": "Wydania",
+      "acceptances": "Przyjęcia",
+      "load-error": "Nie udało się załadować zleconych zadań"
     }
   },
   "tasks": {

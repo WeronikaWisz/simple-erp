@@ -1,1 +1,78 @@
-<p>browse-delegated-warehouse-task works!</p>
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
+  <h2>{{ 'trade.browse-delegated-warehouse-task.browse-title' | translate}}</h2>
+  <p>{{ 'trade.browse-delegated-warehouse-task.task-count' | translate}}: {{taskCount}}</p>
+  <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+    <mat-tab label="{{ 'trade.browse-delegated-warehouse-task.releases' | translate}}">
+      <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
+    </mat-tab>
+    <mat-tab label="{{ 'trade.browse-delegated-warehouse-task.acceptances' | translate}}">
+      <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
+    </mat-tab>
+  </mat-tab-group>
+  <mat-paginator [length]="totalTasksLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>
+
+<ng-template #taskListTemplate let-dataSource>
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="number">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.number' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.number}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="association">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.association' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.association}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="purchaser">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.purchaser' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip (click)="showUserData(row.purchaserId)"> {{row.purchaserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.date' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.orderDate}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.delegated-tasks.status' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip class="chip-waiting" *ngIf="isWaiting(row.status)"> {{getStatus(row.status)}} </mat-chip>
+          <mat-chip class="chip-in-progress" *ngIf="!isWaiting(row.status)"> {{getStatus(row.status)}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="assigned-user">
+      <mat-header-cell *matHeaderCellDef> {{ 'trade.browse-orders.assigned-user' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip (click)="showUserData(row.assignedUserId)"> {{row.assignedUserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToTaskInfo(row.id)">
+          <mat-icon>info</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</ng-template>

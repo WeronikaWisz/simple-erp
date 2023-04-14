@@ -3,8 +3,7 @@ package com.simpleerp.simpleerpapp.services;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
-import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTaskListItem;
-import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
+import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
@@ -581,5 +580,99 @@ public class TradeService {
             purchase.setExecutionDate(currentDate);
             purchaseRepository.save(purchase);
         }
+    }
+
+    public ReleasesAcceptancesResponse loadDelegatedTasks(ETask task, int page, int size) {
+        if(task.equals(ETask.TASK_EXTERNAL_RELEASE)){
+            return loadReleases(page, size);
+        } else {
+            return loadAcceptances(page, size);
+        }
+    }
+
+    public ReleasesAcceptancesResponse loadReleases(int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Release> releaseList = this.releaseRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .orElse(Collections.emptyList());
+        int total = releaseList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
+                    .sorted(Comparator.comparing(Release::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    private List<ReleaseAcceptanceListItem> releaseListToReleaseListItem(List<Release> releases){
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
+        for(Release release: releases){
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(), release.getNumber(),
+                    release.getOrder().getNumber(),
+                    release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    release.getDirection(), release.getRequestingUser().getId(),
+                    release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
+                    release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
+                    release.getAssignedUser().getId(), release.getStatus());
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
+        }
+        return releaseListItemAcceptanceList;
+    }
+
+    public ReleasesAcceptancesResponse loadAcceptances(int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .orElse(Collections.emptyList());
+        int total = acceptanceList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(acceptanceListToAcceptanceListItem(acceptanceList.stream()
+                    .sorted(Comparator.comparing(Acceptance::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    private List<ReleaseAcceptanceListItem> acceptanceListToAcceptanceListItem(List<Acceptance> acceptances) {
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
+        for(Acceptance acceptance: acceptances){
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
+                    acceptance.getNumber(), acceptance.getPurchase().getNumber(),
+                    acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getDirection(), acceptance.getRequestingUser().getId(),
+                    acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
+                    acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
+                    acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
+        }
+        return releaseListItemAcceptanceList;
+    }
+
+    public ReleaseDetails getRelease(Long id) {
+        Release release = releaseRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
+        ReleaseDetails releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
+                release.getOrder().getNumber(),
+                release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                release.getExecutionDate() != null ?
+                        release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                release.getDirection(), release.getOrder().getCustomer().getName(),
+                release.getOrder().getCustomer().getSurname(), release.getOrder().getCustomer().getEmail(),
+                release.getOrder().getCustomer().getPhone(), release.getOrder().getCustomer().getPostalCode(),
+                release.getOrder().getCustomer().getPost(), release.getOrder().getCustomer().getCity(),
+                release.getOrder().getCustomer().getStreet(), release.getOrder().getCustomer().getBuildingNumber(),
+                release.getOrder().getCustomer().getDoorNumber());
+        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+        for(OrderProducts orderProduct: release.getOrder().getOrderProductsSet()){
+            ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                    orderProduct.getProduct().getCode(), orderProduct.getQuantity().toString(), true);
+            releaseProductQuantityList.add(releaseProductQuantity);
+        }
+        releaseDetails.setProductSet(releaseProductQuantityList);
+        return releaseDetails;
     }
 }
