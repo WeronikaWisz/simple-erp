@@ -253,4 +253,53 @@ public class ProductsService {
                 addContractorRequest.getBuildingNumber(), addContractorRequest.getDoorNumber(), LocalDateTime.now()));
 
     }
+
+    public ContractorsResponse loadContractors(int page, int size) {
+        ContractorsResponse contractorsResponse = new ContractorsResponse();
+        List<Contractor> contractorList = contractorRepository.findAll();
+        int total = contractorList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            contractorsResponse.setContractorsList(contractorListToContractorListItem(contractorList).stream()
+                    .sorted(Comparator.comparing(ContractorListItem::getName))
+                    .collect(Collectors.toList()).subList(start, end));
+        }
+        contractorsResponse.setTotalContractorsLength(total);
+        return contractorsResponse;
+    }
+
+    private List<ContractorListItem> contractorListToContractorListItem(List<Contractor> contractorList){
+        List<ContractorListItem> contractorListItems = new ArrayList<>();
+        for(Contractor contractor: contractorList){
+            ContractorListItem contractorListItem = new ContractorListItem(contractor.getId(), contractor.getName(),
+                    contractor.getCountry(), contractor.getNip(), contractor.getUrl(), contractor.getEmail(),
+                    contractor.getPhone());
+            contractorListItems.add(contractorListItem);
+        }
+        return contractorListItems;
+    }
+
+    public UpdateContractorRequest getContractor(Long id) {
+        Contractor contractor = contractorRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
+        return new UpdateContractorRequest(contractor.getId(), contractor.getName(),
+                contractor.getCountry(), contractor.getNip(), contractor.getBankAccount(), contractor.getAccountNumber(),
+                contractor.getUrl(), contractor.getEmail(), contractor.getPhone(), contractor.getPostalCode(), contractor.getPost(),
+                contractor.getCity(), contractor.getStreet(), contractor.getBuildingNumber(), contractor.getDoorNumber());
+    }
+
+//    TODO
+    public void deleteContractor(Long id) {
+    }
+
+    //    TODO
+    public void updateContractor(UpdateContractorRequest updateContractorRequest) {
+        Contractor contractor = contractorRepository.findById(updateContractorRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
+
+//        if(contractor.isPresent()){
+//            throw new ApiExpectationFailedException("exception.emailUsed");
+//        }
+    }
 }

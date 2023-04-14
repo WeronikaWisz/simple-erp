@@ -1,0 +1,67 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && isAdmin">
+  <div class="product-list-header">
+    <div>
+      <h2>{{ 'products.browse-contractors.browse-title' | translate}}</h2>
+      <p>{{ 'products.browse-contractors.contractors-count' | translate}}: {{contractorsCount}}</p>
+    </div>
+    <div>
+      <button mat-raised-button (click)="goToAddContractor()">
+        {{ 'nav.add-contractor' | translate}}
+      </button>
+    </div>
+  </div>
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.name' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="country">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.country' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.country}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="nip">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.nip' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.nip}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.email' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.email}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="phone">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.phone' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.phone}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="url">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-contractors.url' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.url}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToEditContractor(row.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deleteContractor(row.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="totalContractorsLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>

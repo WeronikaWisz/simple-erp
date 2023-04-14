@@ -38,6 +38,9 @@
       <a mat-list-item href routerLink="add-product" *ngIf="hasAdminRole()"><mat-icon>add_circle_outline</mat-icon>
         <span class="button-text">{{ 'nav.add-product' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-contractors" *ngIf="hasAdminRole()"><mat-icon>group</mat-icon>
+        <span class="button-text">{{ 'nav.browse-contractors' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="add-contractor" *ngIf="hasAdminRole()"><mat-icon>person_add</mat-icon>
         <span class="button-text">{{ 'nav.add-contractor' | translate}}</span>
       </a>
@@ -118,6 +121,9 @@
           </button>
           <button mat-menu-item routerLink="add-product">
             <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-product' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-contractors">
+            <mat-icon>group</mat-icon> {{ 'nav.browse-contractors' | translate}}
           </button>
           <button mat-menu-item routerLink="add-contractor">
             <mat-icon>person_add</mat-icon> {{ 'nav.add-contractor' | translate}}

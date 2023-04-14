@@ -87,6 +87,37 @@ public class ProductsController {
                 "success.contractorAdded", null, LocaleContextHolder.getLocale())));
     }
 
+    @GetMapping("/contractors")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadContractors(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        ContractorsResponse contractorsResponse = productsService.loadContractors(page, size);
+        return ResponseEntity.ok(contractorsResponse);
+    }
+
+    @DeleteMapping("/contractor/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> deleteContractor(@PathVariable("id") Long id) {
+        productsService.deleteContractor(id);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.productDeleted", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/contractor/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getContractor(@PathVariable("id") Long id) {
+        UpdateContractorRequest contractor = productsService.getContractor(id);
+        return ResponseEntity.ok(contractor);
+    }
+
+    @PutMapping("/contractor")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> updateContractor(@RequestBody UpdateContractorRequest updateContractorRequest) {
+        productsService.updateContractor(updateContractorRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.contractorUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
     private ProductCode mapProductToProductCode(Product product){
         return modelMapper.map(product, ProductCode.class);
     }

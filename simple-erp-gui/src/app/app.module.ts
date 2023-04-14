@@ -59,6 +59,7 @@ import { BrowseDelegatedWarehouseTaskComponent } from './views/trade/browse-dele
 import { BrowsePurchasesComponent } from './views/trade/browse-purchases/browse-purchases.component';
 import { PurchaseOrderNumberDialogComponent } from './views/trade/browse-purchases/purchase-order-number-dialog/purchase-order-number-dialog.component';
 import { AddContractorComponent } from './views/products/add-contractor/add-contractor.component';
+import { BrowseContractorsComponent } from './views/products/browse-contractors/browse-contractors.component';
 
 @NgModule({
   declarations: [
@@ -91,7 +92,8 @@ import { AddContractorComponent } from './views/products/add-contractor/add-cont
     BrowseDelegatedWarehouseTaskComponent,
     BrowsePurchasesComponent,
     PurchaseOrderNumberDialogComponent,
-    AddContractorComponent
+    AddContractorComponent,
+    BrowseContractorsComponent
   ],
     imports: [
         BrowserModule,

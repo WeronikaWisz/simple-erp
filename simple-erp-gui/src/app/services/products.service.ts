@@ -8,6 +8,8 @@ import {ProductsResponse} from "../models/products/ProductsResponse";
 import {EType} from "../enums/EType";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 import {AddContractorRequest} from "../models/products/AddContractorRequest";
+import {ContractorsResponse} from "../models/products/ContractorsResponse";
+import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -48,5 +50,21 @@ export class ProductsService {
 
   addContractor(addContractorRequest: AddContractorRequest): Observable<any> {
     return this.http.post(PRODUCTS_API + 'contractor', JSON.stringify(addContractorRequest), httpOptions);
+  }
+
+  loadContractors(pageIndex: number, pageSize: number): Observable<ContractorsResponse> {
+    return this.http.get<ContractorsResponse>(PRODUCTS_API + `contractors?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  deleteContractor(id: number): Observable<any> {
+    return this.http.delete(PRODUCTS_API + 'contractor/' + id)
+  }
+
+  getContractor(id: number): Observable<UpdateContractorRequest> {
+    return this.http.get<UpdateContractorRequest>(PRODUCTS_API + 'contractor/' + id, httpOptions);
+  }
+
+  updateContractor(updateContractorRequest: UpdateContractorRequest): Observable<any> {
+    return this.http.put(PRODUCTS_API + 'contractor', JSON.stringify(updateContractorRequest), httpOptions);
   }
 }

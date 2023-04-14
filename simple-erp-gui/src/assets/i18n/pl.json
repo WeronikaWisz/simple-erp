@@ -179,7 +179,22 @@
       "account-number": "Numer konta",
       "register-button": "Zapisz",
       "register-success": "Pomyślnie dodano kontrahenta",
-      "register-error": "Nie udało się dodać kontrahenta"
+      "register-error": "Nie udało się dodać kontrahenta",
+      "edit-title": "Aktualizuj kontrahenta",
+      "load-error": "Nie udało się załadować kontrahenta",
+      "update-error": "Nie udało się zaktualizować kontrahenta"
+    },
+    "browse-contractors": {
+      "browse-title": "Zdefiniowani kontrahenci",
+      "contractors-count": "Liczba kontrahentów",
+      "name": "Nazwa",
+      "country": "Kraj",
+      "nip": "NIP",
+      "email": "E-mail",
+      "phone": "Numer telefonu",
+      "url": "Adres strony",
+      "load-error": "Nie udało się załadować kontrahentów",
+      "delete-error": "Nie udało się usunąc kontrahenta"
     },
     "unit-pieces": "Sztuki",
     "unit-kg": "Kilogramy",
@@ -383,6 +398,7 @@
     "browse-release": "Przeglądaj wydania",
     "browse-acceptance": "Przeglądaj przyjęcia",
     "browse-purchases": "Przeglądaj zakupy",
-    "add-contractor": "Dodaj kontrahenta"
+    "add-contractor": "Dodaj kontrahenta",
+    "browse-contractors": "Przeglądaj kontrahentów"
   }
 }

@@ -179,7 +179,22 @@
       "account-number": "Account number",
       "register-button": "Save",
       "register-success": "Successfully added contractor",
-      "register-error": "Adding contractor failed"
+      "register-error": "Adding contractor failed",
+      "edit-title": "Edit contractor",
+      "load-error": "Cannot load contractor",
+      "update-error": "Cannot update contractor"
+    },
+    "browse-contractors": {
+      "browse-title": "Defined contractors",
+      "contractors-count": "Contractors count",
+      "name": "Name",
+      "country": "Country",
+      "nip": "NIP",
+      "email": "E-mail",
+      "phone": "Phone number",
+      "url": "Website address",
+      "load-error": "Cannot load contractors",
+      "delete-error": "Cannot delete contractor"
     },
     "unit-pieces": "Pieces",
     "unit-kg": "Kilograms",
@@ -383,6 +398,7 @@
     "browse-release": "Browse release",
     "browse-acceptance": "Browse acceptance",
     "browse-purchases": "Browse purchases",
-    "add-contractor": "Add contractor"
+    "add-contractor": "Add contractor",
+    "browse-contractors": "Browse contractors"
   }
 }
