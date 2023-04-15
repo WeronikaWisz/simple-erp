@@ -20,4 +20,6 @@ public interface ReleaseRepository extends JpaRepository<Release, Long> {
     Optional<List<Release>> findByStatusIn(List<EStatus> statuses);
 
     Optional<List<Release>> findByStatusAndDirection(EStatus status, EDirection direction);
+
+    Optional<List<Release>> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
 }

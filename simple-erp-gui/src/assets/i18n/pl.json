@@ -276,7 +276,12 @@
       "browse-title": "Przyjęcia magazynowe",
       "task-count": "Liczba przyjęć",
       "load-error": "Nie udało się załadować przyjęć",
-      "mark-error": "Nie udało się zmienić statusu przyjęć"
+      "mark-error": "Nie udało się zmienić statusu przyjęć",
+      "order-number": "Numer zamówienia",
+      "contractor": "Dane dostawcy",
+      "nip": "NIP",
+      "info-title-external": "Przyjęcie zewnętrzne",
+      "info-title-internal": "Przyjęcie wewnętrzne"
     }
   },
   "trade": {

@@ -276,7 +276,12 @@
       "browse-title": "Acceptances tasks",
       "task-count": "Acceptances count",
       "load-error": "Cannot load acceptances",
-      "mark-error": "Cannot change acceptances status"
+      "mark-error": "Cannot change acceptances status",
+      "order-number": "Order number",
+      "contractor": "Supplier details",
+      "nip": "NIP",
+      "info-title-external": "External acceptance",
+      "info-title-internal": "Internal acceptance"
     }
   },
   "trade": {

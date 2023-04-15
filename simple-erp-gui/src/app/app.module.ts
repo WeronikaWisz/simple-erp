@@ -60,6 +60,7 @@ import { BrowsePurchasesComponent } from './views/trade/browse-purchases/browse-
 import { PurchaseOrderNumberDialogComponent } from './views/trade/browse-purchases/purchase-order-number-dialog/purchase-order-number-dialog.component';
 import { AddContractorComponent } from './views/products/add-contractor/add-contractor.component';
 import { BrowseContractorsComponent } from './views/products/browse-contractors/browse-contractors.component';
+import { AcceptanceInfoDialogComponent } from './views/warehouse/browse-acceptance/acceptance-info-dialog/acceptance-info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -93,7 +94,8 @@ import { BrowseContractorsComponent } from './views/products/browse-contractors/
     BrowsePurchasesComponent,
     PurchaseOrderNumberDialogComponent,
     AddContractorComponent,
-    BrowseContractorsComponent
+    BrowseContractorsComponent,
+    AcceptanceInfoDialogComponent
   ],
     imports: [
         BrowserModule,

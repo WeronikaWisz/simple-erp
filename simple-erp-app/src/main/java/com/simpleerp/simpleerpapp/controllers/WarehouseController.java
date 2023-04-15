@@ -183,4 +183,11 @@ public class WarehouseController {
                 "success.markAcceptance", null, LocaleContextHolder.getLocale())));
     }
 
+    @GetMapping("/acceptance/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> getAcceptance(@PathVariable("id") Long id) {
+        AcceptanceDetails acceptance = warehouseService.getAcceptance(id);
+        return ResponseEntity.ok(acceptance);
+    }
+
 }

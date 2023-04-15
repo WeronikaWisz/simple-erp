@@ -18,4 +18,6 @@ public interface AcceptanceRepository extends JpaRepository<Acceptance, Long> {
     Optional<List<Acceptance>> findByStatus(EStatus statuse);
 
     Optional<List<Acceptance>> findByStatusAndDirection(EStatus status, EDirection direction);
+
+    Optional<List<Acceptance>> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
 }

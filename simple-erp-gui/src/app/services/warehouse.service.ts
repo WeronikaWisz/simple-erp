@@ -11,6 +11,7 @@ import {UserName} from "../models/manage-users/UserName";
 import {ProductCode} from "../models/products/ProductCode";
 import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
+import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
 
 const SUPPLIES_API = 'http://localhost:8080/warehouse/';
 
@@ -99,7 +100,7 @@ export class WarehouseService {
     return this.http.post(SUPPLIES_API + 'acceptances/mark-done', JSON.stringify(ids), httpOptions);
   }
 
-  // getAcceptance(id: number): Observable<ReleaseDetails> {
-  //   return this.http.get<ReleaseDetails>(SUPPLIES_API + 'release/' + id, httpOptions);
-  // }
+  getAcceptance(id: number): Observable<AcceptanceDetails> {
+    return this.http.get<AcceptanceDetails>(SUPPLIES_API + 'acceptance/' + id, httpOptions);
+  }
 }

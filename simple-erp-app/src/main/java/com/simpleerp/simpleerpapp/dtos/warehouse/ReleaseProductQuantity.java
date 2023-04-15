@@ -13,4 +13,9 @@ public class ReleaseProductQuantity {
     private String product;
     private String quantity;
     private Boolean isInStock;
+
+    public ReleaseProductQuantity(String product, String quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
 }

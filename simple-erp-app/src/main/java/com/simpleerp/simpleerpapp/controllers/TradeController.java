@@ -4,6 +4,7 @@ import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
+import com.simpleerp.simpleerpapp.dtos.warehouse.AcceptanceDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
 import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.ReleasesAcceptancesResponse;
@@ -161,5 +162,12 @@ public class TradeController {
     public ResponseEntity<?> getRelease(@PathVariable("id") Long id) {
         ReleaseDetails release = tradeService.getRelease(id);
         return ResponseEntity.ok(release);
+    }
+
+    @GetMapping("/acceptance/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> getAcceptance(@PathVariable("id") Long id) {
+        AcceptanceDetails acceptance = tradeService.getAcceptance(id);
+        return ResponseEntity.ok(acceptance);
     }
 }

@@ -304,9 +304,19 @@ public class ProductsService {
                 contractor.getCity(), contractor.getStreet(), contractor.getBuildingNumber(), contractor.getDoorNumber());
     }
 
-//    TODO
     @Transactional
     public void deleteContractor(Long id) {
+        Contractor contractor = contractorRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
+        List<Product> productList = productRepository.findByContractor(contractor)
+                        .orElse(Collections.emptyList());
+        if(!productList.isEmpty()){
+            productList.forEach(product -> {
+                product.setContractor(null);
+                productRepository.save(product);
+            });
+        }
+        contractorRepository.delete(contractor);
     }
 
     @Transactional

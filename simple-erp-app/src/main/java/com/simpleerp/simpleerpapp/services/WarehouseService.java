@@ -37,7 +37,7 @@ public class WarehouseService {
     private final ReleaseRepository releaseRepository;
     private final ProductRepository productRepository;
     private final AcceptanceRepository acceptanceRepository;
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
 
     @Autowired
     public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseRepository purchaseRepository,
@@ -373,17 +373,30 @@ public class WarehouseService {
     public ReleaseDetails getRelease(Long id) {
         Release release = releaseRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
-        ReleaseDetails releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
-                release.getOrder().getNumber(),
-                release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                release.getExecutionDate() != null ?
-                        release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
-                release.getDirection(), release.getOrder().getCustomer().getName(),
-                release.getOrder().getCustomer().getSurname(), release.getOrder().getCustomer().getEmail(),
-                release.getOrder().getCustomer().getPhone(), release.getOrder().getCustomer().getPostalCode(),
-                release.getOrder().getCustomer().getPost(), release.getOrder().getCustomer().getCity(),
-                release.getOrder().getCustomer().getStreet(), release.getOrder().getCustomer().getBuildingNumber(),
-                release.getOrder().getCustomer().getDoorNumber());
+        ReleaseDetails releaseDetails;
+        if(release.getDirection().equals(EDirection.EXTERNAL)) {
+            releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
+                    release.getOrder().getNumber(),
+                    release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    release.getExecutionDate() != null ?
+                            release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                    release.getDirection(), release.getOrder().getCustomer().getName(),
+                    release.getOrder().getCustomer().getSurname(), release.getOrder().getCustomer().getEmail(),
+                    release.getOrder().getCustomer().getPhone(), release.getOrder().getCustomer().getPostalCode(),
+                    release.getOrder().getCustomer().getPost(), release.getOrder().getCustomer().getCity(),
+                    release.getOrder().getCustomer().getStreet(), release.getOrder().getCustomer().getBuildingNumber(),
+                    release.getOrder().getCustomer().getDoorNumber());
+        } else {
+            // TODO change when production will be set
+            releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
+                    "production number",
+                    release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    release.getExecutionDate() != null ?
+                            release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                    release.getDirection(), release.getRequestingUser().getName(),
+                    release.getRequestingUser().getSurname(), release.getRequestingUser().getEmail(),
+                    release.getRequestingUser().getPhone());
+        }
         List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
         for(OrderProducts orderProduct: release.getOrder().getOrderProductsSet()){
             boolean isProductInStock = this.isProductInStock(orderProduct);
@@ -479,5 +492,54 @@ public class WarehouseService {
             releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
         }
         return releaseListItemAcceptanceList;
+    }
+
+    public AcceptanceDetails getAcceptance(Long id) {
+        Acceptance acceptance = acceptanceRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+        AcceptanceDetails acceptanceDetails;
+        if(acceptance.getDirection().equals(EDirection.EXTERNAL)){
+            if(acceptance.getPurchase().getProduct().getContractor() != null) {
+                acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                        acceptance.getPurchase().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        acceptance.getOrderNumber(), acceptance.getExecutionDate() != null ?
+                        acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                        acceptance.getDirection(), acceptance.getPurchase().getProduct().getContractor().getName(),
+                        acceptance.getPurchase().getProduct().getContractor().getCountry(),
+                        acceptance.getPurchase().getProduct().getContractor().getNip(),
+                        acceptance.getPurchase().getProduct().getContractor().getBankAccount(),
+                        acceptance.getPurchase().getProduct().getContractor().getAccountNumber(),
+                        acceptance.getPurchase().getProduct().getContractor().getUrl(),
+                        acceptance.getPurchase().getProduct().getContractor().getEmail(),
+                        acceptance.getPurchase().getProduct().getContractor().getPhone(),
+                        acceptance.getPurchase().getProduct().getContractor().getPostalCode(),
+                        acceptance.getPurchase().getProduct().getContractor().getPost(),
+                        acceptance.getPurchase().getProduct().getContractor().getCity(),
+                        acceptance.getPurchase().getProduct().getContractor().getStreet(),
+                        acceptance.getPurchase().getProduct().getContractor().getBuildingNumber(),
+                        acceptance.getPurchase().getProduct().getContractor().getDoorNumber());
+            } else {
+                acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                        acceptance.getPurchase().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        acceptance.getOrderNumber(), acceptance.getExecutionDate() != null ?
+                        acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                        acceptance.getDirection(), messageSource.getMessage(
+                        "message.noContractorData", null, LocaleContextHolder.getLocale()));
+            }
+            List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+            ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                    acceptance.getPurchase().getProduct().getCode(), acceptance.getPurchase().getQuantity().toString());
+            releaseProductQuantityList.add(releaseProductQuantity);
+            acceptanceDetails.setProductSet(releaseProductQuantityList);
+        } else {
+            // TODO change when production will be set
+            acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                    "production number", acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getExecutionDate() != null ?
+                    acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                    acceptance.getDirection(), acceptance.getRequestingUser().getName(), acceptance.getRequestingUser().getSurname(),
+                    acceptance.getRequestingUser().getEmail(), acceptance.getRequestingUser().getPhone());
+        }
+        return acceptanceDetails;
     }
 }

@@ -11,6 +11,8 @@ import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -40,13 +42,15 @@ public class TradeService {
     private final ReleaseRepository releaseRepository;
     private final PurchaseRepository purchaseRepository;
     private final AcceptanceRepository acceptanceRepository;
+    private final MessageSource messageSource;
 
     @Autowired
     public TradeService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                         OrderRepository orderRepository, OrderProductsRepository orderProductsRepository,
                         CustomerRepository customerRepository, UserRepository userRepository,
                         TaskRepository taskRepository, ReleaseRepository releaseRepository,
-                        PurchaseRepository purchaseRepository, AcceptanceRepository acceptanceRepository) {
+                        PurchaseRepository purchaseRepository, AcceptanceRepository acceptanceRepository,
+                        MessageSource messageSource) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.orderRepository = orderRepository;
@@ -57,6 +61,7 @@ public class TradeService {
         this.releaseRepository = releaseRepository;
         this.purchaseRepository = purchaseRepository;
         this.acceptanceRepository = acceptanceRepository;
+        this.messageSource = messageSource;
     }
 
     public List<ProductCode> loadProductList() {
@@ -592,7 +597,8 @@ public class TradeService {
 
     public ReleasesAcceptancesResponse loadReleases(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Release> releaseList = this.releaseRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+        List<Release> releaseList = this.releaseRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
+                        EDirection.EXTERNAL)
                 .orElse(Collections.emptyList());
         int total = releaseList.size();
         int start = page * size;
@@ -623,7 +629,8 @@ public class TradeService {
 
     public ReleasesAcceptancesResponse loadAcceptances(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
+                        EDirection.EXTERNAL)
                 .orElse(Collections.emptyList());
         int total = acceptanceList.size();
         int start = page * size;
@@ -674,5 +681,44 @@ public class TradeService {
         }
         releaseDetails.setProductSet(releaseProductQuantityList);
         return releaseDetails;
+    }
+
+    public AcceptanceDetails getAcceptance(Long id) {
+        Acceptance acceptance = acceptanceRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+        AcceptanceDetails acceptanceDetails;
+        if(acceptance.getPurchase().getProduct().getContractor() != null) {
+            acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                    acceptance.getPurchase().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getOrderNumber(), acceptance.getExecutionDate() != null ?
+                    acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                    acceptance.getDirection(), acceptance.getPurchase().getProduct().getContractor().getName(),
+                    acceptance.getPurchase().getProduct().getContractor().getCountry(),
+                    acceptance.getPurchase().getProduct().getContractor().getNip(),
+                    acceptance.getPurchase().getProduct().getContractor().getBankAccount(),
+                    acceptance.getPurchase().getProduct().getContractor().getAccountNumber(),
+                    acceptance.getPurchase().getProduct().getContractor().getUrl(),
+                    acceptance.getPurchase().getProduct().getContractor().getEmail(),
+                    acceptance.getPurchase().getProduct().getContractor().getPhone(),
+                    acceptance.getPurchase().getProduct().getContractor().getPostalCode(),
+                    acceptance.getPurchase().getProduct().getContractor().getPost(),
+                    acceptance.getPurchase().getProduct().getContractor().getCity(),
+                    acceptance.getPurchase().getProduct().getContractor().getStreet(),
+                    acceptance.getPurchase().getProduct().getContractor().getBuildingNumber(),
+                    acceptance.getPurchase().getProduct().getContractor().getDoorNumber());
+        } else {
+            acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                    acceptance.getPurchase().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getOrderNumber(), acceptance.getExecutionDate() != null ?
+                    acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                    acceptance.getDirection(), messageSource.getMessage(
+                    "message.noContractorData", null, LocaleContextHolder.getLocale()));
+        }
+        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+        ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                acceptance.getPurchase().getProduct().getCode(), acceptance.getPurchase().getQuantity().toString());
+        releaseProductQuantityList.add(releaseProductQuantity);
+        acceptanceDetails.setProductSet(releaseProductQuantityList);
+        return acceptanceDetails;
     }
 }

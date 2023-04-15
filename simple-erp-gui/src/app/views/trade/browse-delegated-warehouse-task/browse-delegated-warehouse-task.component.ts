@@ -14,6 +14,7 @@ import {EStatus} from "../../../enums/EStatus";
 import {ReleaseInfoDialogComponent} from "../../warehouse/browse-release/release-info-dialog/release-info-dialog.component";
 import {AssignedUsersDialogComponent} from "../../warehouse/browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component";
 import Swal from "sweetalert2";
+import {AcceptanceInfoDialogComponent} from "../../warehouse/browse-acceptance/acceptance-info-dialog/acceptance-info-dialog.component";
 
 @Component({
   selector: 'app-browse-delegated-warehouse-task',
@@ -129,7 +130,13 @@ export class BrowseDelegatedWarehouseTaskComponent implements OnInit {
         data: id
       });
     } else {
-      console.info("TODO AcceptanceInfoDialog")
+      this.dialog.open(AcceptanceInfoDialogComponent, {
+        maxWidth: '650px',
+        data: {
+          id: id,
+          from: 'TRADE'
+        }
+      });
     }
   }
 

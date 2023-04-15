@@ -17,6 +17,7 @@ import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 import {DelegateExternalAcceptance} from "../models/trade/DelegateExternalAcceptance";
 import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptancesResponse";
 import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
+import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -94,5 +95,9 @@ export class TradeService {
 
   getRelease(id: number): Observable<ReleaseDetails> {
     return this.http.get<ReleaseDetails>(TRADE_API + 'release/' + id, httpOptions);
+  }
+
+  getAcceptance(id: number): Observable<AcceptanceDetails> {
+    return this.http.get<AcceptanceDetails>(TRADE_API + 'acceptance/' + id, httpOptions);
   }
 }

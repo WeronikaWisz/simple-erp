@@ -17,6 +17,7 @@ import {ChangeUserReleaseDialogComponent} from "../browse-release/change-user-re
 import {ETask} from "../../../enums/ETask";
 import {PageEvent} from "@angular/material/paginator";
 import {AssignedUsersDialogComponent} from "../browse-delegated-tasks/assigned-users-dialog/assigned-users-dialog.component";
+import {AcceptanceInfoDialogComponent} from "./acceptance-info-dialog/acceptance-info-dialog.component";
 
 @Component({
   selector: 'app-browse-acceptance',
@@ -168,10 +169,13 @@ export class BrowseAcceptanceComponent implements OnInit {
   }
 
   goToTaskInfo(id: number) {
-    // this.dialog.open(ReleaseInfoDialogComponent, {
-    //   maxWidth: '650px',
-    //   data: id
-    // });
+    this.dialog.open(AcceptanceInfoDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        from: 'WAREHOUSE'
+      }
+    });
   }
 
   isStatusWaiting(): boolean {

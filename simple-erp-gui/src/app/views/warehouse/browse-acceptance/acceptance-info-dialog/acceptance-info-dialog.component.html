@@ -1,0 +1,37 @@
+<h2 mat-dialog-title *ngIf="isExternal(acceptance.direction)">{{ 'supplies.browse-acceptance.info-title-external' | translate}} {{acceptance.number}}</h2>
+<h2 mat-dialog-title  *ngIf="!isExternal(acceptance.direction)">{{ 'supplies.browse-acceptance.info-title-internal' | translate}} {{acceptance.number}}</h2>
+<div mat-dialog-content>
+  <div class="order-data">
+    <h3>{{ 'supplies.browse-release.date' | translate}} <span class="thick">{{acceptance.orderDate}}</span></h3>
+    <h3 *ngIf="acceptance.executionDate">{{ 'supplies.browse-release.execution-date' | translate}} <span class="thick">{{acceptance.executionDate}}</span></h3>
+    <h3>{{ 'supplies.browse-release.association' | translate}} <span class="thick">{{acceptance.association}}</span></h3>
+    <h3 *ngIf="isExternal(acceptance.direction)">{{ 'supplies.browse-acceptance.order-number' | translate}} <span class="thick">{{acceptance.orderNumber}}</span></h3>
+    <hr>
+    <h2>{{ 'trade.browse-orders.products' | translate}}</h2>
+    <div *ngFor="let product of acceptance.productSet">
+      <h3>{{ product.product }}
+        <span class="thick">{{product.quantity}} {{getUnit(product.product)}}</span>
+      </h3>
+    </div>
+    <hr>
+  </div>
+  <div class="customer-data">
+    <h2 class="customer-title">{{ 'supplies.browse-acceptance.contractor' | translate}}</h2>
+    <h3 *ngIf="!isExternal(acceptance.direction)">{{acceptance.name}} {{acceptance.surname}}</h3>
+    <h3 *ngIf="isExternal(acceptance.direction)">{{acceptance.name}}</h3>
+    <h3 *ngIf="acceptance.email"><span class="thick">{{ 'supplies.delegated-tasks.email' | translate}}</span> {{acceptance.email}}</h3>
+    <h3 *ngIf="acceptance.phone"><span class="thick">{{ 'supplies.delegated-tasks.phone' | translate}}</span> {{acceptance.phone}}</h3>
+    <h3 *ngIf="isExternal(acceptance.direction) && acceptance.city">{{ 'trade.browse-orders.address-data' | translate}}:</h3>
+    <p *ngIf="isExternal(acceptance.direction)"><span class="description-titles">{{acceptance.city}} <span *ngIf="acceptance.street">
+    {{ 'trade.browse-orders.street' | translate}}. {{acceptance.street}}</span>
+      {{acceptance.buildingNumber}}<span *ngIf="acceptance.doorNumber">/{{acceptance.doorNumber}}</span> </span>
+    </p>
+    <p *ngIf="isExternal(acceptance.direction)"><span class="description-titles">{{acceptance.postalCode}} {{acceptance.post}}</span></p>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+</div>
+

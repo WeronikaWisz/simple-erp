@@ -55,6 +55,20 @@ public class ReleaseDetails {
         this.doorNumber = doorNumber;
     }
 
+    public ReleaseDetails(Long id, String number, String association, String orderDate, String executionDate,
+                          EDirection direction, String name, String surname, String email, String phone) {
+        this.id = id;
+        this.number = number;
+        this.association = association;
+        this.orderDate = orderDate;
+        this.executionDate = executionDate;
+        this.direction = direction;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.phone = phone;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
