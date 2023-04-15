@@ -2,7 +2,9 @@ package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.products.*;
+import com.simpleerp.simpleerpapp.dtos.trade.ContractorName;
 import com.simpleerp.simpleerpapp.enums.EType;
+import com.simpleerp.simpleerpapp.models.Contractor;
 import com.simpleerp.simpleerpapp.models.Product;
 import com.simpleerp.simpleerpapp.services.ProductsService;
 import org.modelmapper.ModelMapper;
@@ -116,6 +118,18 @@ public class ProductsController {
         productsService.updateContractor(updateContractorRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.contractorUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/contractors-names")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadContractorsNames() {
+        List<ContractorName> contractorsNames = productsService.loadContractorsNames()
+                .stream().map(this::mapContractorToContractorName).collect(Collectors.toList());
+        return ResponseEntity.ok(contractorsNames);
+    }
+
+    private ContractorName mapContractorToContractorName(Contractor contractor){
+        return modelMapper.map(contractor, ContractorName.class);
     }
 
     private ProductCode mapProductToProductCode(Product product){

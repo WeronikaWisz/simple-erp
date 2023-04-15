@@ -10,6 +10,7 @@ import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 import {AddContractorRequest} from "../models/products/AddContractorRequest";
 import {ContractorsResponse} from "../models/products/ContractorsResponse";
 import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
+import {ContractorName} from "../models/products/ContractorName";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -66,5 +67,9 @@ export class ProductsService {
 
   updateContractor(updateContractorRequest: UpdateContractorRequest): Observable<any> {
     return this.http.put(PRODUCTS_API + 'contractor', JSON.stringify(updateContractorRequest), httpOptions);
+  }
+
+  loadContractorsNames(): Observable<ContractorName[]> {
+    return this.http.get<ContractorName[]>(PRODUCTS_API + `contractors-names`);
   }
 }

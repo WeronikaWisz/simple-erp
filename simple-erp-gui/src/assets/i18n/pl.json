@@ -131,7 +131,9 @@
       "add": "Dodaj",
       "edit-title": "Edytuj produkt",
       "update-success": "Pomyśnie zaktualizowano produkt",
-      "update-error": "Nie udało się zaktualizować produktu"
+      "update-error": "Nie udało się zaktualizować produktu",
+      "contractor": "Kontrahent",
+      "load-error-2": "Nie udało się załadować kontrahentów"
     },
     "browse-product" : {
       "browse-title": "Zdefiniowane produkty",
@@ -182,7 +184,8 @@
       "register-error": "Nie udało się dodać kontrahenta",
       "edit-title": "Aktualizuj kontrahenta",
       "load-error": "Nie udało się załadować kontrahenta",
-      "update-error": "Nie udało się zaktualizować kontrahenta"
+      "update-error": "Nie udało się zaktualizować kontrahenta",
+      "update-success": "Pomyślnie zaktualizowano kontrahenta"
     },
     "browse-contractors": {
       "browse-title": "Zdefiniowani kontrahenci",

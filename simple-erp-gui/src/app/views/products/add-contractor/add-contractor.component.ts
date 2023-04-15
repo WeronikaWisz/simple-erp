@@ -88,7 +88,7 @@ export class AddContractorComponent implements OnInit {
     }).subscribe({
       next: (data) => {
         console.log(data);
-        this.router.navigate(['/add-contractor']).then(() => this.showSuccess());
+        this.router.navigate(['/add-contractor']).then(() => this.showSuccess("products.add-contractor.register-success"));
       },
         error: (err) => {
         if(err.error.message.includes("e-mail")){
@@ -105,10 +105,10 @@ export class AddContractorComponent implements OnInit {
     });
   }
 
-  showSuccess(): void {
+  showSuccess(message: string): void {
     Swal.fire({
       position: 'top-end',
-      title: this.getTranslateMessage("products.add-contractor.register-success"),
+      title: this.getTranslateMessage(message),
       icon: 'success',
       showConfirmButton: false,
       timer: 6000
@@ -199,7 +199,7 @@ export class AddContractorComponent implements OnInit {
     }).subscribe({
       next: (data) => {
         console.log(data);
-        this.router.navigate(['/browse-contractors']).then(() => this.showSuccess());
+        this.router.navigate(['/browse-contractors']).then(() => this.showSuccess("products.add-contractor.update-success"));
       },
       error: (err) => {
         if(err.error.message.includes("e-mail")){

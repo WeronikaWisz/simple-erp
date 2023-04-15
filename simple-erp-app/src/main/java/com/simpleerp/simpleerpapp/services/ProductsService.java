@@ -75,6 +75,11 @@ public class ProductsService {
         }
         Product product = new Product(addProductRequest.getCode(), addProductRequest.getName(), purchasePrice,
                 salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now());
+        if(addProductRequest.getContractor() != null){
+            Contractor contractor = contractorRepository.findById(addProductRequest.getContractor())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
+            product.setContractor(contractor);
+        }
         productRepository.save(product);
 
         StockLevel stockLevel = new StockLevel(product, BigDecimal.ZERO, BigDecimal.ZERO,
@@ -162,6 +167,9 @@ public class ProductsService {
                     product.getName(), product.getUnit(),
                     product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
                     product.getSalePrice() != null ? product.getSalePrice().toString() : "");
+            if(product.getContractor() != null){
+                productListItem.setContractor(product.getContractor().getId());
+            }
         }
         return productListItem;
     }
@@ -224,6 +232,13 @@ public class ProductsService {
             product.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
         } else {
             product.setSalePrice(null);
+        }
+        if(updateProductRequest.getContractor() != null){
+            Contractor contractor = contractorRepository.findById(updateProductRequest.getContractor())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
+            product.setContractor(contractor);
+        } else {
+            product.setContractor(null);
         }
         product.setUpdateDate(LocalDateTime.now());
         productRepository.save(product);
@@ -290,16 +305,90 @@ public class ProductsService {
     }
 
 //    TODO
+    @Transactional
     public void deleteContractor(Long id) {
     }
 
-    //    TODO
+    @Transactional
     public void updateContractor(UpdateContractorRequest updateContractorRequest) {
         Contractor contractor = contractorRepository.findById(updateContractorRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
 
-//        if(contractor.isPresent()){
-//            throw new ApiExpectationFailedException("exception.emailUsed");
-//        }
+        String phoneNumber = updateContractorRequest.getPhone();
+        if(!Objects.equals(phoneNumber, "")) {
+            phoneNumber = phoneNumber.replaceAll("\\s+", "");
+            if (!phoneNumber.startsWith("+48")) {
+                phoneNumber = "+48" + phoneNumber;
+            }
+        }
+
+        boolean hasChanged = false;
+        if(!Objects.equals(contractor.getName(), updateContractorRequest.getName())){
+            contractor.setName(updateContractorRequest.getName());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getCountry(), updateContractorRequest.getCountry().toUpperCase(Locale.ROOT))){
+            contractor.setCountry(updateContractorRequest.getCountry().toUpperCase(Locale.ROOT));
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getNip(), updateContractorRequest.getNip())){
+            contractor.setNip(updateContractorRequest.getNip());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getEmail(), updateContractorRequest.getEmail())){
+            if(contractorRepository.findByEmail(updateContractorRequest.getEmail()).isPresent()){
+                throw new ApiExpectationFailedException("exception.emailUsed");
+            }
+            contractor.setEmail(updateContractorRequest.getEmail());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getPhone(), phoneNumber)){
+            contractor.setPhone(phoneNumber);
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getUrl(), updateContractorRequest.getUrl())){
+            contractor.setUrl(updateContractorRequest.getUrl());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getPostalCode(), updateContractorRequest.getPostalCode())){
+            contractor.setPostalCode(updateContractorRequest.getPostalCode());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getPost(), updateContractorRequest.getPost())){
+            contractor.setPost(updateContractorRequest.getPost());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getCity(), updateContractorRequest.getCity())){
+            contractor.setCity(updateContractorRequest.getCity());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getStreet(), updateContractorRequest.getStreet())){
+            contractor.setStreet(updateContractorRequest.getStreet());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getBuildingNumber(), updateContractorRequest.getBuildingNumber())){
+            contractor.setBuildingNumber(updateContractorRequest.getBuildingNumber());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getDoorNumber(), updateContractorRequest.getDoorNumber())){
+            contractor.setDoorNumber(updateContractorRequest.getDoorNumber());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getBankAccount(), updateContractorRequest.getBankAccount())){
+            contractor.setBankAccount(updateContractorRequest.getBankAccount());
+            hasChanged = true;
+        }
+        if(!Objects.equals(contractor.getAccountNumber(), updateContractorRequest.getAccountNumber())){
+            contractor.setAccountNumber(updateContractorRequest.getAccountNumber());
+            hasChanged = true;
+        }
+        if(hasChanged){
+            contractor.setUpdateDate(LocalDateTime.now());
+            contractorRepository.save(contractor);
+        }
+    }
+
+    public List<Contractor> loadContractorsNames() {
+        return contractorRepository.findAll();
     }
 }

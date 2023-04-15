@@ -1,6 +1,5 @@
 package com.simpleerp.simpleerpapp.dtos.trade;
 
-import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -20,6 +20,7 @@ public class AddProductRequest {
     private EUnit unit;
     private String purchasePrice;
     private String salePrice;
+    private Long contractor;
     private List<ProductQuantity> productSet = new ArrayList<>();
 
     @Override
@@ -27,11 +28,13 @@ public class AddProductRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AddProductRequest that = (AddProductRequest) o;
-        return type == that.type && Objects.equals(code, that.code) && Objects.equals(name, that.name) && unit == that.unit && Objects.equals(purchasePrice, that.purchasePrice) && Objects.equals(salePrice, that.salePrice) && Objects.equals(productSet, that.productSet);
+        return type == that.type && Objects.equals(code, that.code) && Objects.equals(name, that.name)
+                && unit == that.unit && Objects.equals(purchasePrice, that.purchasePrice) && Objects.equals(salePrice, that.salePrice)
+                && Objects.equals(contractor, that.contractor) && Objects.equals(productSet, that.productSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, code, name, unit, purchasePrice, salePrice, productSet);
+        return Objects.hash(type, code, name, unit, purchasePrice, salePrice, contractor, productSet);
     }
 }

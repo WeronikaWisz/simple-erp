@@ -11,4 +11,5 @@ export interface ProductListItem {
   purchasePrice?: string;
   salePrice?: string;
   productSet?: ProductQuantity[];
+  contractor?: number;
 }

@@ -12,6 +12,7 @@ import {EType} from "../../../enums/EType";
 import {ProductCode} from "../../../models/products/ProductCode";
 import {ProductsService} from "../../../services/products.service";
 import {ProductListItem} from "../../../models/products/ProductListItem";
+import {ContractorName} from "../../../models/products/ContractorName";
 
 @Component({
   selector: 'app-add-product',
@@ -31,9 +32,12 @@ export class AddProductComponent implements OnInit {
   types: Type[] = [];
 
   isProductSet = false;
+  isBoughtType = false;
 
   productList: ProductCode[] = [];
   unitsForProducts: string[] = [];
+
+  contractors: ContractorName[] = [];
 
   isEditProductView = false;
   productId?: number;
@@ -51,6 +55,7 @@ export class AddProductComponent implements OnInit {
       unit: [null, Validators.required],
       purchasePrice: ['', Validators.required],
       salePrice: ['', Validators.required],
+      contractor: [null],
       productSet: this.formBuilder.array([])
     });
     if (this.tokenStorage.getToken()) {
@@ -66,6 +71,7 @@ export class AddProductComponent implements OnInit {
     this.loadUnits();
     this.loadTypes();
     this.loadProductForSetList();
+    this.loadContractors();
     this.checkIfEditProductView();
   }
 
@@ -160,6 +166,7 @@ export class AddProductComponent implements OnInit {
       this.form.get('purchasePrice')?.addValidators(Validators.required);
       this.form.get('salePrice')?.clearValidators();
       this.isProductSet = false;
+      this.isBoughtType = true;
       this.deleteProducts();
     } else if (this.form.get('type')?.value === EType.PRODUCED){
       this.form.get('unit')?.enable();
@@ -168,6 +175,7 @@ export class AddProductComponent implements OnInit {
       this.form.get('purchasePrice')?.setValue('');
       this.form.get('salePrice')?.addValidators(Validators.required);
       this.isProductSet = false;
+      this.isBoughtType = false;
       this.deleteProducts();
     } else {
       this.form.get('unit')?.disable();
@@ -177,6 +185,7 @@ export class AddProductComponent implements OnInit {
       this.form.get('purchasePrice')?.setValue('');
       this.form.get('salePrice')?.addValidators(Validators.required);
       this.isProductSet = true;
+      this.isBoughtType = false;
       this.addProduct()
     }
     this.form.get('productSet')?.updateValueAndValidity();
@@ -193,6 +202,7 @@ export class AddProductComponent implements OnInit {
       salePrice: this.form.get('salePrice')?.value,
       type: this.form.get('type')?.value,
       unit: this.form.get('unit')?.value,
+      contractor: this.form.get('contractor')?.value
     }).subscribe({
       next: (data) => {
         console.log(data);
@@ -287,6 +297,7 @@ export class AddProductComponent implements OnInit {
     this.form.get('purchasePrice')?.setValue(data.purchasePrice)
     this.form.get('salePrice')?.setValue(data.salePrice)
     this.form.get('unit')?.setValue(EUnit[data.unit])
+    this.form.get('contractor')?.setValue(data.contractor)
     if(data.productSet) {
       const productUnit = this.productList.find(product => product.id === data.productSet![0].product)!.unit as unknown as string;
       this.unitsForProducts[0] = this.units.find(unit => EUnit[unit.unit] === productUnit)!.shortcut
@@ -308,7 +319,8 @@ export class AddProductComponent implements OnInit {
         purchasePrice: this.form.get('purchasePrice')?.value,
         salePrice: this.form.get('salePrice')?.value,
         type: this.form.get('type')?.value,
-        unit: this.form.get('unit')?.value
+        unit: this.form.get('unit')?.value,
+        contractor: this.form.get('contractor')?.value
       }).subscribe({
         next: (data) => {
           console.log(data);
@@ -330,5 +342,24 @@ export class AddProductComponent implements OnInit {
     const products = this.form.controls['productSet'] as FormArray;
     products.removeAt(i)
     this.unitsForProducts = this.unitsForProducts.slice(i,i+1)
+  }
+
+  private loadContractors() {
+    this.productsService.loadContractorsNames()
+      .subscribe({
+        next: (data) => {
+          console.log(data);
+          this.contractors = data;
+        },
+        error: (err) => {
+          Swal.fire({
+            position: 'top-end',
+            title: this.getTranslateMessage("products.add-product.load-error-2"),
+            text: err.error.message,
+            icon: 'error',
+            showConfirmButton: false
+          })
+        }
+      })
   }
 }

@@ -11,4 +11,5 @@ export interface UpdateProductRequest{
   purchasePrice?: string;
   salePrice?: string;
   productSet?: ProductQuantity[];
+  contractor?: number;
 }

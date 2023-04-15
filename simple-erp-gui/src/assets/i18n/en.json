@@ -131,7 +131,9 @@
       "add": "Add",
       "edit-title": "Edit product",
       "update-success": "Successfully updated product",
-      "update-error": "Cannot update product"
+      "update-error": "Cannot update product",
+      "contractor": "Contractor",
+      "load-error-2": "Cannot load contractors"
     },
     "browse-product": {
       "browse-title": "Defined products",
@@ -182,7 +184,8 @@
       "register-error": "Adding contractor failed",
       "edit-title": "Edit contractor",
       "load-error": "Cannot load contractor",
-      "update-error": "Cannot update contractor"
+      "update-error": "Cannot update contractor",
+      "update-success": "Successfully updated contractor"
     },
     "browse-contractors": {
       "browse-title": "Defined contractors",

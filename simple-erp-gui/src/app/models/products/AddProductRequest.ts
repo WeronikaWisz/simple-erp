@@ -10,4 +10,5 @@ export interface AddProductRequest {
   purchasePrice?: string;
   salePrice?: string;
   productSet?: ProductQuantity[];
+  contractor?: number;
 }

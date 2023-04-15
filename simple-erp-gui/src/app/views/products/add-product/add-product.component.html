@@ -54,6 +54,17 @@
           {{ 'products.add-product.sale-price-error' | translate}}
         </mat-error>
       </mat-form-field>
+      <div *ngIf="isBoughtType">
+        <mat-form-field class="full-width-input wider-input" appearance="outline">
+          <mat-label>{{ 'products.add-product.contractor' | translate}}</mat-label>
+          <mat-select formControlName="contractor">
+            <mat-option>--</mat-option>
+            <mat-option *ngFor="let contractor of contractors" [value]="contractor.id">
+              {{contractor.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
       <div *ngIf="isProductSet">
         <h2>{{ 'products.add-product.product-set' | translate}}</h2>
         <div formArrayName="productSet" *ngFor="let product of productSet.controls; let i = index">
