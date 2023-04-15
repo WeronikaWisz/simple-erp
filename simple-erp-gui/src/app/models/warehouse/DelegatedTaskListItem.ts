@@ -10,6 +10,8 @@ export interface DelegatedTaskListItem {
   unit: EUnit;
   quantity: string;
   status: EStatus;
+  purchaserId: number;
+  purchaserName: string;
   assignedUserName: string;
   assignedUserId: number;
   creationDate: string;

@@ -22,6 +22,8 @@ public class DelegatedTaskListItem {
     private EUnit unit;
     private String quantity;
     private EStatus status;
+    private Long purchaserId;
+    private String purchaserName;
     private String assignedUserName;
     private Long assignedUserId;
     private String creationDate;
@@ -29,8 +31,8 @@ public class DelegatedTaskListItem {
     private Boolean accepted;
 
     public DelegatedTaskListItem(Long id, String number, String code, String name, EUnit unit, String quantity,
-                                 EStatus status, String assignedUserName, Long assignedUserId, String creationDate,
-                                 String stockQuantity) {
+                                 EStatus status, String purchaserName, Long purchaserId, String assignedUserName,
+                                 Long assignedUserId, String creationDate, String stockQuantity) {
         this.id = id;
         this.number = number;
         this.code = code;
@@ -38,6 +40,8 @@ public class DelegatedTaskListItem {
         this.unit = unit;
         this.quantity = quantity;
         this.status = status;
+        this.purchaserId = purchaserId;
+        this.purchaserName = purchaserName;
         this.assignedUserName = assignedUserName;
         this.assignedUserId = assignedUserId;
         this.creationDate = creationDate;
@@ -45,8 +49,8 @@ public class DelegatedTaskListItem {
     }
 
     public DelegatedTaskListItem(Long id, String number, String code, String name, EUnit unit, String quantity,
-                                 EStatus status, String assignedUserName, Long assignedUserId,
-                                 String creationDate, String orderNumber, Boolean accepted) {
+                                 EStatus status, String purchaserName, Long purchaserId, String assignedUserName,
+                                 Long assignedUserId, String creationDate, String orderNumber, Boolean accepted) {
         this.id = id;
         this.number = number;
         this.code = code;
@@ -54,6 +58,8 @@ public class DelegatedTaskListItem {
         this.unit = unit;
         this.quantity = quantity;
         this.status = status;
+        this.purchaserId = purchaserId;
+        this.purchaserName = purchaserName;
         this.assignedUserName = assignedUserName;
         this.assignedUserId = assignedUserId;
         this.creationDate = creationDate;
@@ -66,15 +72,17 @@ public class DelegatedTaskListItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DelegatedTaskListItem that = (DelegatedTaskListItem) o;
-        return Objects.equals(id, that.id) && Objects.equals(number, that.number) && Objects.equals(code, that.code)
-                && Objects.equals(name, that.name) && unit == that.unit && Objects.equals(quantity, that.quantity)
-                && status == that.status && Objects.equals(assignedUserName, that.assignedUserName)
+        return Objects.equals(id, that.id) && Objects.equals(number, that.number) && Objects.equals(orderNumber, that.orderNumber)
+                && Objects.equals(code, that.code) && Objects.equals(name, that.name) && unit == that.unit
+                && Objects.equals(quantity, that.quantity) && status == that.status && Objects.equals(purchaserId, that.purchaserId)
+                && Objects.equals(purchaserName, that.purchaserName) && Objects.equals(assignedUserName, that.assignedUserName)
                 && Objects.equals(assignedUserId, that.assignedUserId) && Objects.equals(creationDate, that.creationDate)
                 && Objects.equals(stockQuantity, that.stockQuantity) && Objects.equals(accepted, that.accepted);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, number, code, name, unit, quantity, status, assignedUserName, assignedUserId, creationDate, stockQuantity, accepted);
+        return Objects.hash(id, number, orderNumber, code, name, unit, quantity, status, purchaserId, purchaserName,
+                assignedUserName, assignedUserId, creationDate, stockQuantity, accepted);
     }
 }

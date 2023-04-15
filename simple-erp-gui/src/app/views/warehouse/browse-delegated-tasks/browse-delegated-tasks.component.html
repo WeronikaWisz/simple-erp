@@ -57,6 +57,15 @@
       </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="purchaser">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.purchaser' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip (click)="showUserData(row.purchaserId)"> {{row.purchaserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="date">
       <mat-header-cell *matHeaderCellDef> {{ 'supplies.delegated-tasks.date' | translate}} </mat-header-cell>
       <mat-cell *matCellDef="let element"> {{element.creationDate}} </mat-cell>

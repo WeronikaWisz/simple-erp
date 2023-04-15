@@ -29,7 +29,7 @@ export class BrowsePurchasesComponent implements OnInit {
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['select', 'number', 'code', 'name', 'quantity', 'unit', 'date', 'assigned-user', 'message'];
+  displayedColumns = ['select', 'number', 'code', 'name', 'quantity', 'unit', 'purchaser', 'date', 'assigned-user', 'message'];
   dataSource: MatTableDataSource<DelegatedTaskListItem> = new MatTableDataSource<DelegatedTaskListItem>([]);
   selection = new SelectionModel<DelegatedTaskListItem>(true, []);
 

@@ -179,6 +179,8 @@ public class WarehouseService {
             DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(purchase.getId(),
                     purchase.getNumber(), purchase.getProduct().getCode(), purchase.getProduct().getName(),
                     purchase.getProduct().getUnit(), purchase.getQuantity().toString(), purchase.getStatus(),
+                    purchase.getRequestingUser().getName() + " " +  purchase.getRequestingUser().getSurname(),
+                    purchase.getRequestingUser().getId(),
                     purchase.getAssignedUser().getName() + " " +  purchase.getAssignedUser().getSurname(),
                     purchase.getAssignedUser().getId(),
                     purchase.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),

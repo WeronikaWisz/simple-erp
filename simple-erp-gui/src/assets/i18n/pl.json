@@ -141,7 +141,7 @@
       "code": "Kod",
       "name": "Nazwa",
       "type": "Typ",
-      "unit": "Jednostka",
+      "unit": "J.M.",
       "purchase-price": "Cena zakupu",
       "sale-price": "Cena sprzedaży",
       "load-error": "Nie udało się załadować produktów",
