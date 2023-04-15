@@ -113,6 +113,9 @@ public class ProductsService {
             ProductListItem productListItem = new ProductListItem(product.getId(), product.getType(), product.getCode(),
                     product.getName(), product.getUnit(), product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
                     product.getSalePrice() != null ? product.getSalePrice().toString() : "");
+            if(product.getContractor() != null){
+                productListItem.setContractor(product.getContractor().getId());
+            }
             productListItems.add(productListItem);
         }
         for(ProductSet productSet: productSetList){

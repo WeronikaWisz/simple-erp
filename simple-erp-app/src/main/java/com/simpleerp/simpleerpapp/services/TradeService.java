@@ -2,6 +2,7 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.UpdateContractorRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
@@ -722,5 +723,20 @@ public class TradeService {
         releaseProductQuantityList.add(releaseProductQuantity);
         acceptanceDetails.setProductSet(releaseProductQuantityList);
         return acceptanceDetails;
+    }
+
+    public UpdateContractorRequest getContractor(Long id) {
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.purchaseNotFound"));
+        if(purchase.getProduct().getContractor() != null) {
+            Contractor contractor = purchase.getProduct().getContractor();
+            return new UpdateContractorRequest(contractor.getId(), contractor.getName(),
+                    contractor.getCountry(), contractor.getNip(), contractor.getBankAccount(), contractor.getAccountNumber(),
+                    contractor.getUrl(), contractor.getEmail(), contractor.getPhone(), contractor.getPostalCode(), contractor.getPost(),
+                    contractor.getCity(), contractor.getStreet(), contractor.getBuildingNumber(), contractor.getDoorNumber());
+        } else {
+            return new UpdateContractorRequest(messageSource.getMessage(
+                    "message.noContractorData", null, LocaleContextHolder.getLocale()));
+        }
     }
 }

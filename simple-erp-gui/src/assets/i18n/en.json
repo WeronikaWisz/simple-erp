@@ -195,9 +195,14 @@
       "nip": "NIP",
       "email": "E-mail",
       "phone": "Phone number",
-      "url": "Website address",
+      "url": "Website address: ",
       "load-error": "Cannot load contractors",
-      "delete-error": "Cannot delete contractor"
+      "delete-error": "Cannot delete contractor",
+      "contractor-error": "Cannot load contractor",
+      "bank-data": "Bank data",
+      "nip-dialog": "NIP: ",
+      "bank-account": "Bank account: ",
+      "account-number": "Account number: "
     },
     "unit-pieces": "Pieces",
     "unit-kg": "Kilograms",

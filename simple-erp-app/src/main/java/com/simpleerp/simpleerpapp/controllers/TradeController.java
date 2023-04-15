@@ -3,6 +3,7 @@ package com.simpleerp.simpleerpapp.controllers;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.UpdateContractorRequest;
 import com.simpleerp.simpleerpapp.dtos.trade.*;
 import com.simpleerp.simpleerpapp.dtos.warehouse.AcceptanceDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
@@ -169,5 +170,12 @@ public class TradeController {
     public ResponseEntity<?> getAcceptance(@PathVariable("id") Long id) {
         AcceptanceDetails acceptance = tradeService.getAcceptance(id);
         return ResponseEntity.ok(acceptance);
+    }
+
+    @GetMapping("/purchase/contractor/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getContractor(@PathVariable("id") Long id) {
+        UpdateContractorRequest contractor = tradeService.getContractor(id);
+        return ResponseEntity.ok(contractor);
     }
 }

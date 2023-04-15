@@ -9,6 +9,8 @@ import {ERole} from "../../../enums/ERole";
 import Swal from "sweetalert2";
 import {PageEvent} from "@angular/material/paginator";
 import {ContractorListItem} from "../../../models/products/ContractorListItem";
+import {ContractorDialogComponent} from "./contractor-dialog/contractor-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-browse-contractors',
@@ -36,7 +38,7 @@ export class BrowseContractorsComponent implements OnInit {
   emptySearchList = false;
 
   constructor(private formBuilder: FormBuilder, private productsService: ProductsService,
-              private translate: TranslateService,
+              private translate: TranslateService, public dialog: MatDialog,
               private router: Router, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
@@ -124,4 +126,13 @@ export class BrowseContractorsComponent implements OnInit {
     this.router.navigate(['/add-contractor']);
   }
 
+  goToContractorInfo(id: number) {
+    this.dialog.open(ContractorDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        isFromTrade: false
+      }
+    });
+  }
 }

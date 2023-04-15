@@ -45,6 +45,9 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row" class="action-buttons">
+        <button *ngIf="row.contractor" mat-icon-button (click)="goToContractorInfo(row.contractor)">
+          <mat-icon>person</mat-icon>
+        </button>
         <button mat-icon-button (click)="goToEditProduct(row.id, row.type)">
           <mat-icon>edit</mat-icon>
         </button>

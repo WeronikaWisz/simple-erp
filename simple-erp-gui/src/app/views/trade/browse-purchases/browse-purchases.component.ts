@@ -17,6 +17,7 @@ import {DelegatedTaskListItem} from "../../../models/warehouse/DelegatedTaskList
 import {EUnit} from "../../../enums/EUnit";
 import {ETask} from "../../../enums/ETask";
 import {PurchaseOrderNumberDialogComponent} from "./purchase-order-number-dialog/purchase-order-number-dialog.component";
+import {ContractorDialogComponent} from "../../products/browse-contractors/contractor-dialog/contractor-dialog.component";
 
 @Component({
   selector: 'app-browse-purchases',
@@ -29,7 +30,7 @@ export class BrowsePurchasesComponent implements OnInit {
   isLoggedIn = false;
   hasPermissions = false;
 
-  displayedColumns = ['select', 'number', 'code', 'name', 'quantity', 'unit', 'purchaser', 'date', 'assigned-user', 'message'];
+  displayedColumns = ['select', 'number', 'code', 'name', 'quantity', 'unit', 'purchaser', 'date', 'assigned-user', 'message', 'actions'];
   dataSource: MatTableDataSource<DelegatedTaskListItem> = new MatTableDataSource<DelegatedTaskListItem>([]);
   selection = new SelectionModel<DelegatedTaskListItem>(true, []);
 
@@ -273,6 +274,16 @@ export class BrowsePurchasesComponent implements OnInit {
       if(result){
         this.selection.clear();
         this.loadTasks();
+      }
+    });
+  }
+
+  goToContractorInfo(id: number) {
+    this.dialog.open(ContractorDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        isFromTrade: true
       }
     });
   }

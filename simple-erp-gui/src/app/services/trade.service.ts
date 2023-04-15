@@ -2,22 +2,17 @@ import { Injectable } from '@angular/core';
 import {Observable} from "rxjs";
 import {ProductCode} from "../models/products/ProductCode";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {AddProductRequest} from "../models/products/AddProductRequest";
 import {AddOrderRequest} from "../models/trade/AddOrderRequest";
 import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
 import {OrdersResponse} from "../models/trade/OrdersResponse";
-import {OrderListItem} from "../models/trade/OrderListItem";
 import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
 import {UserName} from "../models/manage-users/UserName";
-import {UpdateDefaultUserRequest} from "../models/manage-users/UpdateDefaultUserRequest";
-import {EType} from "../enums/EType";
-import {ProductListItem} from "../models/products/ProductListItem";
-import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
 import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 import {DelegateExternalAcceptance} from "../models/trade/DelegateExternalAcceptance";
 import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptancesResponse";
 import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
+import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -99,5 +94,9 @@ export class TradeService {
 
   getAcceptance(id: number): Observable<AcceptanceDetails> {
     return this.http.get<AcceptanceDetails>(TRADE_API + 'acceptance/' + id, httpOptions);
+  }
+
+  getContractor(id: number): Observable<UpdateContractorRequest>{
+    return this.http.get<UpdateContractorRequest>(TRADE_API + 'purchase/contractor/' + id, httpOptions);
   }
 }

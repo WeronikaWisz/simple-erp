@@ -195,9 +195,14 @@
       "nip": "NIP",
       "email": "E-mail",
       "phone": "Numer telefonu",
-      "url": "Adres strony",
+      "url": "Adres strony: ",
       "load-error": "Nie udało się załadować kontrahentów",
-      "delete-error": "Nie udało się usunąc kontrahenta"
+      "delete-error": "Nie udało się usunąc kontrahenta",
+      "contractor-error": "Nie udało się załadować kontrahenta",
+      "bank-data": "Dane bankowe",
+      "nip-dialog": "NIP: ",
+      "bank-account": "Konto bankowe: ",
+      "account-number": "Numer konta: "
     },
     "unit-pieces": "Sztuki",
     "unit-kg": "Kilogramy",

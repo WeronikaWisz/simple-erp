@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>{{contractor.name}}</h2>
+<div mat-dialog-content>
+  <h3 *ngIf="contractor.email"><span class="thick">{{ 'supplies.delegated-tasks.email' | translate}}</span> {{contractor.email}}</h3>
+  <h3 *ngIf="contractor.phone"><span class="thick">{{ 'supplies.delegated-tasks.phone' | translate}}</span> {{contractor.phone}}</h3>
+  <h3 *ngIf="contractor.url"><span class="thick">{{ 'products.browse-contractors.url' | translate}}</span> {{contractor.url}}</h3>
+  <h3 *ngIf="contractor.nip"><span class="thick">{{ 'products.browse-contractors.nip-dialog' | translate}}</span>{{contractor.country}} {{contractor.nip}}</h3>
+  <br/>
+  <hr *ngIf="contractor.bankAccount || contractor.accountNumber">
+  <br/>
+  <h3 *ngIf="contractor.bankAccount || contractor.accountNumber">{{ 'products.browse-contractors.bank-data' | translate}}:</h3>
+  <h3 *ngIf="contractor.bankAccount"><span class="thick">{{ 'products.browse-contractors.bank-account' | translate}}</span> {{contractor.bankAccount}}</h3>
+  <h3 *ngIf="contractor.accountNumber"><span class="thick">{{ 'products.browse-contractors.account-number' | translate}}</span> {{contractor.accountNumber}}</h3>
+  <br/>
+  <hr *ngIf="contractor.city">
+  <br/>
+  <h3 *ngIf="contractor.city">{{ 'trade.browse-orders.address-data' | translate}}:</h3>
+  <p><span class="description-titles">{{contractor.city}} <span *ngIf="contractor.street">
+    {{ 'trade.browse-orders.street' | translate}}. {{contractor.street}}</span>
+    {{contractor.buildingNumber}}<span *ngIf="contractor.doorNumber">/{{contractor.doorNumber}}</span> </span>
+  </p>
+  <p><span class="description-titles">{{contractor.postalCode}} {{contractor.post}}</span></p>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+</div>

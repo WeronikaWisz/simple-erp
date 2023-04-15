@@ -11,6 +11,8 @@ import {ProductListItem} from "../../../models/products/ProductListItem";
 import {ProductsService} from "../../../services/products.service";
 import {EUnit} from "../../../enums/EUnit";
 import {EType} from "../../../enums/EType";
+import {ContractorDialogComponent} from "../browse-contractors/contractor-dialog/contractor-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-browse-products',
@@ -37,7 +39,7 @@ export class BrowseProductsComponent implements OnInit {
   emptySearchList = false;
 
   constructor(private formBuilder: FormBuilder, private productsService: ProductsService,
-              private translate: TranslateService,
+              private translate: TranslateService, public dialog: MatDialog,
               private router: Router, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
@@ -168,4 +170,13 @@ export class BrowseProductsComponent implements OnInit {
     }
   }
 
+  goToContractorInfo(id: number) {
+    this.dialog.open(ContractorDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        isFromTrade: false
+      }
+    });
+  }
 }

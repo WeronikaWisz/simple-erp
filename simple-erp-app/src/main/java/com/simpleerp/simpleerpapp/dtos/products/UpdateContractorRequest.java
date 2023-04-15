@@ -28,6 +28,10 @@ public class UpdateContractorRequest {
     private String buildingNumber;
     private String doorNumber;
 
+    public UpdateContractorRequest(String name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
