@@ -91,6 +91,7 @@ export class BrowseDelegatedTasksComponent implements OnInit {
     const dialogRef = this.dialog.open(DelegatePurchaseDialogComponent, {
       maxWidth: '650px',
       data: {
+        taskType: this.taskType,
         taskId: row.id,
         code: row.code,
         name: row.name,

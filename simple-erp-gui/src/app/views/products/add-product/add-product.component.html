@@ -65,8 +65,9 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div *ngIf="isProductSet">
-        <h2>{{ 'products.add-product.product-set' | translate}}</h2>
+      <div *ngIf="isProductSet || isProducedType">
+        <h2 *ngIf="isProductSet">{{ 'products.add-product.product-set' | translate}}</h2>
+        <h2 *ngIf="isProducedType">{{ 'products.add-product.product-production' | translate}}</h2>
         <div formArrayName="productSet" *ngFor="let product of productSet.controls; let i = index">
           <ng-container [formGroupName]="i">
             <mat-form-field class="full-width-input product-input" appearance="outline">
@@ -83,8 +84,23 @@
             <button mat-icon-button color="warn" (click)="deleteProduct(i)"><mat-icon>clear</mat-icon></button>
           </ng-container>
         </div>
-        <div id="button-add-product">
+        <div class="button-add-product">
         <button mat-flat-button color="primary" (click)="addProduct()">{{ 'products.add-product.add' | translate}}</button>
+        </div>
+      </div>
+      <div *ngIf="isProducedType">
+        <h2>{{ 'products.add-product.production-steps' | translate}}</h2>
+        <div formArrayName="productionSteps" *ngFor="let productionStep of productionSteps.controls; let i = index">
+          <ng-container [formGroupName]="i">
+            <mat-form-field class="full-width-input step-input" appearance="outline">
+              <mat-label>{{ 'products.add-product.description' | translate}}</mat-label>
+              <input matInput formControlName="description">
+            </mat-form-field>
+            <button mat-icon-button color="warn" (click)="deleteProductionStep(i)"><mat-icon>clear</mat-icon></button>
+          </ng-container>
+        </div>
+        <div class="button-add-product">
+          <button mat-flat-button color="primary" (click)="addProductionStep()">{{ 'products.add-product.add' | translate}}</button>
         </div>
       </div>
       <span class="save-button">

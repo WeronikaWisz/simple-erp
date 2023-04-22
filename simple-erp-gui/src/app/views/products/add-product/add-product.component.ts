@@ -13,6 +13,7 @@ import {ProductCode} from "../../../models/products/ProductCode";
 import {ProductsService} from "../../../services/products.service";
 import {ProductListItem} from "../../../models/products/ProductListItem";
 import {ContractorName} from "../../../models/products/ContractorName";
+import {UpdateProductRequest} from "../../../models/products/UpdateProductRequest";
 
 @Component({
   selector: 'app-add-product',
@@ -32,6 +33,7 @@ export class AddProductComponent implements OnInit {
   types: Type[] = [];
 
   isProductSet = false;
+  isProducedType = false;
   isBoughtType = false;
 
   productList: ProductCode[] = [];
@@ -56,7 +58,8 @@ export class AddProductComponent implements OnInit {
       purchasePrice: ['', Validators.required],
       salePrice: ['', Validators.required],
       contractor: [null],
-      productSet: this.formBuilder.array([])
+      productSet: this.formBuilder.array([]),
+      productionSteps: this.formBuilder.array([])
     });
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
@@ -73,6 +76,22 @@ export class AddProductComponent implements OnInit {
     this.loadProductForSetList();
     this.loadContractors();
     this.checkIfEditProductView();
+  }
+
+  get productionSteps(): FormArray {
+    return this.form.controls['productionSteps'] as FormArray;
+  }
+
+  addProductionStep() {
+    const productionSteps = this.form.controls['productionSteps'] as FormArray;
+    productionSteps.push(this.formBuilder.group({
+      description: ['', Validators.required]
+    }));
+  }
+
+  deleteProductionSteps(){
+    const productionSteps = this.form.controls['productionSteps'] as FormArray;
+    productionSteps.clear()
   }
 
   get productSet(): FormArray {
@@ -167,7 +186,9 @@ export class AddProductComponent implements OnInit {
       this.form.get('salePrice')?.clearValidators();
       this.isProductSet = false;
       this.isBoughtType = true;
+      this.isProducedType = false;
       this.deleteProducts();
+      this.deleteProductionSteps();
     } else if (this.form.get('type')?.value === EType.PRODUCED){
       this.form.get('unit')?.enable();
       this.form.get('purchasePrice')?.clearValidators();
@@ -176,7 +197,10 @@ export class AddProductComponent implements OnInit {
       this.form.get('salePrice')?.addValidators(Validators.required);
       this.isProductSet = false;
       this.isBoughtType = false;
+      this.isProducedType = true;
       this.deleteProducts();
+      this.addProduct();
+      this.addProductionStep();
     } else {
       this.form.get('unit')?.disable();
       this.form.get('unit')?.setValue(EUnit.PIECES);
@@ -186,9 +210,13 @@ export class AddProductComponent implements OnInit {
       this.form.get('salePrice')?.addValidators(Validators.required);
       this.isProductSet = true;
       this.isBoughtType = false;
-      this.addProduct()
+      this.isProducedType = false;
+      this.deleteProductionSteps();
+      this.deleteProducts();
+      this.addProduct();
     }
     this.form.get('productSet')?.updateValueAndValidity();
+    this.form.get('productionSteps')?.updateValueAndValidity();
     this.form.get('purchasePrice')?.updateValueAndValidity();
     this.form.get('salePrice')?.updateValueAndValidity();
   }
@@ -202,7 +230,8 @@ export class AddProductComponent implements OnInit {
       salePrice: this.form.get('salePrice')?.value,
       type: this.form.get('type')?.value,
       unit: this.form.get('unit')?.value,
-      contractor: this.form.get('contractor')?.value
+      contractor: this.form.get('contractor')?.value,
+      productionSteps: this.form.get('productionSteps')?.value
     }).subscribe({
       next: (data) => {
         console.log(data);
@@ -289,7 +318,7 @@ export class AddProductComponent implements OnInit {
     })
   }
 
-  fillFormWithEditedProduct(data: ProductListItem){
+  fillFormWithEditedProduct(data: UpdateProductRequest){
     this.form.get('type')?.setValue(EType[data.type])
     this.typeChange()
     this.form.get('code')?.setValue(data.code)
@@ -308,6 +337,12 @@ export class AddProductComponent implements OnInit {
       }
     }
     this.form.get('productSet')?.setValue(data.productSet)
+    if(data.productionSteps){
+      for (let i= 1; i < data.productionSteps.length; i++){
+        this.addProductionStep();
+      }
+    }
+    this.form.get('productionSteps')?.setValue(data.productionSteps)
   }
 
   updateProduct(): void {
@@ -320,7 +355,8 @@ export class AddProductComponent implements OnInit {
         salePrice: this.form.get('salePrice')?.value,
         type: this.form.get('type')?.value,
         unit: this.form.get('unit')?.value,
-        contractor: this.form.get('contractor')?.value
+        contractor: this.form.get('contractor')?.value,
+        productionSteps: this.form.get('productionSteps')?.value
       }).subscribe({
         next: (data) => {
           console.log(data);
@@ -342,6 +378,11 @@ export class AddProductComponent implements OnInit {
     const products = this.form.controls['productSet'] as FormArray;
     products.removeAt(i)
     this.unitsForProducts = this.unitsForProducts.slice(i,i+1)
+  }
+
+  deleteProductionStep(i: number) {
+    const productionSteps = this.form.controls['productionSteps'] as FormArray;
+    productionSteps.removeAt(i)
   }
 
   private loadContractors() {

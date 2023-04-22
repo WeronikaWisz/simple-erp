@@ -24,8 +24,12 @@ public class Release {
     private String number;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable=false)
+    @JoinColumn(name = "order_id")
     private Order order;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "production_id")
+    private Production production;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requesting_user_id", nullable=false)
@@ -50,6 +54,16 @@ public class Release {
     public Release(Order order, User requestingUser, User assignedUser, EDirection direction,
                    LocalDateTime creationDate, EStatus status) {
         this.order = order;
+        this.requestingUser = requestingUser;
+        this.assignedUser = assignedUser;
+        this.direction = direction;
+        this.creationDate = creationDate;
+        this.status = status;
+    }
+
+    public Release(Production production, User requestingUser, User assignedUser, EDirection direction,
+                   LocalDateTime creationDate, EStatus status) {
+        this.production = production;
         this.requestingUser = requestingUser;
         this.assignedUser = assignedUser;
         this.direction = direction;

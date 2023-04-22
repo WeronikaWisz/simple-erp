@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
 public class WarehouseService {
 
     private static final String PURCHASE_PREFIX = "ZZ";
-    private static final String PURCHASE_SEPARATOR = "/";
+    private static final String PRODUCTION_PREFIX = "ZP";
+    private static final String SEPARATOR = "/";
 
     private final StockLevelRepository stockLevelRepository;
     private final PurchaseRepository purchaseRepository;
@@ -37,13 +39,16 @@ public class WarehouseService {
     private final ReleaseRepository releaseRepository;
     private final ProductRepository productRepository;
     private final AcceptanceRepository acceptanceRepository;
+    private final ProductionRepository productionRepository;
+    private final ProductProductionRepository productProductionRepository;
     private final MessageSource messageSource;
 
     @Autowired
     public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseRepository purchaseRepository,
                             UserRepository userRepository, TaskRepository taskRepository, MessageSource messageSource,
                             ReleaseRepository releaseRepository, ProductRepository productRepository,
-                            AcceptanceRepository acceptanceRepository) {
+                            AcceptanceRepository acceptanceRepository, ProductionRepository productionRepository,
+                            ProductProductionRepository productProductionRepository) {
         this.stockLevelRepository = stockLevelRepository;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
@@ -52,6 +57,8 @@ public class WarehouseService {
         this.messageSource = messageSource;
         this.productRepository = productRepository;
         this.acceptanceRepository = acceptanceRepository;
+        this.productionRepository= productionRepository;
+        this.productProductionRepository = productProductionRepository;
     }
 
 
@@ -76,10 +83,12 @@ public class WarehouseService {
             SuppliesListItem suppliesListItem = new SuppliesListItem(stockLevel.getId(), stockLevel.getProduct().getType(),
                     stockLevel.getProduct().getCode(), stockLevel.getProduct().getName(), stockLevel.getProduct().getUnit(),
                     stockLevel.getQuantity().toString(), stockLevel.getMinQuantity().toString(), stockLevel.getDaysUntilStockLasts());
-            if(stockLevel.getProduct().getType().equals(EType.BOUGHT) && purchaseTaskDelegated(stockLevel.getProduct())){
+            if(stockLevel.getProduct().getType().equals(EType.BOUGHT) && purchaseTaskDelegated(stockLevel.getProduct())) {
                 suppliesListItem.setMessage(messageSource.getMessage(
                         "message.purchaseDelegated", null, LocaleContextHolder.getLocale()));
-            //TODO here will be check id production task delegated
+            } else if(stockLevel.getProduct().getType().equals(EType.PRODUCED) && productionTaskDelegated(stockLevel.getProduct())) {
+                suppliesListItem.setMessage(messageSource.getMessage(
+                        "message.productionDelegated", null, LocaleContextHolder.getLocale()));
             } else {
 //                 TODO here will be message that supplies end in a few days
                 suppliesListItem.setMessage("");
@@ -97,6 +106,13 @@ public class WarehouseService {
         return !purchaseList.isEmpty();
     }
 
+    private boolean productionTaskDelegated(Product product){
+        List<Production> productionList = productionRepository
+                .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED))
+                .orElse(Collections.emptyList());
+        return !productionList.isEmpty();
+    }
+
     @Transactional
     public void updateSupplies(UpdateSuppliesRequest updateSuppliesRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(updateSuppliesRequest.getId())
@@ -108,6 +124,7 @@ public class WarehouseService {
         stockLevelRepository.save(stockLevel);
     }
 
+    @Transactional
     public void delegatePurchaseTask(PurchaseTaskRequest purchaseTaskRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(purchaseTaskRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
@@ -130,13 +147,45 @@ public class WarehouseService {
         purchase.setCreationDate(currentDate);
         purchaseRepository.save(purchase);
 
-        String purchaseNumber = PURCHASE_PREFIX + PURCHASE_SEPARATOR + currentDate.getDayOfMonth()
-                + PURCHASE_SEPARATOR + currentDate.getMonthValue()
-                + PURCHASE_SEPARATOR + currentDate.getYear()
-                + PURCHASE_SEPARATOR + purchase.getId();
+        String purchaseNumber = PURCHASE_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
+                + SEPARATOR + currentDate.getMonthValue()
+                + SEPARATOR + currentDate.getYear()
+                + SEPARATOR + purchase.getId();
 
         purchase.setNumber(purchaseNumber);
         purchaseRepository.save(purchase);
+    }
+
+    @Transactional
+    public void delegateProductionTask(PurchaseTaskRequest purchaseTaskRequest) {
+        StockLevel stockLevel = stockLevelRepository.findById(purchaseTaskRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        Production production = new Production();
+        production.setProduct(stockLevel.getProduct());
+        production.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
+        production.setStatus(EStatus.WAITING);
+
+        Task task = taskRepository.findByName(ETask.TASK_PRODUCTION)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        production.setAssignedUser(task.getDefaultUser());
+
+        String username = getCurrentUserUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Cannot found user"));
+        production.setRequestingUser(user);
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        production.setCreationDate(currentDate);
+        productionRepository.save(production);
+
+        String productionNumber = PRODUCTION_PREFIX + SEPARATOR + currentDate.getDayOfMonth()
+                + SEPARATOR + currentDate.getMonthValue()
+                + SEPARATOR + currentDate.getYear()
+                + SEPARATOR + production.getId();
+
+        production.setNumber(productionNumber);
+        productionRepository.save(production);
     }
 
     private String getCurrentUserUsername(){
@@ -196,10 +245,36 @@ public class WarehouseService {
         return stockLevel.getQuantity();
     }
 
-    // TODO
     private void loadDelegatedProductionTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
-        delegatedTasksResponse.setTasksList(Collections.emptyList());
-        delegatedTasksResponse.setTotalTasksLength(0);
+        List<Production> productionList = productionRepository
+                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .orElse(Collections.emptyList());
+        int total = productionList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            delegatedTasksResponse.setTasksList(productionTaskListToDelegatedTasksListItem(productionList
+                    .stream().sorted(Comparator.comparing(Production::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        delegatedTasksResponse.setTotalTasksLength(total);
+    }
+
+    private List<DelegatedTaskListItem> productionTaskListToDelegatedTasksListItem(List<Production> productionList){
+        List<DelegatedTaskListItem> delegatedTaskListItems = new ArrayList<>();
+        for(Production production : productionList){
+            DelegatedTaskListItem delegatedTaskListItem = new DelegatedTaskListItem(production.getId(),
+                    production.getNumber(), production.getProduct().getCode(), production.getProduct().getName(),
+                    production.getProduct().getUnit(), production.getQuantity().toString(), production.getStatus(),
+                    production.getRequestingUser().getName() + " " +  production.getRequestingUser().getSurname(),
+                    production.getRequestingUser().getId(),
+                    production.getAssignedUser().getName() + " " +  production.getAssignedUser().getSurname(),
+                    production.getAssignedUser().getId(),
+                    production.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    findProductStockQuantity(production.getProduct()).toString());
+            delegatedTaskListItems.add(delegatedTaskListItem);
+        }
+        return delegatedTaskListItems;
     }
 
     @Transactional
@@ -212,6 +287,18 @@ public class WarehouseService {
         purchase.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
         purchase.setUpdateDate(LocalDateTime.now());
         purchaseRepository.save(purchase);
+    }
+
+    @Transactional
+    public void updateProductionTask(PurchaseTaskRequest purchaseTaskRequest) {
+        Production production = productionRepository.findById(purchaseTaskRequest.getId())
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        if(!production.getStatus().equals(EStatus.WAITING)){
+            throw new ApiExpectationFailedException("exception.taskNotWaiting");
+        }
+        production.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
+        production.setUpdateDate(LocalDateTime.now());
+        productionRepository.save(production);
     }
 
     public void deleteTask(EType type, Long id) {
@@ -231,8 +318,13 @@ public class WarehouseService {
         purchaseRepository.delete(purchase);
     }
 
-    // TODO
     private void deleteDelegatedProductionTasks(Long id) {
+        Production production = productionRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+        if(!production.getStatus().equals(EStatus.WAITING)){
+            throw new ApiExpectationFailedException("exception.taskNotWaiting");
+        }
+        productionRepository.delete(production);
     }
 
     public ReleasesAcceptancesResponse loadReleases(EStatus status, int page, int size) {
@@ -269,13 +361,24 @@ public class WarehouseService {
     private List<ReleaseAcceptanceListItem> releaseListToReleaseListItem(List<Release> releases){
         List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
         for(Release release: releases){
-            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(), release.getNumber(),
-                    release.getOrder().getNumber(),
-                    release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                    release.getDirection(), release.getRequestingUser().getId(),
-                    release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
-                    release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
-                    release.getAssignedUser().getId(), release.getStatus());
+            ReleaseAcceptanceListItem releaseAcceptanceListItem;
+            if(release.getDirection().equals(EDirection.EXTERNAL)) {
+                releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(), release.getNumber(),
+                        release.getOrder().getNumber(),
+                        release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        release.getDirection(), release.getRequestingUser().getId(),
+                        release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
+                        release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
+                        release.getAssignedUser().getId(), release.getStatus());
+            } else {
+                releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(),
+                        release.getNumber(), release.getProduction().getNumber(),
+                        release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        release.getDirection(), release.getRequestingUser().getId(),
+                        release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
+                        release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
+                        release.getAssignedUser().getId(), release.getStatus());
+            }
             releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
         }
         return releaseListItemAcceptanceList;
@@ -343,15 +446,32 @@ public class WarehouseService {
     }
 
     private void decreaseStockLevel(Release release){
-        for(OrderProducts orderProducts: release.getOrder().getOrderProductsSet()){
-            StockLevel stockLevel = stockLevelRepository.findByProduct(orderProducts.getProduct())
-                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
-            BigDecimal newQuantity = stockLevel.getQuantity().subtract(orderProducts.getQuantity());
-            if(newQuantity.compareTo(BigDecimal.ZERO) < 0){
-                throw new ApiExpectationFailedException("exception.stockLevelLessThanZero");
+        if(release.getDirection().equals(EDirection.EXTERNAL)) {
+            for (OrderProducts orderProducts : release.getOrder().getOrderProductsSet()) {
+                StockLevel stockLevel = stockLevelRepository.findByProduct(orderProducts.getProduct())
+                        .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+                BigDecimal newQuantity = stockLevel.getQuantity().subtract(orderProducts.getQuantity());
+                if (newQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new ApiExpectationFailedException("exception.stockLevelLessThanZero");
+                }
+                stockLevel.setQuantity(newQuantity);
+                stockLevelRepository.save(stockLevel);
             }
-            stockLevel.setQuantity(newQuantity);
-            stockLevelRepository.save(stockLevel);
+        } else {
+            ProductProduction productProduction = productProductionRepository.findByProductCode(
+                            release.getProduction().getProduct().getCode())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+            for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+                StockLevel stockLevel = stockLevelRepository.findByProduct(productProductionProduct.getProduct())
+                        .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+                BigDecimal newQuantity = stockLevel.getQuantity().subtract(
+                        productProductionProduct.getQuantity().multiply(release.getProduction().getQuantity()));
+                if (newQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new ApiExpectationFailedException("exception.stockLevelLessThanZero");
+                }
+                stockLevel.setQuantity(newQuantity);
+                stockLevelRepository.save(stockLevel);
+            }
         }
     }
 
@@ -359,9 +479,9 @@ public class WarehouseService {
         List<Product> productList = productRepository.findAll();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
-            if(product.getSalePrice() == null){
-                continue;
-            }
+//            if(product.getSalePrice() == null){
+//                continue;
+//            }
             ProductCode productCode = new ProductCode();
             productCode.setId(product.getId());
             productCode.setName(product.getName());
@@ -376,6 +496,7 @@ public class WarehouseService {
         Release release = releaseRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
         ReleaseDetails releaseDetails;
+        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
         if(release.getDirection().equals(EDirection.EXTERNAL)) {
             releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
                     release.getOrder().getNumber(),
@@ -388,23 +509,33 @@ public class WarehouseService {
                     release.getOrder().getCustomer().getPost(), release.getOrder().getCustomer().getCity(),
                     release.getOrder().getCustomer().getStreet(), release.getOrder().getCustomer().getBuildingNumber(),
                     release.getOrder().getCustomer().getDoorNumber());
+            for(OrderProducts orderProduct: release.getOrder().getOrderProductsSet()){
+                boolean isProductInStock = this.isProductInStock(orderProduct);
+                ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                        orderProduct.getProduct().getCode(), orderProduct.getQuantity().toString(), isProductInStock);
+                releaseProductQuantityList.add(releaseProductQuantity);
+            }
         } else {
-            // TODO change when production will be set
             releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
-                    "production number",
+                    release.getProduction().getNumber(),
                     release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     release.getExecutionDate() != null ?
                             release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
                     release.getDirection(), release.getRequestingUser().getName(),
                     release.getRequestingUser().getSurname(), release.getRequestingUser().getEmail(),
                     release.getRequestingUser().getPhone());
-        }
-        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
-        for(OrderProducts orderProduct: release.getOrder().getOrderProductsSet()){
-            boolean isProductInStock = this.isProductInStock(orderProduct);
-            ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
-                    orderProduct.getProduct().getCode(), orderProduct.getQuantity().toString(), isProductInStock);
-            releaseProductQuantityList.add(releaseProductQuantity);
+            ProductProduction productProduction = productProductionRepository.findByProductCode(
+                    release.getProduction().getProduct().getCode())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+            for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+                boolean isProductInStock = this.isProductInStock(productProductionProduct, release.getProduction().getQuantity());
+                ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                        productProductionProduct.getProduct().getCode(),
+                        (productProductionProduct.getQuantity().multiply(release.getProduction().getQuantity()))
+                                .setScale(2, RoundingMode.HALF_UP).toString(),
+                        isProductInStock);
+                releaseProductQuantityList.add(releaseProductQuantity);
+            }
         }
         releaseDetails.setProductSet(releaseProductQuantityList);
         return releaseDetails;
@@ -414,7 +545,14 @@ public class WarehouseService {
         StockLevel stockLevel = stockLevelRepository.findByProduct(orderProduct.getProduct())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
         BigDecimal quantity = stockLevel.getQuantity().subtract(orderProduct.getQuantity());
-        return (quantity.compareTo(BigDecimal.ZERO) > 0);
+        return (quantity.compareTo(BigDecimal.ZERO) >= 0);
+    }
+
+    private boolean isProductInStock(ProductProductionProducts productProductionProduct, BigDecimal productionQuantity) {
+        StockLevel stockLevel = stockLevelRepository.findByProduct(productProductionProduct.getProduct())
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        BigDecimal quantity = stockLevel.getQuantity().subtract(productProductionProduct.getQuantity().multiply(productionQuantity));
+        return (quantity.compareTo(BigDecimal.ZERO) >= 0);
     }
 
     @Transactional
@@ -443,11 +581,19 @@ public class WarehouseService {
     }
 
     private void increaseStockLevel(Acceptance acceptance){
-        StockLevel stockLevel = stockLevelRepository.findByProduct(acceptance.getPurchase().getProduct())
-                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
-        BigDecimal newQuantity = stockLevel.getQuantity().add(acceptance.getPurchase().getQuantity());
-        stockLevel.setQuantity(newQuantity);
-        stockLevelRepository.save(stockLevel);
+        if(acceptance.getDirection().equals(EDirection.EXTERNAL)) {
+            StockLevel stockLevel = stockLevelRepository.findByProduct(acceptance.getPurchase().getProduct())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+            BigDecimal newQuantity = stockLevel.getQuantity().add(acceptance.getPurchase().getQuantity());
+            stockLevel.setQuantity(newQuantity);
+            stockLevelRepository.save(stockLevel);
+        } else {
+            StockLevel stockLevel = stockLevelRepository.findByProduct(acceptance.getProduction().getProduct())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+            BigDecimal newQuantity = stockLevel.getQuantity().add(acceptance.getProduction().getQuantity());
+            stockLevel.setQuantity(newQuantity);
+            stockLevelRepository.save(stockLevel);
+        }
     }
 
     public ReleasesAcceptancesResponse loadAcceptances(EStatus status, int page, int size) {
@@ -484,13 +630,24 @@ public class WarehouseService {
     private List<ReleaseAcceptanceListItem> acceptanceListToAcceptanceListItem(List<Acceptance> acceptances) {
         List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
         for(Acceptance acceptance: acceptances){
-            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
-                    acceptance.getNumber(), acceptance.getPurchase().getNumber(),
-                    acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                    acceptance.getDirection(), acceptance.getRequestingUser().getId(),
-                    acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
-                    acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
-                    acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            ReleaseAcceptanceListItem releaseAcceptanceListItem;
+            if(acceptance.getDirection().equals(EDirection.EXTERNAL)) {
+                releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
+                        acceptance.getNumber(), acceptance.getPurchase().getNumber(),
+                        acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        acceptance.getDirection(), acceptance.getRequestingUser().getId(),
+                        acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
+                        acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
+                        acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            } else {
+                releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
+                        acceptance.getNumber(), acceptance.getProduction().getNumber(),
+                        acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        acceptance.getDirection(), acceptance.getRequestingUser().getId(),
+                        acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
+                        acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
+                        acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            }
             releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
         }
         return releaseListItemAcceptanceList;
@@ -534,13 +691,17 @@ public class WarehouseService {
             releaseProductQuantityList.add(releaseProductQuantity);
             acceptanceDetails.setProductSet(releaseProductQuantityList);
         } else {
-            // TODO change when production will be set
             acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
-                    "production number", acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getProduction().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                     acceptance.getExecutionDate() != null ?
                     acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
                     acceptance.getDirection(), acceptance.getRequestingUser().getName(), acceptance.getRequestingUser().getSurname(),
                     acceptance.getRequestingUser().getEmail(), acceptance.getRequestingUser().getPhone());
+            List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+            ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                    acceptance.getProduction().getProduct().getCode(), acceptance.getProduction().getQuantity().toString());
+            releaseProductQuantityList.add(releaseProductQuantity);
+            acceptanceDetails.setProductSet(releaseProductQuantityList);
         }
         return acceptanceDetails;
     }

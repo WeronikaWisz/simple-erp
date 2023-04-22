@@ -69,7 +69,7 @@ public class ProductsController {
     @GetMapping("/product/{type}/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getProduct(@PathVariable("type") EType type, @PathVariable("id") Long id) {
-        ProductListItem product = productsService.getProduct(id, type);
+        UpdateProductRequest product = productsService.getProduct(id, type);
         return ResponseEntity.ok(product);
     }
 

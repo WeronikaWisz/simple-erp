@@ -204,6 +204,6 @@ export class ReleaseInfoDialogComponent implements OnInit {
   }
 
   isStatusDone(): boolean {
-    return this.release.executionDate != null;
+    return this.release.executionDate != "";
   }
 }

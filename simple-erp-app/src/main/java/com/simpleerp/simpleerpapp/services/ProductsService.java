@@ -1,6 +1,7 @@
 package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.products.*;
+import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseProductQuantity;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.enums.EUnit;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,18 +24,27 @@ public class ProductsService {
     private final ProductRepository productRepository;
     private final ProductSetRepository productSetRepository;
     private final ProductSetProductsRepository productSetProductsRepository;
+    private final ProductProductionRepository productProductionRepository;
+    private final ProductProductionProductsRepository productProductionProductsRepository;
+    private final ProductionStepRepository productionStepRepository;
     private final StockLevelRepository stockLevelRepository;
     private final ContractorRepository contractorRepository;
 
     @Autowired
     public ProductsService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                            ProductSetProductsRepository productSetProductsRepository,
-                           StockLevelRepository stockLevelRepository, ContractorRepository contractorRepository) {
+                           StockLevelRepository stockLevelRepository, ContractorRepository contractorRepository,
+                           ProductProductionRepository productProductionRepository,
+                           ProductProductionProductsRepository productProductionProductsRepository,
+                           ProductionStepRepository productionStepRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.productSetProductsRepository = productSetProductsRepository;
         this.stockLevelRepository = stockLevelRepository;
         this.contractorRepository = contractorRepository;
+        this.productProductionRepository = productProductionRepository;
+        this.productProductionProductsRepository = productProductionProductsRepository;
+        this.productionStepRepository = productionStepRepository;
     }
 
     @Transactional
@@ -45,6 +56,8 @@ public class ProductsService {
         }
         if(addProductRequest.getType().equals(EType.SET)){
             addProductSet(addProductRequest);
+        } else if (addProductRequest.getType().equals(EType.PRODUCED)){
+            addProducedProduct(addProductRequest);
         } else {
             addSingleProduct(addProductRequest);
         }
@@ -62,6 +75,36 @@ public class ProductsService {
             productSet.addProduct(product, new BigDecimal(productQuantity.getQuantity()));
             productSetProductsRepository.save(productSetProducts);
         }
+    }
+
+    private void addProducedProduct(AddProductRequest addProductRequest) {
+        BigDecimal salePrice = null;
+        if(addProductRequest.getSalePrice() != null && !addProductRequest.getSalePrice().isEmpty()) {
+            salePrice = new BigDecimal(addProductRequest.getSalePrice());
+        }
+        Product product = productRepository.save(new Product(addProductRequest.getCode(), addProductRequest.getName(), null,
+                salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now()));
+
+        ProductProduction productProduction = productProductionRepository.save(new ProductProduction(
+                addProductRequest.getCode(), LocalDateTime.now()));
+
+        for(ProductQuantity productQuantity: addProductRequest.getProductSet()){
+            Product subProduct = productRepository.findById(productQuantity.getProduct())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            ProductProductionProducts productProductionProducts = new ProductProductionProducts(productProduction,
+                    subProduct, new BigDecimal(productQuantity.getQuantity()));
+            productProduction.addProduct(subProduct, new BigDecimal(productQuantity.getQuantity()));
+            productProductionProductsRepository.save(productProductionProducts);
+        }
+
+        for(int i=1; i<=addProductRequest.getProductionSteps().size(); i++){
+            productionStepRepository.save(new ProductionStep(i, addProductRequest.getProductionSteps().get(i-1).getDescription(),
+                    productProduction, LocalDateTime.now()));
+        }
+
+        StockLevel stockLevel = new StockLevel(product, BigDecimal.ZERO, BigDecimal.ZERO,
+                0, LocalDateTime.now());
+        stockLevelRepository.save(stockLevel);
     }
 
     private void addSingleProduct(AddProductRequest addProductRequest) {
@@ -127,6 +170,7 @@ public class ProductsService {
         return productListItems;
     }
 
+    @Transactional
     public void deleteProduct(Long id, EType type) {
         if(type.equals(EType.SET)){
             ProductSet productSet = productSetRepository.findById(id)
@@ -138,9 +182,22 @@ public class ProductsService {
             Product product = productRepository.findById(id).
                     orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
             Optional<List<ProductSetProducts>> productSetProductsList = productSetProductsRepository.findByProduct(product);
-            if(productSetProductsList.isPresent() && !productSetProductsList.get().isEmpty()){
+            Optional<List<ProductProductionProducts>> productProductionProductsList = productProductionProductsRepository.findByProduct(product);
+            if(productSetProductsList.isPresent() && !productSetProductsList.get().isEmpty()
+            || productProductionProductsList.isPresent() && !productProductionProductsList.get().isEmpty()){
                 throw new ApiExpectationFailedException("exception.productIsInSet");
             } else {
+                if(type.equals(EType.PRODUCED)){
+                    ProductProduction productProduction = productProductionRepository.findByProductCode(product.getCode())
+                            .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+                    List<ProductProductionProducts> productProductionProducts = productProduction.getProductProductionProducts();
+                    productProductionProductsRepository.deleteAll(productProductionProducts);
+                    List<ProductionStep> productionSteps = productionStepRepository.findByProductProduction(productProduction)
+                            .orElse(Collections.emptyList());
+                    productionStepRepository.deleteAll(productionSteps);
+                    productProductionRepository.delete(productProduction);
+                }
+
                 StockLevel stockLevel = product.getStockLevel();
                 stockLevelRepository.delete(stockLevel);
                 productRepository.delete(product);
@@ -148,12 +205,12 @@ public class ProductsService {
         }
     }
 
-    public ProductListItem getProduct(Long id, EType type) {
-        ProductListItem productListItem;
+    public UpdateProductRequest getProduct(Long id, EType type) {
+        UpdateProductRequest updateProductRequest;
         if(type.equals(EType.SET)){
             ProductSet productSet = productSetRepository.findById(id)
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
-            productListItem = new ProductListItem(productSet.getId(), EType.SET, productSet.getCode(),
+            updateProductRequest = new UpdateProductRequest(productSet.getId(), EType.SET, productSet.getCode(),
                     productSet.getName(), EUnit.PIECES, "",
                     productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "");
             List<ProductQuantity> productQuantityList = new ArrayList<>();
@@ -162,19 +219,37 @@ public class ProductsService {
                         productSetProductsList.getQuantity().toString());
                 productQuantityList.add(productQuantity);
             }
-            productListItem.setProductSet(productQuantityList);
+            updateProductRequest.setProductSet(productQuantityList);
         } else {
             Product product = productRepository.findById(id).
                     orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
-            productListItem = new ProductListItem(product.getId(), product.getType(), product.getCode(),
+            updateProductRequest = new UpdateProductRequest(product.getId(), product.getType(), product.getCode(),
                     product.getName(), product.getUnit(),
                     product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
                     product.getSalePrice() != null ? product.getSalePrice().toString() : "");
             if(product.getContractor() != null){
-                productListItem.setContractor(product.getContractor().getId());
+                updateProductRequest.setContractor(product.getContractor().getId());
+            }
+            if(product.getType().equals(EType.PRODUCED)){
+                List<ProductQuantity> productQuantityList = new ArrayList<>();
+                ProductProduction productProduction = productProductionRepository.findByProductCode(
+                                product.getCode())
+                        .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+                for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+                    ProductQuantity productQuantity = new ProductQuantity(productProductionProduct.getProduct().getId(),
+                            productProductionProduct.getQuantity().toString());
+                    productQuantityList.add(productQuantity);
+                }
+                updateProductRequest.setProductSet(productQuantityList);
+                List<ProductStepDescription> productStepDescriptionList = new ArrayList<>();
+                for(ProductionStep productionStep: productProduction.getProductionSteps()){
+                    ProductStepDescription productStepDescription = new ProductStepDescription(productionStep.getDescription());
+                    productStepDescriptionList.add(productStepDescription);
+                }
+                updateProductRequest.setProductionSteps(productStepDescriptionList);
             }
         }
-        return productListItem;
+        return updateProductRequest;
     }
 
     @Transactional
@@ -243,8 +318,68 @@ public class ProductsService {
         } else {
             product.setContractor(null);
         }
+        if(product.getType().equals(EType.PRODUCED)){
+            this.updateProducedProduct(updateProductRequest, product);
+        }
         product.setUpdateDate(LocalDateTime.now());
         productRepository.save(product);
+    }
+
+    private void updateProducedProduct(UpdateProductRequest updateProductRequest, Product product) {
+        ProductProduction productProduction = productProductionRepository.findByProductCode(
+                        product.getCode())
+                .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+
+        List<ProductProductionProducts> productProductionProducts = productProduction.getProductProductionProducts();
+        for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
+            Product subProduct = productRepository.findById(productQuantity.getProduct())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            Optional<ProductProductionProducts> productAlreadyInList = productProductionProducts
+                    .stream().filter(currentProduct -> currentProduct.getProduct().getId().equals(subProduct.getId())).findFirst();
+            if(productAlreadyInList.isPresent()){
+                productAlreadyInList.get().setQuantity(new BigDecimal(productQuantity.getQuantity()));
+                productProductionProductsRepository.save(productAlreadyInList.get());
+            } else {
+                ProductProductionProducts newProductProductionProducts = new ProductProductionProducts(productProduction, product,
+                        new BigDecimal(productQuantity.getQuantity()));
+                productProductionProductsRepository.save(newProductProductionProducts);
+            }
+        }
+
+        List<ProductProductionProducts> productProductionProductsToDelete = new ArrayList<>();
+        for(ProductProductionProducts productProductionProduct: productProductionProducts){
+            if(!updateProductRequest.getProductSet().stream().map(ProductQuantity::getProduct)
+                    .collect(Collectors.toList()).contains(productProductionProduct.getProduct().getId())){
+                productProductionProductsToDelete.add(productProductionProduct);
+            }
+        }
+        productProductionProductsRepository.deleteAll(productProductionProductsToDelete);
+
+        List<ProductionStep> productionSteps = productionStepRepository.findByProductProduction(productProduction)
+                .orElse(Collections.emptyList());
+
+        for(int i=1; i<=updateProductRequest.getProductionSteps().size(); i++){
+            Optional<ProductionStep> productionStep = productionStepRepository.findByProductProductionAndNumber(productProduction, i);
+            if(productionStep.isPresent()){
+                productionStep.get().setDescription(updateProductRequest.getProductionSteps().get(i-1).getDescription());
+                productionStep.get().setUpdateDate(LocalDateTime.now());
+                productionStepRepository.save(productionStep.get());
+            } else {
+                ProductionStep newProductionStep = new ProductionStep(i, updateProductRequest.getProductionSteps().get(i-1).getDescription(),
+                        productProduction, LocalDateTime.now());
+                productionStepRepository.save(newProductionStep);
+            }
+        }
+
+        if(productionSteps.size() > updateProductRequest.getProductionSteps().size()){
+            Integer numbersToDelete = productionSteps.size() - (productionSteps.size() - updateProductRequest.getProductionSteps().size());
+            Optional<List<ProductionStep>> productionStepsToDelete = productionStepRepository.findByProductProductionAndNumberAfter(
+                    productProduction, numbersToDelete);
+            if(productionStepsToDelete.isPresent() && !productionStepsToDelete.get().isEmpty()) {
+                productionStepRepository.deleteAll(productionStepsToDelete.get());
+            }
+        }
+
     }
 
     public void addContractor(AddContractorRequest addContractorRequest) {

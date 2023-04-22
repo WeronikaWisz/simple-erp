@@ -1,0 +1,136 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
+  <h2>{{ 'production.browse-production.browse-title' | translate}}</h2>
+  <p>{{ 'production.browse-production.task-count' | translate}}: {{taskCount}}</p>
+  <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+    <mat-tab label="{{ 'trade.browse-orders.waiting' | translate}}">
+      <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
+    </mat-tab>
+    <mat-tab label="{{ 'trade.browse-orders.in-progress' | translate}}">
+      <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
+    </mat-tab>
+    <mat-tab label="{{ 'trade.browse-orders.done' | translate}}">
+      <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
+    </mat-tab>
+  </mat-tab-group>
+  <mat-paginator [length]="totalTasksLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>
+
+<ng-template #taskListTemplate let-dataSource>
+
+  <div class="table-buttons">
+    <button mat-raised-button color="accent" *ngIf="isStatusWaiting()" [disabled]="isNothingSelected() || selectedAreAccepted()" (click)="delegateInternalRelease()">
+      {{ 'production.browse-production.add-internal-release' | translate}}
+    </button>
+    <button mat-raised-button color="accent" *ngIf="isStatusWaiting()" [disabled]="isNothingSelected() || selectedAreNotAccepted()" (click)="markAsInProgress()">
+      {{ 'supplies.browse-release.mark-as-in-progress' | translate}}
+    </button>
+    <button mat-raised-button color="accent" *ngIf="isStatusInProgress()" [disabled]="isNothingSelected() || selectedAreAccepted()" (click)="delegateInternalAcceptance()">
+      {{ 'production.browse-production.add-internal-acceptance' | translate}}
+    </button>
+    <button mat-raised-button color="accent" *ngIf="isStatusInProgress()" [disabled]="isNothingSelected() || selectedAreNotAccepted()" (click)="markAsDone()">
+      {{ 'supplies.browse-release.mark-as-done' | translate}}
+    </button>
+    <button mat-raised-button color="accent" *ngIf="isStatusNotDone()" [disabled]="isNothingSelected()" (click)="changeAssignedUser()">
+      {{ 'trade.browse-orders.change-assigned-user' | translate}}
+    </button>
+  </div>
+
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="select">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null"
+                      [checked]="selection.hasValue() && isAllSelected()"
+                      [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()"
+                      (change)="$event ? selection.toggle(row) : null"
+                      [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="number">
+      <mat-header-cell *matHeaderCellDef> {{ 'trade.browse-purchases.number' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.number}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="code">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.code' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.code}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.name' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-supplies.quantity' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element">
+        <span>{{element.quantity}}</span>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="unit">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.unit' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{getUnit(element.unit)}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="purchaser">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.browse-release.purchaser' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip (click)="showUserData(row.purchaserId)"> {{row.purchaserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.delegated-tasks.date' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.creationDate}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="assigned-user">
+      <mat-header-cell *matHeaderCellDef> {{ 'supplies.delegated-tasks.assigned-user' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list>
+          <mat-chip (click)="showUserData(row.assignedUserId)"> {{row.assignedUserName}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="message">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-chip-list *ngIf="isStatusWaiting()">
+          <mat-chip class="chip-waiting" *ngIf="!row.accepted && row.orderNumber"> {{row.orderNumber}} </mat-chip>
+          <mat-chip class="chip-in-progress" *ngIf="row.accepted"> {{ 'trade.browse-orders.issued' | translate}} </mat-chip>
+        </mat-chip-list>
+        <mat-chip-list *ngIf="isStatusInProgress()">
+          <mat-chip class="chip-waiting" *ngIf="!row.accepted && row.orderNumber"> {{row.orderNumber}} </mat-chip>
+          <mat-chip class="chip-in-progress" *ngIf="row.accepted"> {{ 'trade.browse-purchases.accepted' | translate}} </mat-chip>
+        </mat-chip-list>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToProductInfo(row.id)">
+          <mat-icon>build</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</ng-template>

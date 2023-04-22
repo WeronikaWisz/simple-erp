@@ -1,6 +1,7 @@
 import {EType} from "../../enums/EType";
 import {EUnit} from "../../enums/EUnit";
 import {ProductQuantity} from "./ProductQuantity";
+import {ProductionStepDescription} from "./ProductionStepDescription";
 
 export interface AddProductRequest {
   type: EType;
@@ -11,4 +12,5 @@ export interface AddProductRequest {
   salePrice?: string;
   productSet?: ProductQuantity[];
   contractor?: number;
+  productionSteps?: ProductionStepDescription[];
 }

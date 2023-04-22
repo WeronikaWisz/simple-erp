@@ -87,6 +87,7 @@ export class BrowseSuppliesComponent implements OnInit {
     const dialogRef = this.dialog.open(DelegatePurchaseDialogComponent, {
       maxWidth: '650px',
       data: {
+        taskType: supplies.type,
         stockLevelId: supplies.id,
         code: supplies.code,
         name: supplies.name,
@@ -102,9 +103,24 @@ export class BrowseSuppliesComponent implements OnInit {
     });
   }
 
-  // TODO
-  addProductionTask(id: number) {
-
+  addProductionTask(supplies: SuppliesListItem) {
+    const dialogRef = this.dialog.open(DelegatePurchaseDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        taskType: supplies.type,
+        stockLevelId: supplies.id,
+        code: supplies.code,
+        name: supplies.name,
+        unit: supplies.unit,
+        stockQuantity: supplies.quantity
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if(result){
+        this.loadSupplies();
+      }
+    });
   }
 
   isProductionType(eType: EType): boolean {

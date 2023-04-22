@@ -56,7 +56,15 @@ public class WarehouseController {
     public ResponseEntity<?> delegatePurchaseTask(@RequestBody PurchaseTaskRequest purchaseTaskRequest) {
         warehouseService.delegatePurchaseTask(purchaseTaskRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
-                "success.purchaseTypeCreated", null, LocaleContextHolder.getLocale())));
+                "success.purchaseTaskCreated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PostMapping("/delegate-production")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> delegateProductionTask(@RequestBody PurchaseTaskRequest purchaseTaskRequest) {
+        warehouseService.delegateProductionTask(purchaseTaskRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.productionTaskCreated", null, LocaleContextHolder.getLocale())));
     }
 
     @GetMapping("/delegated-tasks/{type}")
@@ -72,6 +80,14 @@ public class WarehouseController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
     public ResponseEntity<?> updatePurchaseTask(@RequestBody PurchaseTaskRequest purchaseTaskRequest) {
         warehouseService.updatePurchaseTask(purchaseTaskRequest);
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.taskUpdated", null, LocaleContextHolder.getLocale())));
+    }
+
+    @PutMapping("/production-task")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> updateProductionTask(@RequestBody PurchaseTaskRequest purchaseTaskRequest) {
+        warehouseService.updateProductionTask(purchaseTaskRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.taskUpdated", null, LocaleContextHolder.getLocale())));
     }

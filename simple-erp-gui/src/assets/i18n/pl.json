@@ -133,7 +133,10 @@
       "update-success": "Pomyśnie zaktualizowano produkt",
       "update-error": "Nie udało się zaktualizować produktu",
       "contractor": "Kontrahent",
-      "load-error-2": "Nie udało się załadować kontrahentów"
+      "load-error-2": "Nie udało się załadować kontrahentów",
+      "product-production": "Skład produktu",
+      "production-steps": "Kroki produkcji",
+      "description": "Opis"
     },
     "browse-product" : {
       "browse-title": "Zdefiniowane produkty",
@@ -225,6 +228,7 @@
       "purchase-task": "Zleć zakup",
       "purchase-task-edit": "Aktualizuj zlecenie zakupu",
       "production-task": "Zleć produkcję",
+      "production-task-edit": "Aktualizuj zlecenie produkcji",
       "edit-title": "Zmień stany magazynowe",
       "min-quantity": "Minimalna ilość",
       "days": "Liczba dni",
@@ -237,6 +241,7 @@
       "current-quantity": "Aktualny stan na magazynie: ",
       "help": "Podpowiadanie planowania stanów magazynowych",
       "suggestion": "Podaj liczbę dni na jaką ma wystarczyć zapas produktu i zasugerowana zostanie ilość zakupu.",
+      "suggestion-production": "Podaj liczbę dni na jaką ma wystarczyć zapas produktu i zasugerowana zostanie ilość produkcji.",
       "suggest-button": "Sugeruj",
       "delegate-purchase-success": "Pomyślnie dodano zadanie zakupu",
       "delegate-purchase-error": "Nie udało się dodać zadania zakupu",
@@ -380,6 +385,18 @@
       "load-error": "Nie udało się załadować zleconych zadań"
     }
   },
+  "production": {
+    "browse-production": {
+      "browse-title": "List zadań produkcji",
+      "task-count": "Liczba zadań",
+      "add-internal-acceptance": "Zleć przyjęcie wewnętrzne",
+      "add-internal-release": "Zleć wydanie wewnętrzne",
+      "load-error": "Nie udało się załadować zadań",
+      "mark-error": "Nie udało się zmienić statusu",
+      "delegate-acceptance-error": "Nie udało się zlecić przyjęcia",
+      "delegate-release-error": "Nie udało się zlecić wydania"
+    }
+  },
   "tasks": {
     "waiting": "oczekuje",
     "in-progress": "w trakcie"
@@ -412,6 +429,9 @@
     "browse-acceptance": "Przeglądaj przyjęcia",
     "browse-purchases": "Przeglądaj zakupy",
     "add-contractor": "Dodaj kontrahenta",
-    "browse-contractors": "Przeglądaj kontrahentów"
+    "browse-contractors": "Przeglądaj kontrahentów",
+    "production": "PRODUKCJA",
+    "production-l": "Produkcja",
+    "browse-production": "Przeglądaj produkcję"
   }
 }

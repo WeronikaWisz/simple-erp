@@ -133,7 +133,10 @@
       "update-success": "Successfully updated product",
       "update-error": "Cannot update product",
       "contractor": "Contractor",
-      "load-error-2": "Cannot load contractors"
+      "load-error-2": "Cannot load contractors",
+      "product-production": "Composition of product",
+      "production-steps": "Production steps",
+      "description": "Description"
     },
     "browse-product": {
       "browse-title": "Defined products",
@@ -225,6 +228,7 @@
       "purchase-task": "Delegate purchase",
       "purchase-task-edit": "Edit purchase task",
       "production-task": "Delegate production",
+      "production-task-edit": "Edit production task",
       "edit-title": "Edit supplies level",
       "min-quantity": "Minimum quantity",
       "days": "Number of days",
@@ -237,6 +241,7 @@
       "current-quantity": "Current quantity available: ",
       "help": "Suggesting inventory planning",
       "suggestion": "Enter the number of days for which the stock of the product should suffice and the purchase quantity will be suggested.",
+      "suggestion-production": "Enter the number of days for which the stock of the product should suffice and the production quantity will be suggested.",
       "suggest-button": "Suggest",
       "delegate-purchase-success": "Successfully added purchase task",
       "delegate-purchase-error": "Cannot add purchase task",
@@ -380,6 +385,18 @@
       "load-error": "Cannot load delegated tasks"
     }
   },
+  "production": {
+    "browse-production": {
+      "browse-title": "Production task list",
+      "task-count": "Tasks count",
+      "add-internal-acceptance": "Delegate internal acceptance",
+      "add-internal-release": "Delegate internal release",
+      "load-error": "Cannot load production tasks",
+      "mark-error": "Cannot change status",
+      "delegate-acceptance-error": "Cannot delegate acceptance",
+      "delegate-release-error": "Cannot delegate release"
+    }
+  },
   "tasks": {
     "waiting": "waiting",
     "in-progress": "in progress"
@@ -412,6 +429,9 @@
     "browse-acceptance": "Browse acceptance",
     "browse-purchases": "Browse purchases",
     "add-contractor": "Add contractor",
-    "browse-contractors": "Browse contractors"
+    "browse-contractors": "Browse contractors",
+    "production": "PRODUCTION",
+    "production-l": "Production",
+    "browse-production": "Browse production"
   }
 }

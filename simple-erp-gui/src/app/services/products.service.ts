@@ -41,8 +41,8 @@ export class ProductsService {
     return this.http.delete(PRODUCTS_API + 'product/' + type + "/" + id)
   }
 
-  getProduct(id: number, type: EType): Observable<ProductListItem> {
-    return this.http.get<ProductListItem>(PRODUCTS_API + 'product/' + type + "/" + id, httpOptions);
+  getProduct(id: number, type: EType): Observable<UpdateProductRequest> {
+    return this.http.get<UpdateProductRequest>(PRODUCTS_API + 'product/' + type + "/" + id, httpOptions);
   }
 
   updateProduct(updateProductRequest: UpdateProductRequest): Observable<any> {

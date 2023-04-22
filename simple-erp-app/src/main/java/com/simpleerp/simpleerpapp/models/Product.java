@@ -36,6 +36,8 @@ public class Product {
     private EType type;
     @OneToMany(mappedBy = "product")
     List<ProductSetProducts> productsSets = new ArrayList<>();
+    @OneToMany(mappedBy = "product")
+    List<ProductProductionProducts> productsProductions = new ArrayList<>();
 
     @OneToOne
     private StockLevel stockLevel;

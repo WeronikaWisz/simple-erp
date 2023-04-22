@@ -26,8 +26,12 @@ public class Acceptance {
     private String orderNumber;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_id", nullable=false)
+    @JoinColumn(name = "purchase_id")
     private Purchase purchase;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "production_id")
+    private Production production;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requesting_user_id", nullable=false)
@@ -53,6 +57,16 @@ public class Acceptance {
                     LocalDateTime creationDate, EStatus status) {
         this.purchase = purchase;
         this.orderNumber = orderNumber;
+        this.requestingUser = requestingUser;
+        this.assignedUser = assignedUser;
+        this.direction = direction;
+        this.creationDate = creationDate;
+        this.status = status;
+    }
+
+    public Acceptance(Production production, User requestingUser, User assignedUser, EDirection direction,
+                      LocalDateTime creationDate, EStatus status) {
+        this.production = production;
         this.requestingUser = requestingUser;
         this.assignedUser = assignedUser;
         this.direction = direction;

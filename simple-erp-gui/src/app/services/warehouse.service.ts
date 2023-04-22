@@ -38,6 +38,10 @@ export class WarehouseService {
     return this.http.post(SUPPLIES_API + 'delegate-purchase', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
+  delegateProductionTask(purchaseTaskRequest: PurchaseTaskRequest): Observable<any> {
+    return this.http.post(SUPPLIES_API + 'delegate-production', JSON.stringify(purchaseTaskRequest), httpOptions);
+  }
+
   loadDelegatedTasks(type: string, pageIndex: number, pageSize: number): Observable<DelegatedTasksResponse>{
     return this.http.get<DelegatedTasksResponse>(SUPPLIES_API + `delegated-tasks/${type}?page=${pageIndex}&size=${pageSize}`);
   }
@@ -48,6 +52,10 @@ export class WarehouseService {
 
   updatePurchaseTask(purchaseTaskRequest: PurchaseTaskRequest): Observable<any> {
     return this.http.put(SUPPLIES_API + 'purchase-task', JSON.stringify(purchaseTaskRequest), httpOptions);
+  }
+
+  updateProductionTask(purchaseTaskRequest: PurchaseTaskRequest): Observable<any> {
+    return this.http.put(SUPPLIES_API + 'production-task', JSON.stringify(purchaseTaskRequest), httpOptions);
   }
 
   loadReleases(status: string, direction: string, pageIndex: number, pageSize: number): Observable<ReleasesAcceptancesResponse>{

@@ -1,7 +1,5 @@
 package com.simpleerp.simpleerpapp.models;
 
-import com.simpleerp.simpleerpapp.enums.EType;
-import com.simpleerp.simpleerpapp.enums.EUnit;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.Getter;

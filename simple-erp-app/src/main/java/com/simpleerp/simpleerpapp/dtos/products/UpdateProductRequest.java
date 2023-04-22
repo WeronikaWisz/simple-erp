@@ -23,6 +23,18 @@ public class UpdateProductRequest {
     private String salePrice;
     private Long contractor;
     private List<ProductQuantity> productSet = new ArrayList<>();
+    private List<ProductStepDescription> productionSteps = new ArrayList<>();
+
+    public UpdateProductRequest(Long id, EType type, String code, String name, EUnit unit, String purchasePrice,
+                           String salePrice) {
+        this.id = id;
+        this.type = type;
+        this.code = code;
+        this.name = name;
+        this.unit = unit;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -32,11 +44,11 @@ public class UpdateProductRequest {
         return Objects.equals(id, that.id) && type == that.type && Objects.equals(code, that.code)
                 && Objects.equals(name, that.name) && unit == that.unit && Objects.equals(purchasePrice, that.purchasePrice)
                 && Objects.equals(salePrice, that.salePrice) && Objects.equals(contractor, that.contractor)
-                && Objects.equals(productSet, that.productSet);
+                && Objects.equals(productSet, that.productSet) && Objects.equals(productionSteps, that.productionSteps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, code, name, unit, purchasePrice, salePrice, contractor, productSet);
+        return Objects.hash(id, type, code, name, unit, purchasePrice, salePrice, contractor, productSet, productionSteps);
     }
 }
