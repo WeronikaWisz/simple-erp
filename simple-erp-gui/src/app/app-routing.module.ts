@@ -18,6 +18,7 @@ import {BrowseDelegatedWarehouseTaskComponent} from "./views/trade/browse-delega
 import {AddContractorComponent} from "./views/products/add-contractor/add-contractor.component";
 import {BrowseContractorsComponent} from "./views/products/browse-contractors/browse-contractors.component";
 import {BrowseProductionComponent} from "./views/production/browse-production/browse-production.component";
+import {ForecastingComponent} from "./views/settings/forecasting/forecasting.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -42,6 +43,7 @@ const routes: Routes = [
   { path: 'browse-purchases', component: BrowsePurchasesComponent },
   { path: 'browse-delegated-warehouse-task', component: BrowseDelegatedWarehouseTaskComponent },
   { path: 'browse-production', component: BrowseProductionComponent },
+  { path: 'forecasting', component: ForecastingComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 

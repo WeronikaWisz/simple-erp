@@ -64,6 +64,7 @@ import { AcceptanceInfoDialogComponent } from './views/warehouse/browse-acceptan
 import { ContractorDialogComponent } from './views/products/browse-contractors/contractor-dialog/contractor-dialog.component';
 import { BrowseProductionComponent } from './views/production/browse-production/browse-production.component';
 import { ChangeProductionUserDialogComponent } from './views/production/browse-production/change-production-user-dialog/change-production-user-dialog.component';
+import { ForecastingComponent } from './views/settings/forecasting/forecasting.component';
 
 @NgModule({
   declarations: [
@@ -101,7 +102,8 @@ import { ChangeProductionUserDialogComponent } from './views/production/browse-p
     AcceptanceInfoDialogComponent,
     ContractorDialogComponent,
     BrowseProductionComponent,
-    ChangeProductionUserDialogComponent
+    ChangeProductionUserDialogComponent,
+    ForecastingComponent
   ],
     imports: [
         BrowserModule,

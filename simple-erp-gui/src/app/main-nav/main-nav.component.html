@@ -58,6 +58,10 @@
       <a mat-list-item href routerLink="default-users" *ngIf="hasAdminRole()"><mat-icon>settings</mat-icon>
         <span class="button-text">{{ 'nav.default-users' | translate}}</span>
       </a>
+      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.settings' | translate}}</h2>
+      <a mat-list-item href routerLink="forecasting" *ngIf="hasAdminRole()"><mat-icon>trending_up</mat-icon>
+        <span class="button-text">{{ 'nav.forecasting' | translate}}</span>
+      </a>
       <h2 matSubheader>{{ 'nav.my-account' | translate}}</h2>
       <a mat-list-item href routerLink="profile"><mat-icon>person_outline</mat-icon>
         <span class="button-text">{{ 'nav.my-profile' | translate}}</span>
@@ -149,6 +153,12 @@
           </button>
           <button mat-menu-item routerLink="default-users">
             <mat-icon>settings</mat-icon> {{ 'nav.default-users' | translate}}
+          </button>
+        </mat-menu>
+        <button mat-button [matMenuTriggerFor]="settings" *ngIf="hasAdminRole()">{{ 'nav.settings-l' | translate}}</button>
+        <mat-menu #settings="matMenu">
+          <button mat-menu-item routerLink="forecasting">
+            <mat-icon>trending_up</mat-icon> {{ 'nav.forecasting' | translate}}
           </button>
         </mat-menu>
       </span>

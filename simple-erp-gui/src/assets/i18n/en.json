@@ -397,6 +397,23 @@
       "delegate-release-error": "Cannot delegate release"
     }
   },
+  "settings": {
+    "forecasting": {
+      "title": "Demand forecasting for products",
+      "is-active": "Current state",
+      "on": "on",
+      "off": "off",
+      "instruction": "In order to start forecasting the demand for products, historical sales data for a period of at least one year must be provided for the forecast to be accurate. An excerpt from an example file for training the model is provided below. Product codes in historical data must match product codes defined in the system.",
+      "date": "Order date",
+      "code": "Product code",
+      "quantity": "Quantity",
+      "no-file": "Attach historical sales data",
+      "train": "Train",
+      "train-success": "Successfully trained model",
+      "train-error": "Cannot train model",
+      "active-error": "Cannot upload forecasting state"
+    }
+  },
   "tasks": {
     "waiting": "waiting",
     "in-progress": "in progress"
@@ -432,6 +449,9 @@
     "browse-contractors": "Browse contractors",
     "production": "PRODUCTION",
     "production-l": "Production",
-    "browse-production": "Browse production"
+    "browse-production": "Browse production",
+    "settings": "SETTINGS",
+    "settings-l": "Settings",
+    "forecasting": "Forecasting"
   }
 }

@@ -397,6 +397,23 @@
       "delegate-release-error": "Nie udało się zlecić wydania"
     }
   },
+  "settings": {
+    "forecasting": {
+      "title": "Prognozowanie zapotrzebowania na produkty",
+      "is-active": "Aktualny stan",
+      "on": "włączone",
+      "off": "wyłączone",
+      "instruction": "W celu uruchomienia prognozowania zapotrzebowania na produkty należy dostarczyć dane historyczne sprzedaży z okresu minimum roku, aby prognoza była trafna. Fragment przykładowego pliku do trenowania modelu zamieszczono poniżej. Kody produktów w danych historycznych muszą być zgodne z kodami produktów zdefiniowanymi w systemie.",
+      "date": "Data zamówienia",
+      "code": "Kod produktu",
+      "quantity": "Ilość",
+      "no-file": "Dołącz historyczne dane sprzedaży",
+      "train": "Trenuj",
+      "train-success": "Pomyślnie wytrenowano model",
+      "train-error": "Trenowanie nie powiodło się",
+      "active-error": "Nie udało się załadować stanu prognozowania"
+    }
+  },
   "tasks": {
     "waiting": "oczekuje",
     "in-progress": "w trakcie"
@@ -432,6 +449,9 @@
     "browse-contractors": "Przeglądaj kontrahentów",
     "production": "PRODUKCJA",
     "production-l": "Produkcja",
-    "browse-production": "Przeglądaj produkcję"
+    "browse-production": "Przeglądaj produkcję",
+    "settings": "USTAWIENIA",
+    "settings-l": "Ustawienia",
+    "forecasting": "Prognozowanie"
   }
 }
