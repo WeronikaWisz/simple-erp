@@ -12,6 +12,9 @@ import {ProductCode} from "../models/products/ProductCode";
 import {UpdateOrderRequest} from "../models/trade/UpdateOrderRequest";
 import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
+import {ForecastingActive} from "../models/forecasting/ForecastingActive";
+import {EType} from "../enums/EType";
+import {ProductQuantity} from "../models/products/ProductQuantity";
 
 const SUPPLIES_API = 'http://localhost:8080/warehouse/';
 
@@ -110,5 +113,21 @@ export class WarehouseService {
 
   getAcceptance(id: number): Observable<AcceptanceDetails> {
     return this.http.get<AcceptanceDetails>(SUPPLIES_API + 'acceptance/' + id, httpOptions);
+  }
+
+  checkProductForecastingState(id: number): Observable<ForecastingActive> {
+    return this.http.get<ForecastingActive>(SUPPLIES_API + `forecast/active/product/stock/${id}`);
+  }
+
+  checkTaskForecastingState(type: EType, id: number): Observable<ForecastingActive> {
+    return this.http.get<ForecastingActive>(SUPPLIES_API + `forecast/active/product/task/${type}/${id}`);
+  }
+
+  suggestProductStockQuantity(id: number): Observable<ProductQuantity> {
+    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/stock/${id}`);
+  }
+
+  suggestProductTaskQuantity(type: EType, id: number): Observable<ProductQuantity> {
+    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/task/${type}/${id}`);
   }
 }

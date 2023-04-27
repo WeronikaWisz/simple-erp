@@ -29,6 +29,8 @@ export class DelegatePurchaseDialogComponent implements OnInit {
 
   suggestion = ""
 
+  forecastingActive = false;
+
   constructor(
     public dialogRef: MatDialogRef<DelegatePurchaseDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DelegatedTaskData, private formBuilder: FormBuilder,
@@ -63,6 +65,45 @@ export class DelegatePurchaseDialogComponent implements OnInit {
       this.suggestion = this.getTranslateMessage("supplies.browse-supplies.suggestion-production")
     }
     this.loadUnits();
+    this.checkProductForecastingState();
+  }
+
+  checkProductForecastingState(){
+    if(!this.isEditView) {
+      this.suppliesService.checkProductForecastingState(this.data.stockLevelId!)
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.forecastingActive = data.active
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("settings.forecasting.active-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else {
+      this.suppliesService.checkTaskForecastingState(this.type, this.data.taskId!)
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.forecastingActive = data.active
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("settings.forecasting.active-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    }
   }
 
   setFormTitle(){
@@ -197,9 +238,42 @@ export class DelegatePurchaseDialogComponent implements OnInit {
     }
   }
 
-  // TODO
   suggestQuantity() {
-
+    if(!this.isEditView) {
+      this.suppliesService.suggestProductStockQuantity(this.data.stockLevelId!)
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.form.get('quantity')?.setValue(data.quantity)
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("settings.forecasting.active-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else {
+      this.suppliesService.suggestProductTaskQuantity(this.type, this.data.taskId!)
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.form.get('quantity')?.setValue(data.quantity)
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("settings.forecasting.active-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    }
   }
 
   daysNotSet(): boolean {

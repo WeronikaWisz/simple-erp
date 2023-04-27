@@ -1,7 +1,9 @@
 package com.simpleerp.simpleerpapp.services;
 
+import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
@@ -704,5 +706,62 @@ public class WarehouseService {
             acceptanceDetails.setProductSet(releaseProductQuantityList);
         }
         return acceptanceDetails;
+    }
+
+    public ForecastingActive checkProductForecastingState(Long id) {
+        StockLevel stockLevel = stockLevelRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        ForecastingActive forecastingActive = new ForecastingActive();
+        forecastingActive.setActive(stockLevel.getProduct().getForecastingMapping() != null
+                && !stockLevel.getProduct().getForecastingMapping().isEmpty());
+        return forecastingActive;
+    }
+
+    public ForecastingActive checkTaskForecastingState(EType type, Long id) {
+        Product product;
+        if(EType.PRODUCED.equals(type)){
+            Production production = productionRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+            product = production.getProduct();
+        } else {
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+            product = purchase.getProduct();
+        }
+        ForecastingActive forecastingActive = new ForecastingActive();
+        forecastingActive.setActive(product.getForecastingMapping() != null
+                && !product.getForecastingMapping().isEmpty());
+        return forecastingActive;
+    }
+
+//    TODO
+    public ProductQuantity suggestProductStockQuantity(Long id) {
+        StockLevel stockLevel = stockLevelRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        Product product = stockLevel.getProduct();
+
+        ProductQuantity productQuantity = new ProductQuantity();
+        productQuantity.setProduct(product.getId());
+        return productQuantity;
+    }
+
+//    TODO
+    public ProductQuantity suggestProductTaskQuantity(EType type, Long id) {
+        Product product;
+        if(EType.PRODUCED.equals(type)){
+            Production production = productionRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+            product = production.getProduct();
+        } else {
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
+            product = purchase.getProduct();
+        }
+        StockLevel stockLevel = stockLevelRepository.findByProduct(product)
+                .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+
+        ProductQuantity productQuantity = new ProductQuantity();
+        productQuantity.setProduct(product.getId());
+        return productQuantity;
     }
 }

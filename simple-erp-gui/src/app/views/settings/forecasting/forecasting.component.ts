@@ -114,6 +114,7 @@ export class ForecastingComponent implements OnInit {
             icon: 'success',
             showConfirmButton: false
           })
+          this.loadForecastingState();
         },
         error: (err) => {
           Swal.fire({

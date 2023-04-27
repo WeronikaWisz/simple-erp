@@ -49,6 +49,8 @@ public class Product {
     @JoinColumn(name = "contractor_id")
     Contractor contractor;
 
+    private String forecastingMapping;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 

@@ -1,8 +1,10 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
+import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.EDirection;
@@ -204,6 +206,37 @@ public class WarehouseController {
     public ResponseEntity<?> getAcceptance(@PathVariable("id") Long id) {
         AcceptanceDetails acceptance = warehouseService.getAcceptance(id);
         return ResponseEntity.ok(acceptance);
+    }
+
+    @GetMapping("/forecast/active/product/stock/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> checkProductForecastingState(@PathVariable("id") Long id) {
+        ForecastingActive forecastingActive = warehouseService.checkProductForecastingState(id);
+        return ResponseEntity.ok(forecastingActive);
+    }
+
+    @GetMapping("/forecast/active/product/task/{type}/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> checkTaskForecastingState(@PathVariable("type") EType type,
+            @PathVariable("id") Long id) {
+        ForecastingActive forecastingActive = warehouseService.checkTaskForecastingState(type, id);
+        return ResponseEntity.ok(forecastingActive);
+    }
+
+
+    @GetMapping("/forecast/quantity/product/stock/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> suggestProductStockQuantity(@PathVariable("id") Long id) {
+        ProductQuantity productQuantity = warehouseService.suggestProductStockQuantity(id);
+        return ResponseEntity.ok(productQuantity);
+    }
+
+    @GetMapping("/forecast/quantity/product/task/{type}/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
+    public ResponseEntity<?> suggestProductTaskQuantity(@PathVariable("type") EType type,
+                                                       @PathVariable("id") Long id) {
+        ProductQuantity productQuantity = warehouseService.suggestProductTaskQuantity(type, id);
+        return ResponseEntity.ok(productQuantity);
     }
 
 }
