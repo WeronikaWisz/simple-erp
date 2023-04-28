@@ -59,10 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -74,7 +71,7 @@ import java.util.stream.Collectors;
 public class ForecastingService {
 
     private static final String FREQ = "D";
-//    private static final Integer PREDICTION_LENGTH = 4;
+    private static final Integer PREDICTION_LENGTH = 365;
     private static final String MODEL_PATH = "/Users/Weronika/Inf_semestr10/simple-erp/simple-erp-app/src/main/resources/forecasting";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForecastingService.class);
@@ -88,14 +85,6 @@ public class ForecastingService {
         this.productRepository = productRepository;
         this.forecastingPropertiesRepository = forecastingPropertiesRepository;
     }
-
-    //    public ForecastingService() throws TranslateException, IOException, ModelException {
-//        trainModel();
-//        Map<String, Float> metrics = predict(LocalDateTime.now());
-//        for (Map.Entry<String, Float> entry : metrics.entrySet()) {
-//            LOGGER.info(String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
-//        }
-//    }
 
     public TrainingResult trainModel(Integer predictionLength, Integer itemCardinality,
                                      LocalDateTime startTime, int maxDays) throws IOException, TranslateException {
@@ -152,74 +141,75 @@ public class ForecastingService {
         }
     }
 
-//    public static Map<String, Float> predict(LocalDateTime startTime)
-//            throws IOException, TranslateException, ModelException {
-//        try (Model model = Model.newInstance("deepar")) {
-//            DeepARNetwork predictionNetwork = getDeepARModel(new NegativeBinomialOutput(), false);
-//            model.setBlock(predictionNetwork);
-//            model.load(Paths.get(MODEL_PATH));
-//
-//            M5Forecast testSet =
-//                    getDataset(
-//                            new ArrayList<>(),
-//                            predictionNetwork.getContextLength(),
-//                            Dataset.Usage.TEST);
-//
-//            Map<String, Object> arguments = new ConcurrentHashMap<>();
-//            arguments.put("prediction_length", PREDICTION_LENGTH);
-//            arguments.put("freq", FREQ);
-//            arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
-//            arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), true);
-//            arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
-//            DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
-//
-//            Evaluator evaluator =
-//                    new Evaluator(0.5f, 0.67f, 0.95f, 0.99f);
-//            Progress progress = new ProgressBar();
-//            progress.reset("Inferring", testSet.size());
-//            try (Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor(translator)) {
-//                for (Batch batch : testSet.getData(model.getNDManager().newSubManager())) {
-//                    NDList data = batch.getData();
-//                    NDArray target = data.head();
-//                    NDArray featStaticCat = data.get(1);
-//
-//                    NDArray gt = target.get(":, {}:", -PREDICTION_LENGTH);
-//                    NDArray pastTarget = target.get(":, :{}", -PREDICTION_LENGTH);
-//
-//                    NDList gtSplit = gt.split(batch.getSize());
-//                    NDList pastTargetSplit = pastTarget.split(batch.getSize());
-//                    NDList featStaticCatSplit = featStaticCat.split(batch.getSize());
-//
-//                    List<TimeSeriesData> batchInput = new ArrayList<>(batch.getSize());
-//                    for (int i = 0; i < batch.getSize(); i++) {
-//                        TimeSeriesData input = new TimeSeriesData(10);
-//                        input.setStartTime(startTime);
-//                        input.setField(FieldName.TARGET, pastTargetSplit.get(i).squeeze(0));
-//                        input.setField(
-//                                FieldName.FEAT_STATIC_CAT, featStaticCatSplit.get(i).squeeze(0));
-//                        batchInput.add(input);
-//                    }
-//                    List<Forecast> forecasts = predictor.batchPredict(batchInput);
-////                    NDArray samples = ((SampleForecast) forecasts.get(0)).getSortedSamples();
-////                    samples.setName("samples");
-////                    saveNDArray(samples);
-//                    for (int i = 0; i < forecasts.size(); i++) {
-//                        LOGGER.info("Forecast mean: "+forecasts.get(i).mean());
-////                        LOGGER.info("Size: "+((SampleForecast) forecasts.get(0)).getSortedSamples().size());
-////                        LOGGER.info("Mean: "+((SampleForecast) forecasts.get(0)).getSortedSamples().mean(new int[]{0}));
-//                        evaluator.aggregateMetrics(
-//                                evaluator.getMetricsPerTs(
-//                                        gtSplit.get(i).squeeze(0),
-//                                        pastTargetSplit.get(i).squeeze(0),
-//                                        forecasts.get(i)));
-//                    }
-//                    progress.increment(batch.getSize());
-//                    batch.close();
-//                }
-//                return evaluator.computeTotalMetrics();
-//            }
-//        }
-//    }
+    public Map<String, Float> predict(LocalDateTime startTime, Integer itemCardinality, int maxDays)
+            throws IOException, TranslateException, ModelException {
+        try (Model model = Model.newInstance("deepar")) {
+            DeepARNetwork predictionNetwork = getDeepARModel(new NegativeBinomialOutput(), false,
+                    itemCardinality, PREDICTION_LENGTH);
+            model.setBlock(predictionNetwork);
+            model.load(Paths.get(MODEL_PATH));
+
+            M5Forecast testSet =
+                    getDataset(
+                            new ArrayList<>(),
+                            predictionNetwork.getContextLength(),
+                            Dataset.Usage.TEST, startTime, maxDays);
+
+            Map<String, Object> arguments = new ConcurrentHashMap<>();
+            arguments.put("prediction_length", PREDICTION_LENGTH);
+            arguments.put("freq", FREQ);
+            arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
+            arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), true);
+            arguments.put("use_" + FieldName.FEAT_STATIC_REAL.name().toLowerCase(), false);
+            DeepARTranslator translator = DeepARTranslator.builder(arguments).build();
+
+            Evaluator evaluator =
+                    new Evaluator(0.5f, 0.67f, 0.95f, 0.99f);
+            Progress progress = new ProgressBar();
+            progress.reset("Inferring", testSet.size());
+            try (Predictor<TimeSeriesData, Forecast> predictor = model.newPredictor(translator)) {
+                for (Batch batch : testSet.getData(model.getNDManager().newSubManager())) {
+                    NDList data = batch.getData();
+                    NDArray target = data.head();
+                    NDArray featStaticCat = data.get(1);
+
+                    NDArray gt = target.get(":, {}:", -PREDICTION_LENGTH);
+                    NDArray pastTarget = target.get(":, :{}", -PREDICTION_LENGTH);
+
+                    NDList gtSplit = gt.split(batch.getSize());
+                    NDList pastTargetSplit = pastTarget.split(batch.getSize());
+                    NDList featStaticCatSplit = featStaticCat.split(batch.getSize());
+
+                    List<TimeSeriesData> batchInput = new ArrayList<>(batch.getSize());
+                    for (int i = 0; i < batch.getSize(); i++) {
+                        TimeSeriesData input = new TimeSeriesData(10);
+                        input.setStartTime(startTime);
+                        input.setField(FieldName.TARGET, pastTargetSplit.get(i).squeeze(0));
+                        input.setField(
+                                FieldName.FEAT_STATIC_CAT, featStaticCatSplit.get(i).squeeze(0));
+                        batchInput.add(input);
+                    }
+                    List<Forecast> forecasts = predictor.batchPredict(batchInput);
+//                    NDArray samples = ((SampleForecast) forecasts.get(0)).getSortedSamples();
+//                    samples.setName("samples");
+//                    saveNDArray(samples);
+                    for (int i = 0; i < forecasts.size(); i++) {
+                        LOGGER.info("Forecast mean: "+forecasts.get(i).mean());
+//                        LOGGER.info("Size: "+((SampleForecast) forecasts.get(0)).getSortedSamples().size());
+//                        LOGGER.info("Mean: "+((SampleForecast) forecasts.get(0)).getSortedSamples().mean(new int[]{0}));
+                        evaluator.aggregateMetrics(
+                                evaluator.getMetricsPerTs(
+                                        gtSplit.get(i).squeeze(0),
+                                        pastTargetSplit.get(i).squeeze(0),
+                                        forecasts.get(i)));
+                    }
+                    progress.increment(batch.getSize());
+                    batch.close();
+                }
+                return evaluator.computeTotalMetrics();
+            }
+        }
+    }
 
 //    private static void saveNDArray(NDArray array) throws IOException {
 //        Path path = Paths.get(MODEL_PATH).resolve(array.getName() + ".npz");
@@ -286,7 +276,6 @@ public class ForecastingService {
                         .setContextLength(contextLength)
                         .setSampling(32, usage == Dataset.Usage.TRAIN);
 
-//        int maxDays = usage == Dataset.Usage.TRAIN ? 10 : 14;
         for (int i = 1; i <= maxDays; i++) {
             builder.addFeature("d_" + i, FieldName.TARGET);
         }
@@ -349,7 +338,14 @@ public class ForecastingService {
                 this.trainModel(4,
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
                         forecastingTrainingData.getStartDate(), (int) maxDays);
-            } catch (IOException | TranslateException exception){
+                this.prepareInferenceFile();
+                Map<String, Float> metrics = this.predict(LocalDateTime.now(),
+                        forecastingTrainingData.getForecastingTrainingElementList().size(),
+                        (int) maxDays + PREDICTION_LENGTH);
+                for (Map.Entry<String, Float> entry : metrics.entrySet()) {
+                    LOGGER.info(String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
+                }
+            } catch (IOException | TranslateException | ModelException exception){
                 throw new ApiExpectationFailedException("exception.forecastingTraining");
             }
 
@@ -357,6 +353,40 @@ public class ForecastingService {
         } catch (IOException e){
             throw new ApiExpectationFailedException("exception.wrongFileFormat");
         }
+    }
+
+    private void prepareInferenceFile() throws IOException {
+        File csvInferenceFile = new File(MODEL_PATH + "/weekly_sales_train_evaluation.csv");
+
+        List<String> lines = getLinesFrom("/weekly_sales_train_validation.csv");
+        try(PrintWriter pw = new PrintWriter(csvInferenceFile)) {
+            lines.stream()
+                    .map(this::appendDaysToPredictFile)
+                    .forEach(pw::println);
+        }
+    }
+
+    public String appendDaysToPredictFile(String line){
+        StringBuilder newLine = new StringBuilder(line);
+        if(line.contains("id,item_id")){
+            int nextDay = Integer.parseInt(line.substring(line.lastIndexOf(",") + 3)) + 1;
+            for(int i=nextDay; i<(PREDICTION_LENGTH+nextDay); i++){
+                newLine.append(",d_").append(i);
+            }
+        } else {
+            newLine.append(",NaN".repeat(Math.max(0, PREDICTION_LENGTH)));
+        }
+        return newLine.toString();
+    }
+
+    static List<String> getLinesFrom(String fileName) throws IOException {
+        List<String> lines = new ArrayList<>();
+        Scanner file = new Scanner(new File(MODEL_PATH,fileName));
+        while(file.hasNextLine()) {
+            lines.add(file.nextLine());
+        }
+        file.close();
+        return lines;
     }
 
     private String getProductCategoryMapping(String productCode){
