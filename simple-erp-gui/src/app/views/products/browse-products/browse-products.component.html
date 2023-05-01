@@ -51,6 +51,9 @@
         <button *ngIf="isProductionType(row.type)" mat-icon-button (click)="goToProductInfo(row.id)">
           <mat-icon>build</mat-icon>
         </button>
+        <button *ngIf="isSetType(row.type)" mat-icon-button (click)="goToSetInfo(row.id)">
+          <mat-icon>category</mat-icon>
+        </button>
         <button mat-icon-button (click)="goToEditProduct(row.id, row.type)">
           <mat-icon>edit</mat-icon>
         </button>

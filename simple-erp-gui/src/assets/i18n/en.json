@@ -207,6 +207,9 @@
       "bank-account": "Bank account: ",
       "account-number": "Account number: "
     },
+    "product-info": {
+      "info-title": "Products in set"
+    },
     "unit-pieces": "Pieces",
     "unit-kg": "Kilograms",
     "unit-l": "Liters",

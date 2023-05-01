@@ -207,6 +207,9 @@
       "bank-account": "Konto bankowe: ",
       "account-number": "Numer konta: "
     },
+    "product-info": {
+      "info-title": "Produkty w zestawie"
+    },
     "unit-pieces": "Sztuki",
     "unit-kg": "Kilogramy",
     "unit-l": "Litry",

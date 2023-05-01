@@ -3,7 +3,6 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ProductCode} from "../models/products/ProductCode";
 import {AddProductRequest} from "../models/products/AddProductRequest";
-import {ProductListItem} from "../models/products/ProductListItem";
 import {ProductsResponse} from "../models/products/ProductsResponse";
 import {EType} from "../enums/EType";
 import {UpdateProductRequest} from "../models/products/UpdateProductRequest";
@@ -12,6 +11,7 @@ import {ContractorsResponse} from "../models/products/ContractorsResponse";
 import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
 import {ContractorName} from "../models/products/ContractorName";
 import {ProductProductionInfo} from "../models/production/ProductProductionInfo";
+import {ProductSetInfo} from "../models/products/ProductSetInfo";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -79,6 +79,10 @@ export class ProductsService {
   }
 
   getProductProduction(id: number): Observable<ProductProductionInfo> {
-    return this.http.get<ProductProductionInfo>(PRODUCTS_API + 'product-info/' + id);
+    return this.http.get<ProductProductionInfo>(PRODUCTS_API + 'production/product-info/' + id);
+  }
+
+  getProductSet(id: number): Observable<ProductSetInfo> {
+    return this.http.get<ProductSetInfo>(PRODUCTS_API + 'set/product-info/' + id);
   }
 }

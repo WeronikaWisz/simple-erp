@@ -129,11 +129,18 @@ public class ProductsController {
         return ResponseEntity.ok(contractorsNames);
     }
 
-    @GetMapping("/product-info/{id}")
+    @GetMapping("/production/product-info/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getProductProduction(@PathVariable("id") Long id) {
         ProductProductionInfo productProductionInfo = productsService.getProductProduction(id);
         return ResponseEntity.ok(productProductionInfo);
+    }
+
+    @GetMapping("/set/product-info/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getProductSet(@PathVariable("id") Long id) {
+        ProductSetInfo productSetInfo = productsService.getProductSet(id);
+        return ResponseEntity.ok(productSetInfo);
     }
 
     @GetMapping("/only-products")

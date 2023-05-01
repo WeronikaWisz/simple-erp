@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{ 'products.product-info.info-title' | translate}} {{productSet.code}}</h2>
+<div mat-dialog-content>
+  <div class="product-data">
+    <div *ngFor="let product of productSet.productSet">
+      <h3>{{ product.product }}
+        <span class="thick">{{product.quantity}} {{getUnit(product.product)}}</span>
+      </h3>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'supplies.browse-supplies.close' | translate}}
+  </button>
+</div>

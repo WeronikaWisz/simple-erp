@@ -580,4 +580,19 @@ public class ProductsService {
         }
         return productCodeList;
     }
+
+    public ProductSetInfo getProductSet(Long id) {
+        ProductSet productSet = productSetRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        ProductSetInfo productSetInfo = new ProductSetInfo(productSet.getCode(), productSet.getName());
+        List<ProductionProductQuantity> productQuantityList = new ArrayList<>();
+        for(ProductSetProducts productSetProduct: productSet.getProductsSets()){
+            ProductionProductQuantity productionProductQuantity = new ProductionProductQuantity(
+                    productSetProduct.getProduct().getCode(), productSetProduct.getQuantity().toString()
+            );
+            productQuantityList.add(productionProductQuantity);
+        }
+        productSetInfo.setProductSet(productQuantityList);
+        return productSetInfo;
+    }
 }

@@ -14,6 +14,7 @@ import {EType} from "../../../enums/EType";
 import {ContractorDialogComponent} from "../browse-contractors/contractor-dialog/contractor-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {ProductionInfoDialogComponent} from "../../production/browse-production/production-info-dialog/production-info-dialog.component";
+import {ProductSetInfoDialogComponent} from "./product-set-info-dialog/product-set-info-dialog.component";
 
 @Component({
   selector: 'app-browse-products',
@@ -194,6 +195,18 @@ export class BrowseProductsComponent implements OnInit {
   isProductionType(eType: EType): boolean {
     let type = eType as unknown as string;
     return type === EType[EType.PRODUCED];
+  }
+
+  isSetType(eType: EType): boolean {
+    let type = eType as unknown as string;
+    return type === EType[EType.SET];
+  }
+
+  goToSetInfo(id: number) {
+    this.dialog.open(ProductSetInfoDialogComponent, {
+      maxWidth: '650px',
+      data: id
+    });
   }
 
 }
