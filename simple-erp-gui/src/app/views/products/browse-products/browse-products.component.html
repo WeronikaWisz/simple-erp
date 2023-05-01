@@ -48,6 +48,9 @@
         <button *ngIf="row.contractor" mat-icon-button (click)="goToContractorInfo(row.contractor)">
           <mat-icon>person</mat-icon>
         </button>
+        <button *ngIf="isProductionType(row.type)" mat-icon-button (click)="goToProductInfo(row.id)">
+          <mat-icon>build</mat-icon>
+        </button>
         <button mat-icon-button (click)="goToEditProduct(row.id, row.type)">
           <mat-icon>edit</mat-icon>
         </button>

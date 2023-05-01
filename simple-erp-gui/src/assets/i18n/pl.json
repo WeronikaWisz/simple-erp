@@ -395,6 +395,12 @@
       "mark-error": "Nie udało się zmienić statusu",
       "delegate-acceptance-error": "Nie udało się zlecić przyjęcia",
       "delegate-release-error": "Nie udało się zlecić wydania"
+    },
+    "product-info": {
+      "load-error": "Nie udało załadować się produkcji produktu",
+      "info-title": "Proces produkcji produktu",
+      "products": "Materiały",
+      "steps": "Kroki produkcji"
     }
   },
   "settings": {

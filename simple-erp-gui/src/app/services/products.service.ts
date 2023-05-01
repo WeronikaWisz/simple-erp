@@ -11,6 +11,7 @@ import {AddContractorRequest} from "../models/products/AddContractorRequest";
 import {ContractorsResponse} from "../models/products/ContractorsResponse";
 import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
 import {ContractorName} from "../models/products/ContractorName";
+import {ProductProductionInfo} from "../models/production/ProductProductionInfo";
 
 const PRODUCTS_API = 'http://localhost:8080/products/';
 
@@ -71,5 +72,13 @@ export class ProductsService {
 
   loadContractorsNames(): Observable<ContractorName[]> {
     return this.http.get<ContractorName[]>(PRODUCTS_API + `contractors-names`);
+  }
+
+  loadProductList(): Observable<ProductCode[]> {
+    return this.http.get<ProductCode[]>(PRODUCTS_API + 'only-products');
+  }
+
+  getProductProduction(id: number): Observable<ProductProductionInfo> {
+    return this.http.get<ProductProductionInfo>(PRODUCTS_API + 'product-info/' + id);
   }
 }

@@ -13,6 +13,7 @@ import {EUnit} from "../../../enums/EUnit";
 import {EType} from "../../../enums/EType";
 import {ContractorDialogComponent} from "../browse-contractors/contractor-dialog/contractor-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
+import {ProductionInfoDialogComponent} from "../../production/browse-production/production-info-dialog/production-info-dialog.component";
 
 @Component({
   selector: 'app-browse-products',
@@ -179,4 +180,20 @@ export class BrowseProductsComponent implements OnInit {
       }
     });
   }
+
+  goToProductInfo(id: number) {
+    this.dialog.open(ProductionInfoDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        from: 'PRODUCTS'
+      }
+    });
+  }
+
+  isProductionType(eType: EType): boolean {
+    let type = eType as unknown as string;
+    return type === EType[EType.PRODUCED];
+  }
+
 }

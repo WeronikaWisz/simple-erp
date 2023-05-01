@@ -1,7 +1,11 @@
 package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
+import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
+import com.simpleerp.simpleerpapp.dtos.production.ProductionProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
+import com.simpleerp.simpleerpapp.dtos.products.ProductStepDescription;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
@@ -359,5 +363,31 @@ public class ProductionService {
         releaseProductQuantityList.add(releaseProductQuantity);
         acceptanceDetails.setProductSet(releaseProductQuantityList);
         return acceptanceDetails;
+    }
+
+    public ProductProductionInfo getProductProduction(Long id) {
+        Production production = productionRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.productionNotFound"));
+        Product product = production.getProduct();
+        ProductProductionInfo productProductionInfo = new ProductProductionInfo(product.getCode(),
+                product.getName(), product.getUnit());
+        List<ProductionProductQuantity> productQuantityList = new ArrayList<>();
+        ProductProduction productProduction = productProductionRepository.findByProductCode(
+                product.getCode()).orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+        for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+            ProductionProductQuantity productionProductQuantity = new ProductionProductQuantity(
+                    productProductionProduct.getProduct().getCode(),
+                    productProductionProduct.getQuantity().toString());
+            productQuantityList.add(productionProductQuantity);
+        }
+        productProductionInfo.setProductSet(productQuantityList);
+
+        List<ProductStepDescription> productStepDescriptionList = new ArrayList<>();
+        for(ProductionStep productionStep: productProduction.getProductionSteps()){
+            ProductStepDescription productStepDescription = new ProductStepDescription(productionStep.getDescription());
+            productStepDescriptionList.add(productStepDescription);
+        }
+        productProductionInfo.setProductionSteps(productStepDescriptionList);
+        return productProductionInfo;
     }
 }

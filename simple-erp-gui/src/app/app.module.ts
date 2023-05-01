@@ -65,6 +65,7 @@ import { ContractorDialogComponent } from './views/products/browse-contractors/c
 import { BrowseProductionComponent } from './views/production/browse-production/browse-production.component';
 import { ChangeProductionUserDialogComponent } from './views/production/browse-production/change-production-user-dialog/change-production-user-dialog.component';
 import { ForecastingComponent } from './views/settings/forecasting/forecasting.component';
+import { ProductionInfoDialogComponent } from './views/production/browse-production/production-info-dialog/production-info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -103,7 +104,8 @@ import { ForecastingComponent } from './views/settings/forecasting/forecasting.c
     ContractorDialogComponent,
     BrowseProductionComponent,
     ChangeProductionUserDialogComponent,
-    ForecastingComponent
+    ForecastingComponent,
+    ProductionInfoDialogComponent
   ],
     imports: [
         BrowserModule,

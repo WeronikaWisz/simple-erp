@@ -1,5 +1,7 @@
 package com.simpleerp.simpleerpapp.services;
 
+import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
+import com.simpleerp.simpleerpapp.dtos.production.ProductionProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseProductQuantity;
 import com.simpleerp.simpleerpapp.enums.EType;
@@ -538,5 +540,44 @@ public class ProductsService {
 
     public List<Contractor> loadContractorsNames() {
         return contractorRepository.findAll();
+    }
+
+    public ProductProductionInfo getProductProduction(Long id) {
+        Product product = productRepository.findById(id).
+                orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        ProductProductionInfo productProductionInfo = new ProductProductionInfo(product.getCode(),
+                product.getName(), product.getUnit());
+        List<ProductionProductQuantity> productQuantityList = new ArrayList<>();
+        ProductProduction productProduction = productProductionRepository.findByProductCode(
+                product.getCode()).orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+        for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+            ProductionProductQuantity productionProductQuantity = new ProductionProductQuantity(
+                    productProductionProduct.getProduct().getCode(),
+                    productProductionProduct.getQuantity().toString());
+            productQuantityList.add(productionProductQuantity);
+        }
+        productProductionInfo.setProductSet(productQuantityList);
+
+        List<ProductStepDescription> productStepDescriptionList = new ArrayList<>();
+        for(ProductionStep productionStep: productProduction.getProductionSteps()){
+            ProductStepDescription productStepDescription = new ProductStepDescription(productionStep.getDescription());
+            productStepDescriptionList.add(productStepDescription);
+        }
+        productProductionInfo.setProductionSteps(productStepDescriptionList);
+        return productProductionInfo;
+    }
+
+    public List<ProductCode> loadProductList() {
+        List<Product> productList = productRepository.findAll();
+        List<ProductCode> productCodeList = new ArrayList<>();
+        for (Product product: productList){
+            ProductCode productCode = new ProductCode();
+            productCode.setId(product.getId());
+            productCode.setName(product.getName());
+            productCode.setCode(product.getCode());
+            productCode.setUnit(product.getUnit());
+            productCodeList.add(productCode);
+        }
+        return productCodeList;
     }
 }

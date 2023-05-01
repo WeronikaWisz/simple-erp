@@ -1,6 +1,7 @@
 package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
+import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
 import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.dtos.trade.ContractorName;
 import com.simpleerp.simpleerpapp.enums.EType;
@@ -126,6 +127,20 @@ public class ProductsController {
         List<ContractorName> contractorsNames = productsService.loadContractorsNames()
                 .stream().map(this::mapContractorToContractorName).collect(Collectors.toList());
         return ResponseEntity.ok(contractorsNames);
+    }
+
+    @GetMapping("/product-info/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getProductProduction(@PathVariable("id") Long id) {
+        ProductProductionInfo productProductionInfo = productsService.getProductProduction(id);
+        return ResponseEntity.ok(productProductionInfo);
+    }
+
+    @GetMapping("/only-products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadProductList() {
+        List<ProductCode> productCodeList = productsService.loadProductList();
+        return ResponseEntity.ok(productCodeList);
     }
 
     private ContractorName mapContractorToContractorName(Contractor contractor){

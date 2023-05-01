@@ -395,6 +395,12 @@
       "mark-error": "Cannot change status",
       "delegate-acceptance-error": "Cannot delegate acceptance",
       "delegate-release-error": "Cannot delegate release"
+    },
+    "product-info": {
+      "load-error": "Cannot load product production",
+      "info-title": "Production of product",
+      "products": "Materials",
+      "steps": "Production steps"
     }
   },
   "settings": {

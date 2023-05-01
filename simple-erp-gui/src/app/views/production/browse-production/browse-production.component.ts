@@ -16,6 +16,8 @@ import {AssignedUsersDialogComponent} from "../../warehouse/browse-delegated-tas
 import {EUnit} from "../../../enums/EUnit";
 import {ProductionService} from "../../../services/production.service";
 import {ChangeProductionUserDialogComponent} from "./change-production-user-dialog/change-production-user-dialog.component";
+import {AcceptanceInfoDialogComponent} from "../../warehouse/browse-acceptance/acceptance-info-dialog/acceptance-info-dialog.component";
+import {ProductionInfoDialogComponent} from "./production-info-dialog/production-info-dialog.component";
 
 @Component({
   selector: 'app-browse-production',
@@ -275,13 +277,13 @@ export class BrowseProductionComponent implements OnInit {
   }
 
   goToProductInfo(id: number) {
-    // this.dialog.open(ContractorDialogComponent, {
-    //   maxWidth: '650px',
-    //   data: {
-    //     id: id,
-    //     isFromTrade: true
-    //   }
-    // });
+    this.dialog.open(ProductionInfoDialogComponent, {
+      maxWidth: '650px',
+      data: {
+        id: id,
+        from: 'PRODUCTION'
+      }
+    });
   }
 
 }

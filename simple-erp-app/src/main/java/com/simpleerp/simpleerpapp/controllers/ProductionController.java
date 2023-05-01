@@ -2,6 +2,7 @@ package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
+import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.DelegateExternalAcceptance;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
@@ -123,4 +124,12 @@ public class ProductionController {
         AcceptanceDetails acceptance = productionService.getAcceptance(id);
         return ResponseEntity.ok(acceptance);
     }
+
+    @GetMapping("/product-info/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> getProductProduction(@PathVariable("id") Long id) {
+        ProductProductionInfo productProductionInfo = productionService.getProductProduction(id);
+        return ResponseEntity.ok(productProductionInfo);
+    }
+
 }
