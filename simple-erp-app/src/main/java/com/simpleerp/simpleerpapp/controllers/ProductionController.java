@@ -3,6 +3,7 @@ package com.simpleerp.simpleerpapp.controllers;
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
+import com.simpleerp.simpleerpapp.dtos.production.ProductionProductResponse;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.DelegateExternalAcceptance;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
@@ -125,11 +126,26 @@ public class ProductionController {
         return ResponseEntity.ok(acceptance);
     }
 
+    @GetMapping("/production-info/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> getProductionInfo(@PathVariable("id") Long id) {
+        ProductProductionInfo productProductionInfo = productionService.getProductionInfo(id);
+        return ResponseEntity.ok(productProductionInfo);
+    }
+
     @GetMapping("/product-info/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
-    public ResponseEntity<?> getProductProduction(@PathVariable("id") Long id) {
-        ProductProductionInfo productProductionInfo = productionService.getProductProduction(id);
+    public ResponseEntity<?> getProductInfo(@PathVariable("id") Long id) {
+        ProductProductionInfo productProductionInfo = productionService.getProductInfo(id);
         return ResponseEntity.ok(productProductionInfo);
+    }
+
+    @GetMapping("/production-products")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> loadProductionProducts(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
+        ProductionProductResponse productionProductResponse = productionService.loadProductionProducts(page, size);
+        return ResponseEntity.ok(productionProductResponse);
     }
 
 }

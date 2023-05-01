@@ -46,7 +46,7 @@ export class ProductionInfoDialogComponent implements OnInit {
 
   loadProduct(){
     if(this.data.from == 'PRODUCTION') {
-      this.productionService.getProductProduction(this.data.id)
+      this.productionService.getProductionInfo(this.data.id)
         .subscribe({
           next: (data) => {
             this.productProduction = data
@@ -63,6 +63,22 @@ export class ProductionInfoDialogComponent implements OnInit {
         })
     } else if(this.data.from == 'PRODUCTS'){
       this.productsService.getProductProduction(this.data.id)
+        .subscribe({
+          next: (data) => {
+            this.productProduction = data
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("production.product-info.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.data.from == 'PRODUCTION-PRODUCT'){
+      this.productionService.getProductInfo(this.data.id)
         .subscribe({
           next: (data) => {
             this.productProduction = data
@@ -118,7 +134,7 @@ export class ProductionInfoDialogComponent implements OnInit {
   }
 
   loadProductList(){
-    if(this.data.from == 'PRODUCTION') {
+    if(this.data.from == 'PRODUCTION' || this.data.from == 'PRODUCTION-PRODUCT') {
       this.productionService.loadProductList()
         .subscribe({
           next: (data) => {

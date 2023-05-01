@@ -9,6 +9,7 @@ import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
 import {ProductCode} from "../models/products/ProductCode";
 import {ProductProductionInfo} from "../models/production/ProductProductionInfo";
+import {ProductionProductResponse} from "../models/production/ProductionProductResponse";
 
 const PRODUCTION_API = 'http://localhost:8080/production/';
 
@@ -67,7 +68,15 @@ export class ProductionService {
     return this.http.get<ProductCode[]>(PRODUCTION_API + 'products');
   }
 
-  getProductProduction(id: number): Observable<ProductProductionInfo> {
+  getProductionInfo(id: number): Observable<ProductProductionInfo> {
+    return this.http.get<ProductProductionInfo>(PRODUCTION_API + 'production-info/' + id, httpOptions);
+  }
+
+  loadProductionProducts(pageIndex: number, pageSize: number): Observable<ProductionProductResponse> {
+    return this.http.get<ProductionProductResponse>(PRODUCTION_API + `production-products?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  getProductInfo(id: number): Observable<ProductProductionInfo> {
     return this.http.get<ProductProductionInfo>(PRODUCTION_API + 'product-info/' + id, httpOptions);
   }
 }

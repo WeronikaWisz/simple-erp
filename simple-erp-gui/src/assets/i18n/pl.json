@@ -404,6 +404,9 @@
       "info-title": "Proces produkcji produktu",
       "products": "Materiały",
       "steps": "Kroki produkcji"
+    },
+    "browse-production-product": {
+      "browse-title": "Produkowane produkty"
     }
   },
   "settings": {
@@ -461,6 +464,7 @@
     "browse-production": "Przeglądaj produkcję",
     "settings": "USTAWIENIA",
     "settings-l": "Ustawienia",
-    "forecasting": "Prognozowanie"
+    "forecasting": "Prognozowanie",
+    "browse-production-products": "Przeglądaj produkty"
   }
 }

@@ -19,6 +19,7 @@ import {AddContractorComponent} from "./views/products/add-contractor/add-contra
 import {BrowseContractorsComponent} from "./views/products/browse-contractors/browse-contractors.component";
 import {BrowseProductionComponent} from "./views/production/browse-production/browse-production.component";
 import {ForecastingComponent} from "./views/settings/forecasting/forecasting.component";
+import {BrowseProductionProductsComponent} from "./views/production/browse-production-products/browse-production-products.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -43,6 +44,7 @@ const routes: Routes = [
   { path: 'browse-purchases', component: BrowsePurchasesComponent },
   { path: 'browse-delegated-warehouse-task/:type', component: BrowseDelegatedWarehouseTaskComponent },
   { path: 'browse-production', component: BrowseProductionComponent },
+  { path: 'browse-production-products', component: BrowseProductionProductsComponent },
   { path: 'forecasting', component: ForecastingComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];

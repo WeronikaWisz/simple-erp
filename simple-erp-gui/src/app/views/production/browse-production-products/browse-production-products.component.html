@@ -1,0 +1,43 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
+  <div class="product-list-header">
+    <div>
+      <h2>{{ 'production.browse-production-product.browse-title' | translate}}</h2>
+      <p>{{ 'products.browse-product.product-count' | translate}}: {{productCount}}</p>
+    </div>
+  </div>
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="code">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.code' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.code}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.name' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="unit">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.unit' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{getUnit(element.unit)}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let row" class="action-buttons">
+        <button mat-icon-button (click)="goToProductInfo(row.productId)">
+          <mat-icon>build</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="totalProductsLength"
+                 [pageSize]="pageSize"
+                 [pageIndex]="pageIndex"
+                 [pageSizeOptions]="pageSizeOptions"
+                 (page)="pageChanged($event)">
+  </mat-paginator>
+</div>

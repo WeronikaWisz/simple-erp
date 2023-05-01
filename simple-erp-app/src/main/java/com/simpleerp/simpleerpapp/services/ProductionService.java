@@ -2,10 +2,10 @@ package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
+import com.simpleerp.simpleerpapp.dtos.production.ProductionProductListItem;
 import com.simpleerp.simpleerpapp.dtos.production.ProductionProductQuantity;
-import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.dtos.products.ProductQuantity;
-import com.simpleerp.simpleerpapp.dtos.products.ProductStepDescription;
+import com.simpleerp.simpleerpapp.dtos.production.ProductionProductResponse;
+import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
@@ -365,10 +365,19 @@ public class ProductionService {
         return acceptanceDetails;
     }
 
-    public ProductProductionInfo getProductProduction(Long id) {
+    public ProductProductionInfo getProductInfo(Long id) {
+        Product product = productRepository.findById(id).
+                orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        return getProductProduction(product);
+    }
+
+    public ProductProductionInfo getProductionInfo(Long id) {
         Production production = productionRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.productionNotFound"));
-        Product product = production.getProduct();
+        return getProductProduction(production.getProduct());
+    }
+
+    private ProductProductionInfo getProductProduction(Product product){
         ProductProductionInfo productProductionInfo = new ProductProductionInfo(product.getCode(),
                 product.getName(), product.getUnit());
         List<ProductionProductQuantity> productQuantityList = new ArrayList<>();
@@ -389,5 +398,31 @@ public class ProductionService {
         }
         productProductionInfo.setProductionSteps(productStepDescriptionList);
         return productProductionInfo;
+    }
+
+    public ProductionProductResponse loadProductionProducts(int page, int size) {
+        ProductionProductResponse productionProductResponse = new ProductionProductResponse();
+        List<Product> productList = productRepository.findByType(EType.PRODUCED)
+                .orElse(Collections.emptyList());
+        int total = productList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            productionProductResponse.setProductsList(productListToProductListItem(productList).stream()
+                    .sorted(Comparator.comparing(ProductionProductListItem::getCode))
+                    .collect(Collectors.toList()).subList(start, end));
+        }
+        productionProductResponse.setTotalProductsLength(total);
+        return productionProductResponse;
+    }
+
+    private List<ProductionProductListItem> productListToProductListItem(List<Product> productList) {
+        List<ProductionProductListItem> productionProductListItems = new ArrayList<>();
+        for(Product product: productList){
+            ProductionProductListItem productionProductListItem = new ProductionProductListItem(product.getId(),
+                   product.getCode(), product.getName(), product.getUnit());
+            productionProductListItems.add(productionProductListItem);
+        }
+        return productionProductListItems;
     }
 }

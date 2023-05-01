@@ -9,6 +9,9 @@
       <a mat-list-item href routerLink="browse-production" *ngIf="hasAdminRole() || hasProductionRole()"><mat-icon>dns</mat-icon>
         <span class="button-text">{{ 'nav.browse-production' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-production-products" *ngIf="hasAdminRole() || hasProductionRole()"><mat-icon>category</mat-icon>
+        <span class="button-text">{{ 'nav.browse-production-products' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="browse-delegated-warehouse-task/production" *ngIf="hasAdminRole() || hasProductionRole()"><mat-icon>filter_frames</mat-icon>
         <span class="button-text">{{ 'nav.browse-delegated-tasks' | translate}}</span>
       </a>
@@ -99,6 +102,9 @@
         <mat-menu #production="matMenu">
           <button mat-menu-item routerLink="browse-production">
             <mat-icon>dns</mat-icon> {{ 'nav.browse-production' | translate}}
+          </button>
+          <button mat-menu-item routerLink="browse-production-products">
+            <mat-icon>category</mat-icon> {{ 'nav.browse-production-products' | translate}}
           </button>
           <button mat-menu-item routerLink="browse-delegated-warehouse-task/production">
             <mat-icon>filter_frames</mat-icon> {{ 'nav.browse-delegated-tasks' | translate}}

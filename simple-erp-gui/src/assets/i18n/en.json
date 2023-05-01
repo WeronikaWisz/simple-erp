@@ -404,6 +404,9 @@
       "info-title": "Production of product",
       "products": "Materials",
       "steps": "Production steps"
+    },
+    "browse-production-product": {
+      "browse-title": "Produced product"
     }
   },
   "settings": {
@@ -461,6 +464,7 @@
     "browse-production": "Browse production",
     "settings": "SETTINGS",
     "settings-l": "Settings",
-    "forecasting": "Forecasting"
+    "forecasting": "Forecasting",
+    "browse-production-products": "Browse products"
   }
 }
