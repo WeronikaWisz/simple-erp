@@ -41,7 +41,7 @@ const routes: Routes = [
   { path: 'browse-acceptance', component: BrowseAcceptanceComponent },
   { path: 'browse-release', component: BrowseReleaseComponent },
   { path: 'browse-purchases', component: BrowsePurchasesComponent },
-  { path: 'browse-delegated-warehouse-task', component: BrowseDelegatedWarehouseTaskComponent },
+  { path: 'browse-delegated-warehouse-task/:type', component: BrowseDelegatedWarehouseTaskComponent },
   { path: 'browse-production', component: BrowseProductionComponent },
   { path: 'forecasting', component: ForecastingComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }

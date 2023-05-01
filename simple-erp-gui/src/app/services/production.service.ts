@@ -4,6 +4,10 @@ import {Observable} from "rxjs";
 import {DelegatedTasksResponse} from "../models/warehouse/DelegatedTasksResponse";
 import {UserName} from "../models/manage-users/UserName";
 import {UpdateAssignedUserRequest} from "../models/trade/UpdateAssignedUserRequest";
+import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptancesResponse";
+import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
+import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
+import {ProductCode} from "../models/products/ProductCode";
 
 const PRODUCTION_API = 'http://localhost:8080/production/';
 
@@ -44,5 +48,21 @@ export class ProductionService {
 
   updateAssignedUsers(updateAssignedUserRequest: UpdateAssignedUserRequest): Observable<any> {
     return this.http.put(PRODUCTION_API + 'assigned-user', JSON.stringify(updateAssignedUserRequest), httpOptions);
+  }
+
+  loadDelegatedTasks(task: string, pageIndex: number, pageSize: number): Observable<ReleasesAcceptancesResponse>{
+    return this.http.get<ReleasesAcceptancesResponse>(PRODUCTION_API + `delegated-tasks/${task}?page=${pageIndex}&size=${pageSize}`);
+  }
+
+  getRelease(id: number): Observable<ReleaseDetails> {
+    return this.http.get<ReleaseDetails>(PRODUCTION_API + 'release/' + id, httpOptions);
+  }
+
+  getAcceptance(id: number): Observable<AcceptanceDetails> {
+    return this.http.get<AcceptanceDetails>(PRODUCTION_API + 'acceptance/' + id, httpOptions);
+  }
+
+  loadProductList(): Observable<ProductCode[]> {
+    return this.http.get<ProductCode[]>(PRODUCTION_API + 'products');
   }
 }

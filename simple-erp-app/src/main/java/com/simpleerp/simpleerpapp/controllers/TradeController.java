@@ -45,6 +45,13 @@ public class TradeController {
         return ResponseEntity.ok(productCodeList);
     }
 
+    @GetMapping("/order-products")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> loadOrderProductList() {
+        List<ProductCode> productCodeList = tradeService.loadOrderProductList();
+        return ResponseEntity.ok(productCodeList);
+    }
+
     @PostMapping("/order")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> addOrder(@RequestBody AddOrderRequest addOrderRequest) {

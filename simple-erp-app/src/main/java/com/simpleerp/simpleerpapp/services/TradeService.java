@@ -65,7 +65,7 @@ public class TradeService {
         this.messageSource = messageSource;
     }
 
-    public List<ProductCode> loadProductList() {
+    public List<ProductCode> loadOrderProductList() {
         List<Product> productList = productRepository.findAll();
         List<ProductSet> productSetList = productSetRepository.findAll();
         List<ProductCode> productCodeList = new ArrayList<>();
@@ -86,6 +86,20 @@ public class TradeService {
             productCode.setName(productSet.getName());
             productCode.setCode(productSet.getCode());
             productCode.setUnit(EUnit.PIECES);
+            productCodeList.add(productCode);
+        }
+        return productCodeList;
+    }
+
+    public List<ProductCode> loadProductList() {
+        List<Product> productList = productRepository.findAll();
+        List<ProductCode> productCodeList = new ArrayList<>();
+        for (Product product: productList){
+            ProductCode productCode = new ProductCode();
+            productCode.setId(product.getId());
+            productCode.setName(product.getName());
+            productCode.setCode(product.getCode());
+            productCode.setUnit(product.getUnit());
             productCodeList.add(productCode);
         }
         return productCodeList;

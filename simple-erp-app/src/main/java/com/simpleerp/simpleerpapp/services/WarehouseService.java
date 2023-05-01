@@ -481,9 +481,6 @@ public class WarehouseService {
         List<Product> productList = productRepository.findAll();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
-//            if(product.getSalePrice() == null){
-//                continue;
-//            }
             ProductCode productCode = new ProductCode();
             productCode.setId(product.getId());
             productCode.setName(product.getName());

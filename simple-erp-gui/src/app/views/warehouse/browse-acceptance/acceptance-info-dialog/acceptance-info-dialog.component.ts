@@ -6,11 +6,11 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {TradeService} from "../../../../services/trade.service";
 import {WarehouseService} from "../../../../services/warehouse.service";
 import {TranslateService} from "@ngx-translate/core";
-import {TokenStorageService} from "../../../../services/token-storage.service";
 import Swal from "sweetalert2";
 import {EUnit} from "../../../../enums/EUnit";
 import {AcceptanceDetails} from "../../../../models/warehouse/AcceptanceDetails";
-import {AcceptanceDialogData} from "../../../../models/warehouse/AcceptanceDialogData";
+import {ReleaseAcceptanceDialogData} from "../../../../models/warehouse/ReleaseAcceptanceDialogData";
+import {ProductionService} from "../../../../services/production.service";
 
 @Component({
   selector: 'app-acceptance-info-dialog',
@@ -51,8 +51,9 @@ export class AcceptanceInfoDialogComponent implements OnInit {
   }
   constructor(
     public dialogRef: MatDialogRef<AcceptanceInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: AcceptanceDialogData, private tradeService: TradeService,
-    private warehouseService: WarehouseService, private translate: TranslateService
+    @Inject(MAT_DIALOG_DATA) public data: ReleaseAcceptanceDialogData, private tradeService: TradeService,
+    private warehouseService: WarehouseService, private translate: TranslateService,
+    private productionService: ProductionService
   ) {
     dialogRef.disableClose = true;
 
@@ -83,6 +84,22 @@ export class AcceptanceInfoDialogComponent implements OnInit {
         })
     } else if(this.data.from == 'TRADE') {
       this.tradeService.getAcceptance(this.data.id)
+        .subscribe({
+          next: (data) => {
+            this.acceptance = data
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("trade.add-order.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.data.from == 'PRODUCTION') {
+      this.productionService.getAcceptance(this.data.id)
         .subscribe({
           next: (data) => {
             this.acceptance = data
@@ -157,6 +174,23 @@ export class AcceptanceInfoDialogComponent implements OnInit {
         })
     } else if(this.data.from == 'TRADE') {
       this.tradeService.loadProductList()
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.productList = data;
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("products.add-product.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.data.from == 'PRODUCTION') {
+      this.productionService.loadProductList()
         .subscribe({
           next: (data) => {
             console.log(data);

@@ -118,7 +118,7 @@ export class AddOrderComponent implements OnInit {
   }
 
   loadProductForSetList(){
-    this.tradeService.loadProductList()
+    this.tradeService.loadOrderProductList()
       .subscribe({
         next: (data) => {
           console.log(data);

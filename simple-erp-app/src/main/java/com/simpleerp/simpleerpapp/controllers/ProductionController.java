@@ -2,10 +2,15 @@ package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
+import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.DelegateExternalAcceptance;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
+import com.simpleerp.simpleerpapp.dtos.warehouse.AcceptanceDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
+import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseDetails;
+import com.simpleerp.simpleerpapp.dtos.warehouse.ReleasesAcceptancesResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.ETask;
 import com.simpleerp.simpleerpapp.services.ProductionService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +92,35 @@ public class ProductionController {
         productionService.updateAssignedUser(updateAssignedUserRequest);
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.assignedUserUpdate", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/delegated-tasks/{task}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> loadDelegatedTasks(@PathVariable("task") ETask task,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = productionService.loadDelegatedTasks(task, page, size);
+        return ResponseEntity.ok(releasesAcceptancesResponse);
+    }
+
+    @GetMapping("/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> loadProductList() {
+        List<ProductCode> productCodeList = productionService.loadProductList();
+        return ResponseEntity.ok(productCodeList);
+    }
+
+    @GetMapping("/release/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> getRelease(@PathVariable("id") Long id) {
+        ReleaseDetails release = productionService.getRelease(id);
+        return ResponseEntity.ok(release);
+    }
+
+    @GetMapping("/acceptance/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_PRODUCTION')")
+    public ResponseEntity<?> getAcceptance(@PathVariable("id") Long id) {
+        AcceptanceDetails acceptance = productionService.getAcceptance(id);
+        return ResponseEntity.ok(acceptance);
     }
 }

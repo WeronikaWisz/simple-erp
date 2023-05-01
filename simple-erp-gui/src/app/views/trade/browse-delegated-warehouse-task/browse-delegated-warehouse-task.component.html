@@ -1,7 +1,7 @@
 <div class="content mat-elevation-z8" *ngIf="isLoggedIn && hasPermissions">
   <h2>{{ 'trade.browse-delegated-warehouse-task.browse-title' | translate}}</h2>
   <p>{{ 'trade.browse-delegated-warehouse-task.task-count' | translate}}: {{taskCount}}</p>
-  <mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="onTabChange($event)">
     <mat-tab label="{{ 'trade.browse-delegated-warehouse-task.releases' | translate}}">
       <ng-template *ngTemplateOutlet="taskListTemplate; context: {$implicit: dataSource}"></ng-template>
     </mat-tab>

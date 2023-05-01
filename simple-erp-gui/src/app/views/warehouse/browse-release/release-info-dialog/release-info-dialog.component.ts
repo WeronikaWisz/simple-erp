@@ -12,6 +12,8 @@ import {EStatus} from "../../../../enums/EStatus";
 import {TradeService} from "../../../../services/trade.service";
 import {TokenStorageService} from "../../../../services/token-storage.service";
 import {ERole} from "../../../../enums/ERole";
+import {ReleaseAcceptanceDialogData} from "../../../../models/warehouse/ReleaseAcceptanceDialogData";
+import {ProductionService} from "../../../../services/production.service";
 
 @Component({
   selector: 'app-release-info-dialog',
@@ -22,14 +24,11 @@ export class ReleaseInfoDialogComponent implements OnInit {
 
   dataChanged = false;
 
-  hasWarehouseRole = false;
-  hasTradeRole = false;
-
   productList: ProductCode[] = [];
   units: Unit[] = [];
 
   release: ReleaseDetails = {
-    id: this.data,
+    id: this.data.id,
     name: '',
     surname: '',
     email: '',
@@ -49,33 +48,23 @@ export class ReleaseInfoDialogComponent implements OnInit {
   }
   constructor(
     public dialogRef: MatDialogRef<ReleaseInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: number, private tradeService: TradeService,
+    @Inject(MAT_DIALOG_DATA) public data: ReleaseAcceptanceDialogData, private tradeService: TradeService,
     private warehouseService: WarehouseService, private translate: TranslateService,
-    private tokenStorage: TokenStorageService
+    private productionService: ProductionService
   ) {
     dialogRef.disableClose = true;
 
   }
 
   ngOnInit(): void {
-    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_ADMIN]))){
-      this.hasWarehouseRole = true;
-      this.hasTradeRole = true;
-    }
-    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_WAREHOUSE]))){
-      this.hasWarehouseRole = true;
-    }
-    if(this.tokenStorage.getUser() && (this.tokenStorage.getUser().roles.includes(ERole[ERole.ROLE_TRADE]))){
-      this.hasTradeRole = true;
-    }
     this.loadUnits();
     this.loadProductForSetList();
     this.loadRelease();
   }
 
   loadRelease(){
-    if(this.hasWarehouseRole) {
-      this.warehouseService.getRelease(this.data)
+    if(this.data.from == 'WAREHOUSE') {
+      this.warehouseService.getRelease(this.data.id)
         .subscribe({
           next: (data) => {
             this.release = data
@@ -90,8 +79,24 @@ export class ReleaseInfoDialogComponent implements OnInit {
             })
           }
         })
-    } else if(this.hasTradeRole) {
-      this.tradeService.getRelease(this.data)
+    } else if(this.data.from == 'TRADE') {
+      this.tradeService.getRelease(this.data.id)
+        .subscribe({
+          next: (data) => {
+            this.release = data
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("trade.add-order.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.data.from == 'PRODUCTION') {
+      this.productionService.getRelease(this.data.id)
         .subscribe({
           next: (data) => {
             this.release = data
@@ -147,7 +152,7 @@ export class ReleaseInfoDialogComponent implements OnInit {
   }
 
   loadProductForSetList(){
-    if(this.hasWarehouseRole) {
+    if(this.data.from == 'WAREHOUSE') {
       this.warehouseService.loadProductList()
         .subscribe({
           next: (data) => {
@@ -164,8 +169,25 @@ export class ReleaseInfoDialogComponent implements OnInit {
             })
           }
         })
-    } else if(this.hasTradeRole) {
+    } else if(this.data.from == 'TRADE') {
       this.tradeService.loadProductList()
+        .subscribe({
+          next: (data) => {
+            console.log(data);
+            this.productList = data;
+          },
+          error: (err) => {
+            Swal.fire({
+              position: 'top-end',
+              title: this.getTranslateMessage("products.add-product.load-error"),
+              text: err.error.message,
+              icon: 'error',
+              showConfirmButton: false
+            })
+          }
+        })
+    } else if(this.data.from == 'PRODUCTION') {
+      this.productionService.loadProductList()
         .subscribe({
           next: (data) => {
             console.log(data);

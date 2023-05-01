@@ -119,7 +119,7 @@ export class WarehouseService {
     return this.http.get<ForecastingActive>(SUPPLIES_API + `forecast/active/product/stock/${id}`);
   }
 
-  checkTaskForecastingState(type: EType, id: number): Observable<ForecastingActive> {
+  checkTaskForecastingState(type: string, id: number): Observable<ForecastingActive> {
     return this.http.get<ForecastingActive>(SUPPLIES_API + `forecast/active/product/task/${type}/${id}`);
   }
 
@@ -127,7 +127,7 @@ export class WarehouseService {
     return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/stock/${id}`);
   }
 
-  suggestProductTaskQuantity(type: EType, id: number): Observable<ProductQuantity> {
+  suggestProductTaskQuantity(type: string, id: number): Observable<ProductQuantity> {
     return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/task/${type}/${id}`);
   }
 }

@@ -1,24 +1,23 @@
 package com.simpleerp.simpleerpapp.services;
 
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
+import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
-import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTaskListItem;
-import com.simpleerp.simpleerpapp.dtos.warehouse.DelegatedTasksResponse;
-import com.simpleerp.simpleerpapp.enums.EDirection;
-import com.simpleerp.simpleerpapp.enums.ERole;
-import com.simpleerp.simpleerpapp.enums.EStatus;
-import com.simpleerp.simpleerpapp.enums.ETask;
+import com.simpleerp.simpleerpapp.dtos.warehouse.*;
+import com.simpleerp.simpleerpapp.enums.*;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -230,5 +229,135 @@ public class ProductionService {
         UserDetailsI userDetails = (UserDetailsI) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userDetails.getUsername();
+    }
+
+    public ReleasesAcceptancesResponse loadDelegatedTasks(ETask task, int page, int size) {
+        if(task.equals(ETask.TASK_INTERNAL_RELEASE)){
+            return loadReleases(page, size);
+        } else {
+            return loadAcceptances(page, size);
+        }
+    }
+
+    public ReleasesAcceptancesResponse loadReleases(int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Release> releaseList = this.releaseRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
+                        EDirection.INTERNAL)
+                .orElse(Collections.emptyList());
+        int total = releaseList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(releaseListToReleaseListItem(releaseList.stream()
+                    .sorted(Comparator.comparing(Release::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    private List<ReleaseAcceptanceListItem> releaseListToReleaseListItem(List<Release> releases){
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
+        for(Release release: releases){
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(release.getId(), release.getNumber(),
+                    release.getProduction().getNumber(),
+                    release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    release.getDirection(), release.getRequestingUser().getId(),
+                    release.getRequestingUser().getName() + " " + release.getRequestingUser().getSurname(),
+                    release.getAssignedUser().getName() + " " + release.getAssignedUser().getSurname(),
+                    release.getAssignedUser().getId(), release.getStatus());
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
+        }
+        return releaseListItemAcceptanceList;
+    }
+
+    public ReleasesAcceptancesResponse loadAcceptances(int page, int size) {
+        ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
+                        EDirection.INTERNAL)
+                .orElse(Collections.emptyList());
+        int total = acceptanceList.size();
+        int start = page * size;
+        int end = Math.min(start + size, total);
+        if(end >= start) {
+            releasesAcceptancesResponse.setReleasesList(acceptanceListToAcceptanceListItem(acceptanceList.stream()
+                    .sorted(Comparator.comparing(Acceptance::getCreationDate)).collect(Collectors.toList())
+                    .subList(start, end)));
+        }
+        releasesAcceptancesResponse.setTotalTasksLength(total);
+        return releasesAcceptancesResponse;
+    }
+
+    private List<ReleaseAcceptanceListItem> acceptanceListToAcceptanceListItem(List<Acceptance> acceptances) {
+        List<ReleaseAcceptanceListItem> releaseListItemAcceptanceList = new ArrayList<>();
+        for(Acceptance acceptance: acceptances){
+            ReleaseAcceptanceListItem releaseAcceptanceListItem = new ReleaseAcceptanceListItem(acceptance.getId(),
+                    acceptance.getNumber(), acceptance.getProduction().getNumber(),
+                    acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                    acceptance.getDirection(), acceptance.getRequestingUser().getId(),
+                    acceptance.getRequestingUser().getName() + " " + acceptance.getRequestingUser().getSurname(),
+                    acceptance.getAssignedUser().getName() + " " + acceptance.getAssignedUser().getSurname(),
+                    acceptance.getAssignedUser().getId(), acceptance.getStatus());
+            releaseListItemAcceptanceList.add(releaseAcceptanceListItem);
+        }
+        return releaseListItemAcceptanceList;
+    }
+
+    public List<ProductCode> loadProductList() {
+        List<Product> productList = productRepository.findAll();
+        List<ProductCode> productCodeList = new ArrayList<>();
+        for (Product product: productList){
+            ProductCode productCode = new ProductCode();
+            productCode.setId(product.getId());
+            productCode.setName(product.getName());
+            productCode.setCode(product.getCode());
+            productCode.setUnit(product.getUnit());
+            productCodeList.add(productCode);
+        }
+        return productCodeList;
+    }
+
+    public ReleaseDetails getRelease(Long id) {
+        Release release = releaseRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.releaseNotFound"));
+        ReleaseDetails releaseDetails = new ReleaseDetails(release.getId(), release.getNumber(),
+                release.getProduction().getNumber(),
+                release.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                release.getExecutionDate() != null ?
+                        release.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                release.getDirection(), release.getRequestingUser().getName(),
+                release.getRequestingUser().getSurname(), release.getRequestingUser().getEmail(),
+                release.getRequestingUser().getPhone());
+        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+        ProductProduction productProduction = productProductionRepository.findByProductCode(
+                        release.getProduction().getProduct().getCode())
+                .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+        for(ProductProductionProducts productProductionProduct: productProduction.getProductProductionProducts()){
+            ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                    productProductionProduct.getProduct().getCode(),
+                    (productProductionProduct.getQuantity().multiply(release.getProduction().getQuantity()))
+                            .setScale(2, RoundingMode.HALF_UP).toString(),
+                    true);
+            releaseProductQuantityList.add(releaseProductQuantity);
+        }
+        releaseDetails.setProductSet(releaseProductQuantityList);
+        return releaseDetails;
+    }
+
+    public AcceptanceDetails getAcceptance(Long id) {
+        Acceptance acceptance = acceptanceRepository.findById(id)
+                .orElseThrow(() -> new ApiNotFoundException("exception.acceptanceNotFound"));
+        AcceptanceDetails acceptanceDetails = new AcceptanceDetails(acceptance.getId(), acceptance.getNumber(),
+                acceptance.getProduction().getNumber(), acceptance.getCreationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                acceptance.getExecutionDate() != null ?
+                        acceptance.getExecutionDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "",
+                acceptance.getDirection(), acceptance.getRequestingUser().getName(), acceptance.getRequestingUser().getSurname(),
+                acceptance.getRequestingUser().getEmail(), acceptance.getRequestingUser().getPhone());
+        List<ReleaseProductQuantity> releaseProductQuantityList = new ArrayList<>();
+        ReleaseProductQuantity releaseProductQuantity = new ReleaseProductQuantity(
+                acceptance.getProduction().getProduct().getCode(), acceptance.getProduction().getQuantity().toString());
+        releaseProductQuantityList.add(releaseProductQuantity);
+        acceptanceDetails.setProductSet(releaseProductQuantityList);
+        return acceptanceDetails;
     }
 }

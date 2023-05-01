@@ -31,6 +31,10 @@ export class TradeService {
     return this.http.get<ProductCode[]>(TRADE_API + 'products');
   }
 
+  loadOrderProductList(): Observable<ProductCode[]> {
+    return this.http.get<ProductCode[]>(TRADE_API + 'order-products');
+  }
+
   addOrder(addOrderRequest: AddOrderRequest): Observable<any> {
     console.log(JSON.stringify(addOrderRequest));
     return this.http.post(TRADE_API + 'order', JSON.stringify(addOrderRequest), httpOptions);

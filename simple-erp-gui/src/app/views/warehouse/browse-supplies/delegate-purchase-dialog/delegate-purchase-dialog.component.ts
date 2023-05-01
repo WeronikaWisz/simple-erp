@@ -87,7 +87,7 @@ export class DelegatePurchaseDialogComponent implements OnInit {
           }
         })
     } else {
-      this.suppliesService.checkTaskForecastingState(this.type, this.data.taskId!)
+      this.suppliesService.checkTaskForecastingState(EType[this.type], this.data.taskId!)
         .subscribe({
           next: (data) => {
             console.log(data);
@@ -257,7 +257,7 @@ export class DelegatePurchaseDialogComponent implements OnInit {
           }
         })
     } else {
-      this.suppliesService.suggestProductTaskQuantity(this.type, this.data.taskId!)
+      this.suppliesService.suggestProductTaskQuantity(EType[this.type], this.data.taskId!)
         .subscribe({
           next: (data) => {
             console.log(data);

@@ -171,7 +171,10 @@ export class BrowseReleaseComponent implements OnInit {
   goToTaskInfo(id: number) {
     this.dialog.open(ReleaseInfoDialogComponent, {
       maxWidth: '650px',
-      data: id
+      data: {
+        id: id,
+        from: 'WAREHOUSE'
+      }
     });
   }
 

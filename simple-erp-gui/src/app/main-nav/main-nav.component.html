@@ -9,6 +9,9 @@
       <a mat-list-item href routerLink="browse-production" *ngIf="hasAdminRole() || hasProductionRole()"><mat-icon>dns</mat-icon>
         <span class="button-text">{{ 'nav.browse-production' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="browse-delegated-warehouse-task/production" *ngIf="hasAdminRole() || hasProductionRole()"><mat-icon>filter_frames</mat-icon>
+        <span class="button-text">{{ 'nav.browse-delegated-tasks' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade' | translate}}</h2>
       <a mat-list-item href routerLink="browse-orders" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list</mat-icon>
         <span class="button-text">{{ 'nav.browse-orders' | translate}}</span>
@@ -19,7 +22,7 @@
       <a mat-list-item href routerLink="browse-purchases" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list_alt</mat-icon>
         <span class="button-text">{{ 'nav.browse-purchases' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="browse-delegated-warehouse-task" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>filter_frames</mat-icon>
+      <a mat-list-item href routerLink="browse-delegated-warehouse-task/trade" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>filter_frames</mat-icon>
         <span class="button-text">{{ 'nav.browse-delegated-tasks' | translate}}</span>
       </a>
       <h2 matSubheader *ngIf="hasAdminRole() || hasWarehouseRole()">{{ 'nav.warehouse' | translate}}</h2>
@@ -97,6 +100,9 @@
           <button mat-menu-item routerLink="browse-production">
             <mat-icon>dns</mat-icon> {{ 'nav.browse-production' | translate}}
           </button>
+          <button mat-menu-item routerLink="browse-delegated-warehouse-task/production">
+            <mat-icon>filter_frames</mat-icon> {{ 'nav.browse-delegated-tasks' | translate}}
+          </button>
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="trade" *ngIf="hasAdminRole() || hasTradeRole()">{{ 'nav.trade-l' | translate}}</button>
         <mat-menu #trade="matMenu">
@@ -109,7 +115,7 @@
           <button mat-menu-item routerLink="browse-purchases">
             <mat-icon>list_alt</mat-icon> {{ 'nav.browse-purchases' | translate}}
           </button>
-          <button mat-menu-item routerLink="browse-delegated-warehouse-task">
+          <button mat-menu-item routerLink="browse-delegated-warehouse-task/trade">
             <mat-icon>filter_frames</mat-icon> {{ 'nav.browse-delegated-tasks' | translate}}
           </button>
         </mat-menu>
