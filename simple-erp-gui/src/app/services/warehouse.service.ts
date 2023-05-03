@@ -123,11 +123,11 @@ export class WarehouseService {
     return this.http.get<ForecastingActive>(SUPPLIES_API + `forecast/active/product/task/${type}/${id}`);
   }
 
-  suggestProductStockQuantity(id: number): Observable<ProductQuantity> {
-    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/stock/${id}`);
+  suggestProductStockQuantity(id: number, days: number): Observable<ProductQuantity> {
+    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/stock/${id}?days=${days}`);
   }
 
-  suggestProductTaskQuantity(type: string, id: number): Observable<ProductQuantity> {
-    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/task/${type}/${id}`);
+  suggestProductTaskQuantity(type: string, id: number, days: number): Observable<ProductQuantity> {
+    return this.http.get<ProductQuantity>(SUPPLIES_API + `forecast/quantity/product/task/${type}/${id}?days=${days}`);
   }
 }

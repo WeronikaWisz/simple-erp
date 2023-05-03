@@ -240,7 +240,7 @@ export class DelegatePurchaseDialogComponent implements OnInit {
 
   suggestQuantity() {
     if(!this.isEditView) {
-      this.suppliesService.suggestProductStockQuantity(this.data.stockLevelId!)
+      this.suppliesService.suggestProductStockQuantity(this.data.stockLevelId!, this.form.get('days')?.value)
         .subscribe({
           next: (data) => {
             console.log(data);
@@ -257,7 +257,7 @@ export class DelegatePurchaseDialogComponent implements OnInit {
           }
         })
     } else {
-      this.suppliesService.suggestProductTaskQuantity(EType[this.type], this.data.taskId!)
+      this.suppliesService.suggestProductTaskQuantity(EType[this.type], this.data.taskId!, this.form.get('days')?.value)
         .subscribe({
           next: (data) => {
             console.log(data);

@@ -26,4 +26,12 @@ public class ForecastingProperties {
 
     private LocalDateTime creationDate;
     private Boolean isValid;
+
+    public ForecastingProperties(String code, String name, String value, LocalDateTime creationDate, Boolean isValid) {
+        this.code = code;
+        this.name = name;
+        this.value = value;
+        this.creationDate = creationDate;
+        this.isValid = isValid;
+    }
 }

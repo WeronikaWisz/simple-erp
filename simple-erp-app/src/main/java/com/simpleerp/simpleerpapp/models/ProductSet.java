@@ -29,6 +29,8 @@ public class ProductSet {
     @OneToMany(mappedBy = "productSet")
     List<ProductSetProducts> productsSets = new ArrayList<>();
 
+    private String forecastingMapping;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 

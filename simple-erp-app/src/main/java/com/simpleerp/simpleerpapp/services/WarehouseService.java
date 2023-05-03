@@ -1,5 +1,6 @@
 package com.simpleerp.simpleerpapp.services;
 
+import com.simpleerp.simpleerpapp.dtos.forecasting.DailyForecastAmount;
 import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
@@ -12,6 +13,8 @@ import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -43,14 +46,22 @@ public class WarehouseService {
     private final AcceptanceRepository acceptanceRepository;
     private final ProductionRepository productionRepository;
     private final ProductProductionRepository productProductionRepository;
+    private final ProductForecastingRepository productForecastingRepository;
+    private final ProductSetProductsRepository productSetProductsRepository;
+    private final ProductProductionProductsRepository productProductionProductsRepository;
     private final MessageSource messageSource;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WarehouseService.class);
 
     @Autowired
     public WarehouseService(StockLevelRepository stockLevelRepository, PurchaseRepository purchaseRepository,
                             UserRepository userRepository, TaskRepository taskRepository, MessageSource messageSource,
                             ReleaseRepository releaseRepository, ProductRepository productRepository,
                             AcceptanceRepository acceptanceRepository, ProductionRepository productionRepository,
-                            ProductProductionRepository productProductionRepository) {
+                            ProductProductionRepository productProductionRepository,
+                            ProductForecastingRepository productForecastingRepository,
+                            ProductSetProductsRepository productSetProductsRepository,
+                            ProductProductionProductsRepository productProductionProductsRepository) {
         this.stockLevelRepository = stockLevelRepository;
         this.purchaseRepository = purchaseRepository;
         this.userRepository = userRepository;
@@ -61,6 +72,9 @@ public class WarehouseService {
         this.acceptanceRepository = acceptanceRepository;
         this.productionRepository= productionRepository;
         this.productProductionRepository = productProductionRepository;
+        this.productForecastingRepository = productForecastingRepository;
+        this.productSetProductsRepository = productSetProductsRepository;
+        this.productProductionProductsRepository = productProductionProductsRepository;
     }
 
 
@@ -705,6 +719,7 @@ public class WarehouseService {
         return acceptanceDetails;
     }
 
+//    TODO - jesli produkt nie sprzedawany to nie ma mapowania, patrzec po skladzie, do tego ponizej tez
     public ForecastingActive checkProductForecastingState(Long id) {
         StockLevel stockLevel = stockLevelRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
@@ -713,7 +728,7 @@ public class WarehouseService {
                 && !stockLevel.getProduct().getForecastingMapping().isEmpty());
         return forecastingActive;
     }
-
+//    TODO
     public ForecastingActive checkTaskForecastingState(EType type, Long id) {
         Product product;
         if(EType.PRODUCED.equals(type)){
@@ -731,21 +746,17 @@ public class WarehouseService {
         return forecastingActive;
     }
 
-//    TODO
-    public ProductQuantity suggestProductStockQuantity(Long id) {
+    public ProductQuantity suggestProductStockQuantity(Long id, int days) {
         StockLevel stockLevel = stockLevelRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
         Product product = stockLevel.getProduct();
 
-        ProductQuantity productQuantity = new ProductQuantity();
-        productQuantity.setProduct(product.getId());
-        return productQuantity;
+        return suggestProductQuantity(product, stockLevel, days);
     }
 
-//    TODO
-    public ProductQuantity suggestProductTaskQuantity(EType type, Long id) {
+    public ProductQuantity suggestProductTaskQuantity(EType type, Long id, int days) {
         Product product;
-        if(EType.PRODUCED.equals(type)){
+        if (EType.PRODUCED.equals(type)) {
             Production production = productionRepository.findById(id)
                     .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
             product = production.getProduct();
@@ -757,8 +768,63 @@ public class WarehouseService {
         StockLevel stockLevel = stockLevelRepository.findByProduct(product)
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
 
+        return suggestProductQuantity(product, stockLevel, days);
+    }
+
+    private ProductQuantity suggestProductQuantity(Product product, StockLevel stockLevel, int days){
+        double productForecastForDays = getProductForecastForDays(product, days);
+        BigDecimal suggestedAmount;
+        if (BigDecimal.valueOf(productForecastForDays).compareTo(stockLevel.getQuantity()) > 0) {
+            suggestedAmount = (BigDecimal.valueOf(productForecastForDays)).subtract(stockLevel.getQuantity());
+        } else {
+            suggestedAmount = BigDecimal.ZERO;
+        }
+
         ProductQuantity productQuantity = new ProductQuantity();
         productQuantity.setProduct(product.getId());
+        if (product.getUnit().equals(EUnit.PIECES)){
+            productQuantity.setQuantity(String.format("%.0f", suggestedAmount));
+        } else {
+            productQuantity.setQuantity(String.format("%.2f", suggestedAmount));
+        }
         return productQuantity;
+    }
+
+    private double getProductForecastForDays(Product product, int days){
+        double quantity = 0;
+        if(product.getSalePrice() != null && product.getForecastingMapping() != null){
+            quantity += getProductForecastQuantity(product.getCode(), days);
+        }
+
+        Optional<List<ProductSetProducts>> productSetProducts = productSetProductsRepository.findByProduct(product);
+        if(productSetProducts.isPresent() && !productSetProducts.get().isEmpty()){
+            for (ProductSetProducts productSetProduct: productSetProducts.get()) {
+                quantity += getProductForecastQuantity(productSetProduct.getProductSet().getCode(), days)
+                        * productSetProduct.getQuantity().doubleValue();
+            }
+        }
+
+        Optional<List<ProductProductionProducts>> productProductionProducts = productProductionProductsRepository
+                .findByProduct(product);
+        if(productProductionProducts.isPresent() && !productProductionProducts.get().isEmpty()){
+            for (ProductProductionProducts productProductionProduct: productProductionProducts.get()) {
+                quantity += getProductForecastQuantity(productProductionProduct.getProductProduction().getProductCode(), days)
+                        * productProductionProduct.getQuantity().doubleValue();
+            }
+        }
+
+        return quantity;
+    }
+
+    private double getProductForecastQuantity(String code, int days){
+        double quantity = 0;
+        ProductForecasting productForecasting = productForecastingRepository.findByProductCode(code)
+                .orElseThrow(() -> new ApiExpectationFailedException("exception.forecastingProductCode"));
+        List<String> forecastForDays = productForecasting.getDailyForecast().getDailyForecastAmountList().subList(0, days)
+                .stream().map(DailyForecastAmount::getAmount).collect(Collectors.toList());
+        for (String amount: forecastForDays) {
+            quantity += Double.parseDouble(amount);
+        }
+        return quantity;
     }
 }

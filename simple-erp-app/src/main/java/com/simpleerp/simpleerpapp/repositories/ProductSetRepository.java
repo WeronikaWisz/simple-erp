@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ProductSetRepository extends JpaRepository<ProductSet, Long> {
     Optional<ProductSet> findByCode(String code);
+    Optional<ProductSet> findByForecastingMapping(String mapping);
 }

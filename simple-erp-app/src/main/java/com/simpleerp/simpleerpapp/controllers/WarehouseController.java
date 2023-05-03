@@ -226,16 +226,18 @@ public class WarehouseController {
 
     @GetMapping("/forecast/quantity/product/stock/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
-    public ResponseEntity<?> suggestProductStockQuantity(@PathVariable("id") Long id) {
-        ProductQuantity productQuantity = warehouseService.suggestProductStockQuantity(id);
+    public ResponseEntity<?> suggestProductStockQuantity(@PathVariable("id") Long id,
+                                                         @RequestParam(defaultValue = "0") int days) {
+        ProductQuantity productQuantity = warehouseService.suggestProductStockQuantity(id, days);
         return ResponseEntity.ok(productQuantity);
     }
 
     @GetMapping("/forecast/quantity/product/task/{type}/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_WAREHOUSE')")
     public ResponseEntity<?> suggestProductTaskQuantity(@PathVariable("type") EType type,
-                                                       @PathVariable("id") Long id) {
-        ProductQuantity productQuantity = warehouseService.suggestProductTaskQuantity(type, id);
+                                                        @PathVariable("id") Long id,
+                                                        @RequestParam(defaultValue = "0") int days) {
+        ProductQuantity productQuantity = warehouseService.suggestProductTaskQuantity(type, id, days);
         return ResponseEntity.ok(productQuantity);
     }
 

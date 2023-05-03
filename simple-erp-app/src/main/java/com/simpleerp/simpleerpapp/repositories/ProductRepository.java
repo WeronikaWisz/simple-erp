@@ -14,4 +14,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByCode(String code);
     Optional<List<Product>> findByContractor(Contractor contractor);
     Optional<List<Product>> findByType(EType type);
+    Optional<Product> findByForecastingMapping(String mapping);
 }
