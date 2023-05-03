@@ -345,7 +345,7 @@
       "number": "Numer",
       "customer": "Kupujący",
       "date": "Data zamówienia",
-      "price": "Koszt",
+      "price": "Kwota",
       "assigned-user": "Osoba przypisana",
       "load-error": "Nie udało się załadować zamówień",
       "delete-error": "Nie udało się usunąć zamówienia",

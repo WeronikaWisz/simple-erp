@@ -345,7 +345,7 @@
       "number": "Number",
       "customer": "Customer",
       "date": "Order date",
-      "price": "Price",
+      "price": "Amount",
       "assigned-user": "Assigned user",
       "load-error": "Cannot load orders",
       "delete-error": "Cannot delete order",
