@@ -105,10 +105,10 @@ public class WarehouseService {
             } else if(stockLevel.getProduct().getType().equals(EType.PRODUCED) && productionTaskDelegated(stockLevel.getProduct())) {
                 suppliesListItem.setMessage(messageSource.getMessage(
                         "message.productionDelegated", null, LocaleContextHolder.getLocale()));
-            } else {
-//                 TODO here will be message that supplies end in a few days
-                suppliesListItem.setMessage("");
-//                suppliesListItem.setWarningMessage(true);
+            } else if (checkIfProductForecastingActive(stockLevel.getProduct()) && checkIfConsiderRestocking(stockLevel)) {
+                suppliesListItem.setMessage(messageSource.getMessage(
+                        "message.restock", null, LocaleContextHolder.getLocale()));
+                suppliesListItem.setIsWarningMessage(true);
             }
             suppliesListItems.add(suppliesListItem);
         }
@@ -127,6 +127,14 @@ public class WarehouseService {
                 .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED))
                 .orElse(Collections.emptyList());
         return !productionList.isEmpty();
+    }
+
+
+    private boolean checkIfConsiderRestocking(StockLevel stockLevel) {
+        int days = stockLevel.getDaysUntilStockLasts();
+        double productForecast = getProductForecastForDays(stockLevel.getProduct(), days);
+        return BigDecimal.valueOf(productForecast)
+                .compareTo(stockLevel.getQuantity().subtract(stockLevel.getMinQuantity())) > 0;
     }
 
     @Transactional
@@ -719,16 +727,13 @@ public class WarehouseService {
         return acceptanceDetails;
     }
 
-//    TODO - jesli produkt nie sprzedawany to nie ma mapowania, patrzec po skladzie, do tego ponizej tez
+
     public ForecastingActive checkProductForecastingState(Long id) {
         StockLevel stockLevel = stockLevelRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
-        ForecastingActive forecastingActive = new ForecastingActive();
-        forecastingActive.setActive(stockLevel.getProduct().getForecastingMapping() != null
-                && !stockLevel.getProduct().getForecastingMapping().isEmpty());
-        return forecastingActive;
+        return getProductForecastingActive(stockLevel.getProduct());
     }
-//    TODO
+
     public ForecastingActive checkTaskForecastingState(EType type, Long id) {
         Product product;
         if(EType.PRODUCED.equals(type)){
@@ -740,10 +745,44 @@ public class WarehouseService {
                     .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
             product = purchase.getProduct();
         }
+        return getProductForecastingActive(product);
+    }
+
+    private ForecastingActive getProductForecastingActive(Product product){
         ForecastingActive forecastingActive = new ForecastingActive();
-        forecastingActive.setActive(product.getForecastingMapping() != null
-                && !product.getForecastingMapping().isEmpty());
+        forecastingActive.setActive(checkIfProductForecastingActive(product));
         return forecastingActive;
+    }
+
+
+    private boolean checkIfProductForecastingActive(Product product){
+
+        boolean productActive = true;
+        if(product.getSalePrice() != null){
+            productActive = product.getForecastingMapping() != null;
+        }
+
+        boolean productSetActive = true;
+        Optional<List<ProductSetProducts>> productSetProducts = productSetProductsRepository.findByProduct(product);
+        if(productSetProducts.isPresent() && !productSetProducts.get().isEmpty()){
+            productSetActive = productSetProducts.get().stream().allMatch(psp -> psp.getProductSet().getForecastingMapping() != null);
+        }
+
+        boolean productProductionActive = true;
+        Optional<List<ProductProductionProducts>> productProductionProducts = productProductionProductsRepository
+                .findByProduct(product);
+        if(productProductionProducts.isPresent() && !productProductionProducts.get().isEmpty()){
+            productProductionActive = productProductionProducts.get().stream().allMatch(p ->
+                    checkIfProductHasForecastingMapping(p.getProductProduction().getProductCode()));
+        }
+
+        return productActive && productSetActive && productProductionActive;
+    }
+
+    private boolean checkIfProductHasForecastingMapping(String code){
+        Product product = productRepository.findByCode(code)
+                .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        return product.getForecastingMapping() != null;
     }
 
     public ProductQuantity suggestProductStockQuantity(Long id, int days) {

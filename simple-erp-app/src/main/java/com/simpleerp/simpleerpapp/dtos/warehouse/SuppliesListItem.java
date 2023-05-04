@@ -21,7 +21,7 @@ public class SuppliesListItem {
     private String minQuantity;
     private Integer days;
     private String message;
-    private boolean isWarningMessage = false;
+    private Boolean isWarningMessage = false;
 
     public SuppliesListItem(Long id, EType type, String code, String name, EUnit unit,
                             String quantity, String minQuantity, Integer days) {

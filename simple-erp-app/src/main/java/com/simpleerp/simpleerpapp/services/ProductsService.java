@@ -3,7 +3,8 @@ package com.simpleerp.simpleerpapp.services;
 import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
 import com.simpleerp.simpleerpapp.dtos.production.ProductionProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.products.*;
-import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseProductQuantity;
+import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
+import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.EType;
 import com.simpleerp.simpleerpapp.enums.EUnit;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +31,11 @@ public class ProductsService {
     private final ProductionStepRepository productionStepRepository;
     private final StockLevelRepository stockLevelRepository;
     private final ContractorRepository contractorRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final ProductionRepository productionRepository;
+    private final OrderRepository orderRepository;
+    private final OrderProductsRepository orderProductsRepository;
+    private final ProductForecastingRepository productForecastingRepository;
 
     @Autowired
     public ProductsService(ProductRepository productRepository, ProductSetRepository productSetRepository,
@@ -38,7 +43,10 @@ public class ProductsService {
                            StockLevelRepository stockLevelRepository, ContractorRepository contractorRepository,
                            ProductProductionRepository productProductionRepository,
                            ProductProductionProductsRepository productProductionProductsRepository,
-                           ProductionStepRepository productionStepRepository) {
+                           ProductionStepRepository productionStepRepository, PurchaseRepository purchaseRepository,
+                           ProductionRepository productionRepository, OrderRepository orderRepository,
+                           OrderProductsRepository orderProductsRepository,
+                           ProductForecastingRepository productForecastingRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.productSetProductsRepository = productSetProductsRepository;
@@ -47,6 +55,11 @@ public class ProductsService {
         this.productProductionRepository = productProductionRepository;
         this.productProductionProductsRepository = productProductionProductsRepository;
         this.productionStepRepository = productionStepRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.productionRepository = productionRepository;
+        this.orderRepository = orderRepository;
+        this.orderProductsRepository = orderProductsRepository;
+        this.productForecastingRepository = productForecastingRepository;
     }
 
     @Transactional
@@ -177,12 +190,15 @@ public class ProductsService {
         if(type.equals(EType.SET)){
             ProductSet productSet = productSetRepository.findById(id)
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            this.checkIfProductSetNotInOrder(productSet);
+            this.deleteFromForecasting(productSet.getCode());
             List<ProductSetProducts> productSetProducts = productSet.getProductsSets();
             productSetProductsRepository.deleteAll(productSetProducts);
             productSetRepository.delete(productSet);
         } else {
             Product product = productRepository.findById(id).
                     orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            this.checkIfProductNotInOrderOrTask(product);
             Optional<List<ProductSetProducts>> productSetProductsList = productSetProductsRepository.findByProduct(product);
             Optional<List<ProductProductionProducts>> productProductionProductsList = productProductionProductsRepository.findByProduct(product);
             if(productSetProductsList.isPresent() && !productSetProductsList.get().isEmpty()
@@ -199,10 +215,45 @@ public class ProductsService {
                     productionStepRepository.deleteAll(productionSteps);
                     productProductionRepository.delete(productProduction);
                 }
-
+                this.deleteFromForecasting(product.getCode());
                 StockLevel stockLevel = product.getStockLevel();
                 stockLevelRepository.delete(stockLevel);
                 productRepository.delete(product);
+            }
+        }
+    }
+
+    private void deleteFromForecasting(String code) {
+        Optional<ProductForecasting> productForecasting = productForecastingRepository.findByProductCode(code);
+        productForecasting.ifPresent(productForecastingRepository::delete);
+    }
+
+    private void checkIfProductNotInOrderOrTask(Product product) {
+        Optional<List<Purchase>> purchases = purchaseRepository.findByProductAndStatusNotIn(product,
+                List.of(EStatus.DONE,EStatus.CANCELED));
+        if(purchases.isPresent() && !purchases.get().isEmpty()){
+            throw new ApiExpectationFailedException("exception.productInPurchase");
+        }
+        Optional<List<Production>> productions = productionRepository.findByProductAndStatusNotIn(product,
+                List.of(EStatus.DONE,EStatus.CANCELED));
+        if(productions.isPresent() && !productions.get().isEmpty()){
+            throw new ApiExpectationFailedException("exception.productInProduction");
+        }
+        Optional<List<OrderProducts>> orderProducts = orderProductsRepository.findByProduct(product);
+        if(orderProducts.isPresent() && !orderProducts.get().isEmpty()
+                && orderProducts.get().stream().anyMatch(o -> o.getOrder().getStatus().equals(EStatus.WAITING)
+                || o.getOrder().getStatus().equals(EStatus.IN_PROGRESS) )){
+            throw new ApiExpectationFailedException("exception.productInOrder");
+        }
+    }
+
+    private void checkIfProductSetNotInOrder(ProductSet productSet) {
+        Optional<List<Order>> orders = orderRepository.findByStatusIn(List.of(EStatus.WAITING,EStatus.IN_PROGRESS));
+        if(orders.isPresent() && !orders.get().isEmpty()){
+            if(orders.get().stream().anyMatch(o ->
+                    o.getOrderProducts().getOrderProductQuantityList().stream().map(OrderProductQuantity::getProduct)
+                            .anyMatch(p -> p.equals(productSet.getCode())))){
+                throw new ApiExpectationFailedException("exception.productInOrder");
             }
         }
     }
