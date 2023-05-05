@@ -1,8 +1,5 @@
 package com.simpleerp.simpleerpapp.services;
 
-import ai.djl.ModelException;
-import ai.djl.translate.TranslateException;
-import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingTrainingData;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.products.UpdateContractorRequest;
@@ -23,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
