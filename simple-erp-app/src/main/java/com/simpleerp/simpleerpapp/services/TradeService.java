@@ -1,5 +1,8 @@
 package com.simpleerp.simpleerpapp.services;
 
+import ai.djl.ModelException;
+import ai.djl.translate.TranslateException;
+import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingTrainingData;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UserName;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
 import com.simpleerp.simpleerpapp.dtos.products.UpdateContractorRequest;
@@ -8,17 +11,21 @@ import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
+import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -193,7 +200,7 @@ public class TradeService {
         Optional<Customer> customer = customerRepository.findByEmail(customerData.getEmail());
 
         String phoneNumber = customerData.getPhone();
-        if(!Objects.equals(phoneNumber, "")) {
+        if(phoneNumber != null && !Objects.equals(phoneNumber, "")) {
             phoneNumber = phoneNumber.replaceAll("\\s+", "");
             if (!phoneNumber.startsWith("+48")) {
                 phoneNumber = "+48" + phoneNumber;
@@ -210,7 +217,7 @@ public class TradeService {
                 customer.get().setSurname(customerData.getSurname());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getPhone(), phoneNumber)){
+            if(phoneNumber != null && !Objects.equals(customer.get().getPhone(), phoneNumber)){
                 customer.get().setPhone(phoneNumber);
                 hasChanged = true;
             }
@@ -234,7 +241,8 @@ public class TradeService {
                 customer.get().setBuildingNumber(customerData.getBuildingNumber());
                 hasChanged = true;
             }
-            if(!Objects.equals(customer.get().getDoorNumber(), customerData.getDoorNumber())){
+            if(customerData.getDoorNumber() != null && !Objects.equals(customer.get().getDoorNumber(),
+                    customerData.getDoorNumber())){
                 customer.get().setDoorNumber(customerData.getDoorNumber());
                 hasChanged = true;
             }
@@ -751,6 +759,21 @@ public class TradeService {
         } else {
             return new UpdateContractorRequest(messageSource.getMessage(
                     "message.noContractorData", null, LocaleContextHolder.getLocale()));
+        }
+    }
+
+    @Transactional
+    public void importOrders(InputStreamSource file) {
+        try {
+            List<AddOrderRequest> addOrderRequests = ExcelHelper.createOrders(file.getInputStream());
+            for (AddOrderRequest addOrderRequest: addOrderRequests) {
+                Optional<Order> existingOrder = orderRepository.findByNumber(addOrderRequest.getNumber());
+                if(existingOrder.isEmpty()){
+                    addOrder(addOrderRequest);
+                }
+            }
+        } catch (IOException e){
+            throw new ApiExpectationFailedException("exception.importOrders");
         }
     }
 }

@@ -365,10 +365,15 @@
       "mark-as-received": "Potwierdzono odbiór",
       "not-issued": "Oczekuje na wydanie",
       "issued": "Wydane",
-      "mark-error": "Nie udało się oznaczyć zamówień jako odebrane"
+      "mark-error": "Nie udało się oznaczyć zamówień jako odebrane",
+      "import-order": "Importuj",
+      "import-title": "Importuj zamówienia",
+      "no-file": "Dołącz plik z zamówieniami",
+      "import-success": "Pomyslnie zaimportowano zamówienia",
+      "import-error": "Nie udało się zaimportować zamówień"
     },
     "browse-purchases": {
-      "browse-title": "Lista zleceń zakupów",
+      "browse-title": "Lista zakupów",
       "task-count": "Liczba zleceń",
       "number": "Numer",
       "accepted": "Przyjęto",
@@ -390,7 +395,7 @@
   },
   "production": {
     "browse-production": {
-      "browse-title": "List zadań produkcji",
+      "browse-title": "Lista zadań produkcji",
       "task-count": "Liczba zadań",
       "add-internal-acceptance": "Zleć przyjęcie wewnętrzne",
       "add-internal-release": "Zleć wydanie wewnętrzne",
@@ -448,23 +453,23 @@
     "browse-products": "Lista produktów",
     "warehouse": "MAGAZYN",
     "warehouse-l": "Magazyn",
-    "browse-supplies": "Przeglądaj zapasy",
+    "browse-supplies": "Stany magazynowe",
     "browse-delegated-tasks": "Zlecone zadania",
     "trade": "HANDEL",
     "trade-l": "Handel",
     "add-order": "Dodaj zamówienie",
-    "browse-orders": "Przegladaj zamówienia",
-    "browse-release": "Przeglądaj wydania",
-    "browse-acceptance": "Przeglądaj przyjęcia",
-    "browse-purchases": "Przeglądaj zakupy",
+    "browse-orders": "Zamówienia",
+    "browse-release": "Wydania",
+    "browse-acceptance": "Przyjęcia",
+    "browse-purchases": "Zakupy",
     "add-contractor": "Dodaj kontrahenta",
-    "browse-contractors": "Przeglądaj kontrahentów",
+    "browse-contractors": "Kontrahenci",
     "production": "PRODUKCJA",
     "production-l": "Produkcja",
-    "browse-production": "Przeglądaj produkcję",
-    "settings": "USTAWIENIA",
-    "settings-l": "Ustawienia",
+    "browse-production": "Zadania produkcji",
+    "settings": "ANALIZY",
+    "settings-l": "Analizy",
     "forecasting": "Prognozowanie",
-    "browse-production-products": "Przeglądaj produkty"
+    "browse-production-products": "Lista produktów"
   }
 }

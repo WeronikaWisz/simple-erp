@@ -5,6 +5,9 @@
       <p>{{ 'trade.browse-orders.order-count' | translate}}: {{orderCount}}</p>
     </div>
     <div>
+      <button mat-raised-button (click)="goToImportOrders()">
+        {{ 'trade.browse-orders.import-order' | translate}}
+      </button>
       <button mat-raised-button (click)="goToAddOrder()">
         {{ 'nav.add-order' | translate}}
       </button>

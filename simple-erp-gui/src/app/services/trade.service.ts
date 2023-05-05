@@ -103,4 +103,11 @@ export class TradeService {
   getContractor(id: number): Observable<UpdateContractorRequest>{
     return this.http.get<UpdateContractorRequest>(TRADE_API + 'purchase/contractor/' + id, httpOptions);
   }
+
+  importOrders(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<ArrayBuffer>(TRADE_API + 'orders/import', formData)
+  }
 }

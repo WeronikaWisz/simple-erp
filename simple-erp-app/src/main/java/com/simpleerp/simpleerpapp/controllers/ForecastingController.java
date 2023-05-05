@@ -2,11 +2,9 @@ package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
-import com.simpleerp.simpleerpapp.dtos.products.ProductsResponse;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
-import com.simpleerp.simpleerpapp.forecasting.ExcelHelper;
+import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.services.ForecastingService;
-import com.simpleerp.simpleerpapp.services.ProductsService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

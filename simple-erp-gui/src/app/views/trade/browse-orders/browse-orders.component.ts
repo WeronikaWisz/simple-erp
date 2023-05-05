@@ -17,6 +17,7 @@ import {CustomerDialogComponent} from "./customer-dialog/customer-dialog.compone
 import {ChangeUserDialogComponent} from "./change-user-dialog/change-user-dialog.component";
 import {OrderInfoDialogComponent} from "./order-info-dialog/order-info-dialog.component";
 import {ETask} from "../../../enums/ETask";
+import {ImportOrdersDialogComponent} from "./import-orders-dialog/import-orders-dialog.component";
 
 @Component({
   selector: 'app-browse-orders',
@@ -255,5 +256,15 @@ export class BrowseOrdersComponent implements OnInit {
 
   goToAddOrder() {
     this.router.navigate(['/add-order']);
+  }
+
+  goToImportOrders() {
+    const dialogRef = this.dialog.open(ImportOrdersDialogComponent, {
+      maxWidth: '650px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+        this.selection.clear()
+        this.loadOrders();
+    });
   }
 }

@@ -1,4 +1,4 @@
-package com.simpleerp.simpleerpapp.forecasting;
+package com.simpleerp.simpleerpapp.helpers;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDArrays;

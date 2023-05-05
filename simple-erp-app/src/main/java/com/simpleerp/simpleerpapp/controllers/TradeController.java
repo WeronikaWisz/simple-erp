@@ -11,6 +11,8 @@ import com.simpleerp.simpleerpapp.dtos.warehouse.ReleaseDetails;
 import com.simpleerp.simpleerpapp.dtos.warehouse.ReleasesAcceptancesResponse;
 import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.enums.ETask;
+import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
+import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.services.TradeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -180,9 +183,21 @@ public class TradeController {
     }
 
     @GetMapping("/purchase/contractor/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
     public ResponseEntity<?> getContractor(@PathVariable("id") Long id) {
         UpdateContractorRequest contractor = tradeService.getContractor(id);
         return ResponseEntity.ok(contractor);
+    }
+
+    @PostMapping("/orders/import")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> train(@RequestParam("file") MultipartFile file) {
+        if(ExcelHelper.hasExcelFormat(file)) {
+            tradeService.importOrders(file);
+        } else {
+            throw new ApiExpectationFailedException("exception.wrongFileFormat");
+        }
+        return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
+                "success.import", null, LocaleContextHolder.getLocale())));
     }
 }

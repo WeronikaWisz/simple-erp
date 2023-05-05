@@ -365,7 +365,12 @@
       "mark-as-received": "Receipt confirmed",
       "not-issued": "Waiting for release",
       "issued": "Released",
-      "mark-error": "Cannot mark orders as received"
+      "mark-error": "Cannot mark orders as received",
+      "import-order": "Import",
+      "import-title": "Import orders",
+      "no-file": "Attach orders data",
+      "import-success": "Successfully imported orders",
+      "import-error": "Cannot import orders"
     },
     "browse-purchases": {
       "browse-title": "Purchase tasks list",
@@ -448,23 +453,23 @@
     "browse-products": "Products list",
     "warehouse": "WAREHOUSE",
     "warehouse-l": "Warehouse",
-    "browse-supplies": "Browse supplies",
+    "browse-supplies": "Stock levels",
     "browse-delegated-tasks": "Delegated tasks",
     "trade": "TRADE",
     "trade-l": "Trade",
     "add-order": "Add order",
-    "browse-orders": "Browse orders",
-    "browse-release": "Browse release",
-    "browse-acceptance": "Browse acceptance",
-    "browse-purchases": "Browse purchases",
+    "browse-orders": "Orders",
+    "browse-release": "Releases",
+    "browse-acceptance": "Acceptances",
+    "browse-purchases": "Purchases",
     "add-contractor": "Add contractor",
-    "browse-contractors": "Browse contractors",
+    "browse-contractors": "Contractors",
     "production": "PRODUCTION",
     "production-l": "Production",
-    "browse-production": "Browse production",
-    "settings": "SETTINGS",
-    "settings-l": "Settings",
+    "browse-production": "Production tasks",
+    "settings": "ANALYSIS",
+    "settings-l": "Analysis",
     "forecasting": "Forecasting",
-    "browse-production-products": "Browse products"
+    "browse-production-products": "Products list"
   }
 }

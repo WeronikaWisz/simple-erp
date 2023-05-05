@@ -1,4 +1,4 @@
-package com.simpleerp.simpleerpapp.forecasting;
+package com.simpleerp.simpleerpapp.helpers;
 
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.ForecastingProperties;

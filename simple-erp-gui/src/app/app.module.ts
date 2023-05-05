@@ -68,6 +68,7 @@ import { ForecastingComponent } from './views/settings/forecasting/forecasting.c
 import { ProductionInfoDialogComponent } from './views/production/browse-production/production-info-dialog/production-info-dialog.component';
 import { ProductSetInfoDialogComponent } from './views/products/browse-products/product-set-info-dialog/product-set-info-dialog.component';
 import { BrowseProductionProductsComponent } from './views/production/browse-production-products/browse-production-products.component';
+import { ImportOrdersDialogComponent } from './views/trade/browse-orders/import-orders-dialog/import-orders-dialog.component';
 
 @NgModule({
   declarations: [
@@ -109,7 +110,8 @@ import { BrowseProductionProductsComponent } from './views/production/browse-pro
     ForecastingComponent,
     ProductionInfoDialogComponent,
     ProductSetInfoDialogComponent,
-    BrowseProductionProductsComponent
+    BrowseProductionProductsComponent,
+    ImportOrdersDialogComponent
   ],
     imports: [
         BrowserModule,

@@ -40,11 +40,10 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import com.simpleerp.simpleerpapp.dtos.forecasting.*;
 import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
-import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
-import com.simpleerp.simpleerpapp.forecasting.Evaluator;
-import com.simpleerp.simpleerpapp.forecasting.ExcelHelper;
+import com.simpleerp.simpleerpapp.helpers.Evaluator;
+import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import org.slf4j.Logger;
@@ -374,7 +373,7 @@ public class ForecastingService {
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
                         forecastingTrainingData.getStartDate(), (int) maxDays, false);
                 long daysTillYesterday = Duration.between(forecastingTrainingData.getEndDate(),
-                        LocalDateTime.now().minusDays(2)).toDays();
+                        LocalDateTime.now().minusDays(1)).toDays();
                 List<String> mappingList = this.prepareInferenceFile((int) daysTillYesterday);
                 Map<String, Float> metrics = this.predict(forecastingTrainingData.getStartDate(),
                         forecastingTrainingData.getForecastingTrainingElementList().size(),

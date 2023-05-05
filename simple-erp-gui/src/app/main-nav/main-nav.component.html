@@ -19,9 +19,6 @@
       <a mat-list-item href routerLink="browse-orders" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list</mat-icon>
         <span class="button-text">{{ 'nav.browse-orders' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="add-order" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>note_add</mat-icon>
-        <span class="button-text">{{ 'nav.add-order' | translate}}</span>
-      </a>
       <a mat-list-item href routerLink="browse-purchases" *ngIf="hasAdminRole() || hasTradeRole()"><mat-icon>list_alt</mat-icon>
         <span class="button-text">{{ 'nav.browse-purchases' | translate}}</span>
       </a>
@@ -45,28 +42,19 @@
       <a mat-list-item href routerLink="browse-products" *ngIf="hasAdminRole()"><mat-icon>category</mat-icon>
         <span class="button-text">{{ 'nav.browse-products' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="add-product" *ngIf="hasAdminRole()"><mat-icon>add_circle_outline</mat-icon>
-        <span class="button-text">{{ 'nav.add-product' | translate}}</span>
-      </a>
       <a mat-list-item href routerLink="browse-contractors" *ngIf="hasAdminRole()"><mat-icon>group</mat-icon>
         <span class="button-text">{{ 'nav.browse-contractors' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="add-contractor" *ngIf="hasAdminRole()"><mat-icon>person_add</mat-icon>
-        <span class="button-text">{{ 'nav.add-contractor' | translate}}</span>
+      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.settings' | translate}}</h2>
+      <a mat-list-item href routerLink="forecasting" *ngIf="hasAdminRole()"><mat-icon>trending_up</mat-icon>
+        <span class="button-text">{{ 'nav.forecasting' | translate}}</span>
       </a>
       <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.manage-users' | translate}}</h2>
       <a mat-list-item href routerLink="browse-users" *ngIf="hasAdminRole()"><mat-icon>face</mat-icon>
         <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
       </a>
-      <a mat-list-item href routerLink="add-user" *ngIf="hasAdminRole()"><mat-icon>add_circle_outline</mat-icon>
-        <span class="button-text">{{ 'nav.add-user' | translate}}</span>
-      </a>
       <a mat-list-item href routerLink="default-users" *ngIf="hasAdminRole()"><mat-icon>settings</mat-icon>
         <span class="button-text">{{ 'nav.default-users' | translate}}</span>
-      </a>
-      <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.settings' | translate}}</h2>
-      <a mat-list-item href routerLink="forecasting" *ngIf="hasAdminRole()"><mat-icon>trending_up</mat-icon>
-        <span class="button-text">{{ 'nav.forecasting' | translate}}</span>
       </a>
       <h2 matSubheader>{{ 'nav.my-account' | translate}}</h2>
       <a mat-list-item href routerLink="profile"><mat-icon>person_outline</mat-icon>
@@ -115,9 +103,6 @@
           <button mat-menu-item routerLink="browse-orders">
             <mat-icon>list</mat-icon> {{ 'nav.browse-orders' | translate}}
           </button>
-          <button mat-menu-item routerLink="add-order">
-            <mat-icon>note_add</mat-icon> {{ 'nav.add-order' | translate}}
-          </button>
           <button mat-menu-item routerLink="browse-purchases">
             <mat-icon>list_alt</mat-icon> {{ 'nav.browse-purchases' | translate}}
           </button>
@@ -145,14 +130,14 @@
           <button mat-menu-item routerLink="browse-products">
             <mat-icon>category</mat-icon> {{ 'nav.browse-products' | translate}}
           </button>
-          <button mat-menu-item routerLink="add-product">
-            <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-product' | translate}}
-          </button>
           <button mat-menu-item routerLink="browse-contractors">
             <mat-icon>group</mat-icon> {{ 'nav.browse-contractors' | translate}}
           </button>
-          <button mat-menu-item routerLink="add-contractor">
-            <mat-icon>person_add</mat-icon> {{ 'nav.add-contractor' | translate}}
+        </mat-menu>
+        <button mat-button [matMenuTriggerFor]="settings" *ngIf="hasAdminRole()">{{ 'nav.settings-l' | translate}}</button>
+        <mat-menu #settings="matMenu">
+          <button mat-menu-item routerLink="forecasting">
+            <mat-icon>trending_up</mat-icon> {{ 'nav.forecasting' | translate}}
           </button>
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="users" *ngIf="hasAdminRole()">{{ 'nav.manage-users-l' | translate}}</button>
@@ -160,17 +145,8 @@
           <button mat-menu-item routerLink="browse-users">
             <mat-icon>face</mat-icon> {{ 'nav.browse-users' | translate}}
           </button>
-          <button mat-menu-item routerLink="add-user">
-            <mat-icon>add_circle_outline</mat-icon> {{ 'nav.add-user' | translate}}
-          </button>
           <button mat-menu-item routerLink="default-users">
             <mat-icon>settings</mat-icon> {{ 'nav.default-users' | translate}}
-          </button>
-        </mat-menu>
-        <button mat-button [matMenuTriggerFor]="settings" *ngIf="hasAdminRole()">{{ 'nav.settings-l' | translate}}</button>
-        <mat-menu #settings="matMenu">
-          <button mat-menu-item routerLink="forecasting">
-            <mat-icon>trending_up</mat-icon> {{ 'nav.forecasting' | translate}}
           </button>
         </mat-menu>
       </span>

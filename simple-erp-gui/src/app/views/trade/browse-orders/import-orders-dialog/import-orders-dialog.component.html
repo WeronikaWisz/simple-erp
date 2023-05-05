@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>{{ 'trade.browse-orders.import-title' | translate}}</h2>
+<div mat-dialog-content>
+  <input type="file" class="file-input" accept=".xlsx, .xls"
+         (change)="onFileSelected($event)" #fileUpload>
+  <div class="file-upload">
+    <button mat-mini-fab color="primary" class="upload-btn"
+            (click)="fileUpload.click()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+    {{fileName || 'trade.browse-orders.no-file' | translate}}
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="dataChanged">
+    {{ 'manage-users.default-users.close' | translate}}
+  </button>
+  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="!canUploadFile">
+    {{ 'manage-users.default-users.save' | translate}}
+  </button>
+</div>
+
