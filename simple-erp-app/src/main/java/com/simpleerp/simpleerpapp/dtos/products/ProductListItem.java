@@ -22,12 +22,14 @@ public class ProductListItem {
     private String name;
     private EUnit unit;
     private String purchasePrice;
+    private String purchaseVat;
     private String salePrice;
+    private String saleVat;
     private Long contractor;
     private List<ProductQuantity> productSet = new ArrayList<>();
 
     public ProductListItem(Long id, EType type, String code, String name, EUnit unit, String purchasePrice,
-                           String salePrice) {
+                           String salePrice, String purchaseVat, String saleVat) {
         this.id = id;
         this.type = type;
         this.code = code;
@@ -35,6 +37,8 @@ public class ProductListItem {
         this.unit = unit;
         this.purchasePrice = purchasePrice;
         this.salePrice = salePrice;
+        this.purchaseVat = purchaseVat;
+        this.saleVat = saleVat;
     }
 
     @Override
@@ -43,13 +47,15 @@ public class ProductListItem {
         if (o == null || getClass() != o.getClass()) return false;
         ProductListItem that = (ProductListItem) o;
         return Objects.equals(id, that.id) && type == that.type && Objects.equals(code, that.code)
-                && Objects.equals(name, that.name) && unit == that.unit && Objects.equals(purchasePrice, that.purchasePrice)
-                && Objects.equals(salePrice, that.salePrice) && Objects.equals(contractor, that.contractor)
-                && Objects.equals(productSet, that.productSet);
+                && Objects.equals(name, that.name) && unit == that.unit
+                && Objects.equals(purchasePrice, that.purchasePrice) && Objects.equals(purchaseVat, that.purchaseVat)
+                && Objects.equals(salePrice, that.salePrice) && Objects.equals(saleVat, that.saleVat)
+                && Objects.equals(contractor, that.contractor) && Objects.equals(productSet, that.productSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, code, name, unit, purchasePrice, salePrice, contractor, productSet);
+        return Objects.hash(id, type, code, name, unit, purchasePrice, purchaseVat, salePrice, saleVat,
+                contractor, productSet);
     }
 }

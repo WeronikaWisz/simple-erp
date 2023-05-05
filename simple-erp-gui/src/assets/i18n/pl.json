@@ -119,8 +119,12 @@
       "unit-error": "Wybierz jednostkę",
       "purchase-price": "Cena zakupu",
       "purchase-price-error": "Wprowadź cenę zakupu",
+      "purchase-vat": "VAT zakupu",
+      "purchase-vat-error": "Wprowadź VAT zakupu",
       "sale-price": "Cena sprzedaży",
       "sale-price-error": "Wprowadź cenę sprzedaży",
+      "sale-vat": "VAT sprzedaży",
+      "sale-vat-error": "Wprowadź VAT sprzedaży",
       "product-set": "Produkty w zestawie",
       "product": "Produkt",
       "quantity": "Ilość",
@@ -147,6 +151,7 @@
       "unit": "J.M.",
       "purchase-price": "Cena zakupu",
       "sale-price": "Cena sprzedaży",
+      "vat": "VAT",
       "load-error": "Nie udało się załadować produktów",
       "delete-error": "Nie udało się usunąć produktu"
     },
@@ -429,7 +434,7 @@
       "train-success": "Pomyślnie wytrenowano model",
       "train-error": "Trenowanie nie powiodło się",
       "active-error": "Nie udało się załadować stanu prognozowania",
-      "rmsse": "Średniokwadratowy skalowany błąd (RMSSE)",
+      "rmsse": "Błąd średniokwadratowy skalowany (RMSSE)",
       "loss": "Strata (loss)"
     }
   },

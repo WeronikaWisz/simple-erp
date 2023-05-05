@@ -11,7 +11,6 @@ import {EUnit} from "../../../enums/EUnit";
 import {EType} from "../../../enums/EType";
 import {ProductCode} from "../../../models/products/ProductCode";
 import {ProductsService} from "../../../services/products.service";
-import {ProductListItem} from "../../../models/products/ProductListItem";
 import {ContractorName} from "../../../models/products/ContractorName";
 import {UpdateProductRequest} from "../../../models/products/UpdateProductRequest";
 
@@ -56,7 +55,9 @@ export class AddProductComponent implements OnInit {
       type: [null, Validators.required],
       unit: [null, Validators.required],
       purchasePrice: ['', Validators.required],
+      purchaseVat: ['', Validators.required],
       salePrice: ['', Validators.required],
+      saleVat: ['', Validators.required],
       contractor: [null],
       productSet: this.formBuilder.array([]),
       productionSteps: this.formBuilder.array([])
@@ -183,7 +184,10 @@ export class AddProductComponent implements OnInit {
       this.form.get('unit')?.enable();
       this.form.get('purchasePrice')?.enable();
       this.form.get('purchasePrice')?.addValidators(Validators.required);
+      this.form.get('purchaseVat')?.enable();
+      this.form.get('purchaseVat')?.addValidators(Validators.required);
       this.form.get('salePrice')?.clearValidators();
+      this.form.get('saleVat')?.clearValidators();
       this.isProductSet = false;
       this.isBoughtType = true;
       this.isProducedType = false;
@@ -194,7 +198,11 @@ export class AddProductComponent implements OnInit {
       this.form.get('purchasePrice')?.clearValidators();
       this.form.get('purchasePrice')?.disable();
       this.form.get('purchasePrice')?.setValue('');
+      this.form.get('purchaseVat')?.clearValidators();
+      this.form.get('purchaseVat')?.disable();
+      this.form.get('purchaseVat')?.setValue('');
       this.form.get('salePrice')?.addValidators(Validators.required);
+      this.form.get('saleVat')?.addValidators(Validators.required);
       this.isProductSet = false;
       this.isBoughtType = false;
       this.isProducedType = true;
@@ -207,7 +215,11 @@ export class AddProductComponent implements OnInit {
       this.form.get('purchasePrice')?.clearValidators();
       this.form.get('purchasePrice')?.disable();
       this.form.get('purchasePrice')?.setValue('');
+      this.form.get('purchaseVat')?.clearValidators();
+      this.form.get('purchaseVat')?.disable();
+      this.form.get('purchaseVat')?.setValue('');
       this.form.get('salePrice')?.addValidators(Validators.required);
+      this.form.get('saleVat')?.addValidators(Validators.required);
       this.isProductSet = true;
       this.isBoughtType = false;
       this.isProducedType = false;
@@ -219,6 +231,8 @@ export class AddProductComponent implements OnInit {
     this.form.get('productionSteps')?.updateValueAndValidity();
     this.form.get('purchasePrice')?.updateValueAndValidity();
     this.form.get('salePrice')?.updateValueAndValidity();
+    this.form.get('purchaseVat')?.updateValueAndValidity();
+    this.form.get('saleVat')?.updateValueAndValidity();
   }
 
   onSubmit(): void {
@@ -227,7 +241,9 @@ export class AddProductComponent implements OnInit {
       name: this.form.get('name')?.value,
       productSet: this.form.get('productSet')?.value,
       purchasePrice: this.form.get('purchasePrice')?.value,
+      purchaseVat: this.form.get('purchaseVat')?.value,
       salePrice: this.form.get('salePrice')?.value,
+      saleVat: this.form.get('saleVat')?.value,
       type: this.form.get('type')?.value,
       unit: this.form.get('unit')?.value,
       contractor: this.form.get('contractor')?.value,
@@ -324,7 +340,9 @@ export class AddProductComponent implements OnInit {
     this.form.get('code')?.setValue(data.code)
     this.form.get('name')?.setValue(data.name)
     this.form.get('purchasePrice')?.setValue(data.purchasePrice)
+    this.form.get('purchaseVat')?.setValue(data.purchaseVat)
     this.form.get('salePrice')?.setValue(data.salePrice)
+    this.form.get('saleVat')?.setValue(data.saleVat)
     this.form.get('unit')?.setValue(EUnit[data.unit])
     this.form.get('contractor')?.setValue(data.contractor)
     if(data.productSet) {
@@ -352,7 +370,9 @@ export class AddProductComponent implements OnInit {
         name: this.form.get('name')?.value,
         productSet: this.form.get('productSet')?.value,
         purchasePrice: this.form.get('purchasePrice')?.value,
+        purchaseVat: this.form.get('purchaseVat')?.value,
         salePrice: this.form.get('salePrice')?.value,
+        saleVat: this.form.get('saleVat')?.value,
         type: this.form.get('type')?.value,
         unit: this.form.get('unit')?.value,
         contractor: this.form.get('contractor')?.value,

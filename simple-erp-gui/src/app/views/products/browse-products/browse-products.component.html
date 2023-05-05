@@ -32,9 +32,19 @@
       <mat-cell *matCellDef="let element"> {{showPrice(element.purchasePrice)}} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="purchaseVat">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.vat' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{showVat(element.purchaseVat)}} </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="salePrice">
       <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.sale-price' | translate}} </mat-header-cell>
       <mat-cell *matCellDef="let element"> {{showPrice(element.salePrice)}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="saleVat">
+      <mat-header-cell *matHeaderCellDef> {{ 'products.browse-product.vat' | translate}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{showVat(element.saleVat)}} </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="unit">

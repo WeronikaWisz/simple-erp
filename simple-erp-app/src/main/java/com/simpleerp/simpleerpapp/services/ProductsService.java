@@ -80,7 +80,8 @@ public class ProductsService {
 
     private void addProductSet(AddProductRequest addProductRequest) {
         ProductSet productSet = productSetRepository.save(new ProductSet(addProductRequest.getCode(), addProductRequest.getName(),
-                new BigDecimal(addProductRequest.getSalePrice()), LocalDateTime.now()));
+                new BigDecimal(addProductRequest.getSalePrice()), new BigDecimal(addProductRequest.getSaleVat()),
+                LocalDateTime.now()));
 
         for(ProductQuantity productQuantity: addProductRequest.getProductSet()){
             Product product = productRepository.findById(productQuantity.getProduct())
@@ -94,11 +95,16 @@ public class ProductsService {
 
     private void addProducedProduct(AddProductRequest addProductRequest) {
         BigDecimal salePrice = null;
+        BigDecimal saleVat = null;
         if(addProductRequest.getSalePrice() != null && !addProductRequest.getSalePrice().isEmpty()) {
             salePrice = new BigDecimal(addProductRequest.getSalePrice());
         }
-        Product product = productRepository.save(new Product(addProductRequest.getCode(), addProductRequest.getName(), null,
-                salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now()));
+        if(addProductRequest.getSaleVat() != null && !addProductRequest.getSaleVat().isEmpty()) {
+            saleVat = new BigDecimal(addProductRequest.getSaleVat());
+        }
+        Product product = productRepository.save(new Product(addProductRequest.getCode(), addProductRequest.getName(),
+                null, salePrice, null, saleVat, addProductRequest.getUnit(), addProductRequest.getType(),
+                LocalDateTime.now()));
 
         ProductProduction productProduction = productProductionRepository.save(new ProductProduction(
                 addProductRequest.getCode(), LocalDateTime.now()));
@@ -125,14 +131,23 @@ public class ProductsService {
     private void addSingleProduct(AddProductRequest addProductRequest) {
         BigDecimal purchasePrice = null;
         BigDecimal salePrice = null;
+        BigDecimal purchaseVat = null;
+        BigDecimal saleVat = null;
         if(addProductRequest.getPurchasePrice() != null && !addProductRequest.getPurchasePrice().isEmpty()) {
             purchasePrice = new BigDecimal(addProductRequest.getPurchasePrice());
+        }
+        if(addProductRequest.getPurchaseVat() != null && !addProductRequest.getPurchaseVat().isEmpty()) {
+            purchaseVat = new BigDecimal(addProductRequest.getPurchaseVat());
         }
         if(addProductRequest.getSalePrice() != null && !addProductRequest.getSalePrice().isEmpty()) {
             salePrice = new BigDecimal(addProductRequest.getSalePrice());
         }
+        if(addProductRequest.getSaleVat() != null && !addProductRequest.getSaleVat().isEmpty()) {
+            saleVat = new BigDecimal(addProductRequest.getSaleVat());
+        }
         Product product = new Product(addProductRequest.getCode(), addProductRequest.getName(), purchasePrice,
-                salePrice, addProductRequest.getUnit(), addProductRequest.getType(), LocalDateTime.now());
+                salePrice, purchaseVat, saleVat, addProductRequest.getUnit(),
+                addProductRequest.getType(), LocalDateTime.now());
         if(addProductRequest.getContractor() != null){
             Contractor contractor = contractorRepository.findById(addProductRequest.getContractor())
                     .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
@@ -170,7 +185,9 @@ public class ProductsService {
         for(Product product: productList){
             ProductListItem productListItem = new ProductListItem(product.getId(), product.getType(), product.getCode(),
                     product.getName(), product.getUnit(), product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
-                    product.getSalePrice() != null ? product.getSalePrice().toString() : "");
+                    product.getSalePrice() != null ? product.getSalePrice().toString() : "",
+                    product.getPurchaseVat() != null ? product.getPurchaseVat().toString() : "",
+                    product.getSaleVat() != null ? product.getSaleVat().toString() : "");
             if(product.getContractor() != null){
                 productListItem.setContractor(product.getContractor().getId());
             }
@@ -179,7 +196,8 @@ public class ProductsService {
         for(ProductSet productSet: productSetList){
             ProductListItem productListItem = new ProductListItem(productSet.getId(), EType.SET, productSet.getCode(),
                     productSet.getName(), EUnit.PIECES, "",
-                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "");
+                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "", "",
+                    productSet.getSaleVat() != null ? productSet.getSaleVat().toString() : "");
             productListItems.add(productListItem);
         }
         return productListItems;
@@ -265,7 +283,8 @@ public class ProductsService {
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
             updateProductRequest = new UpdateProductRequest(productSet.getId(), EType.SET, productSet.getCode(),
                     productSet.getName(), EUnit.PIECES, "",
-                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "");
+                    productSet.getSalePrice() != null ? productSet.getSalePrice().toString() : "", "",
+                    productSet.getSaleVat() != null ? productSet.getSaleVat().toString() : "" );
             List<ProductQuantity> productQuantityList = new ArrayList<>();
             for(ProductSetProducts productSetProductsList : productSet.getProductsSets()){
                 ProductQuantity productQuantity = new ProductQuantity(productSetProductsList.getProduct().getId(),
@@ -279,7 +298,9 @@ public class ProductsService {
             updateProductRequest = new UpdateProductRequest(product.getId(), product.getType(), product.getCode(),
                     product.getName(), product.getUnit(),
                     product.getPurchasePrice() != null ? product.getPurchasePrice().toString() : "",
-                    product.getSalePrice() != null ? product.getSalePrice().toString() : "");
+                    product.getSalePrice() != null ? product.getSalePrice().toString() : "",
+                    product.getPurchaseVat() != null ? product.getPurchaseVat().toString() : "",
+                    product.getSaleVat() != null ? product.getSaleVat().toString() : "");
             if(product.getContractor() != null){
                 updateProductRequest.setContractor(product.getContractor().getId());
             }
@@ -321,6 +342,7 @@ public class ProductsService {
         productSet.setCode(updateProductRequest.getCode());
         productSet.setName(updateProductRequest.getName());
         productSet.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
+        productSet.setSaleVat(new BigDecimal(updateProductRequest.getSaleVat()));
         productSet.setUpdateDate(LocalDateTime.now());
 
         for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
@@ -359,10 +381,20 @@ public class ProductsService {
         } else {
             product.setPurchasePrice(null);
         }
+        if(updateProductRequest.getPurchaseVat() != null && !updateProductRequest.getPurchaseVat().isEmpty()) {
+            product.setPurchaseVat(new BigDecimal(updateProductRequest.getPurchaseVat()));
+        } else {
+            product.setPurchaseVat(null);
+        }
         if(updateProductRequest.getSalePrice() != null && !updateProductRequest.getSalePrice().isEmpty()) {
             product.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
         } else {
             product.setSalePrice(null);
+        }
+        if(updateProductRequest.getSaleVat() != null && !updateProductRequest.getSaleVat().isEmpty()) {
+            product.setSaleVat(new BigDecimal(updateProductRequest.getSaleVat()));
+        } else {
+            product.setSaleVat(null);
         }
         if(updateProductRequest.getContractor() != null){
             Contractor contractor = contractorRepository.findById(updateProductRequest.getContractor())

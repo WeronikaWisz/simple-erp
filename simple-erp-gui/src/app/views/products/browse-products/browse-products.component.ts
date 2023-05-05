@@ -27,7 +27,7 @@ export class BrowseProductsComponent implements OnInit {
   isLoggedIn = false;
   isAdmin = false;
 
-  displayedColumns = ['code', 'name', 'type', 'purchasePrice', 'salePrice', 'unit', 'actions'];
+  displayedColumns = ['code', 'name', 'type', 'purchasePrice', 'purchaseVat', 'salePrice', 'saleVat', 'unit', 'actions'];
   dataSource: MatTableDataSource<ProductListItem> = new MatTableDataSource<ProductListItem>([]);
 
   products: ProductListItem[] = [];
@@ -167,6 +167,14 @@ export class BrowseProductsComponent implements OnInit {
   showPrice(price: string): string{
     if(price){
       return price + ' zł'
+    } else {
+      return ''
+    }
+  }
+
+  showVat(vat: string): string{
+    if(vat){
+      return vat.split('.')[0] + '%'
     } else {
       return ''
     }

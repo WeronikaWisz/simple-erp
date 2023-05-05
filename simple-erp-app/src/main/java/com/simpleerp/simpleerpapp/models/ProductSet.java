@@ -26,6 +26,7 @@ public class ProductSet {
     @Nonnull
     private String name;
     private BigDecimal salePrice;
+    private BigDecimal saleVat;
     @OneToMany(mappedBy = "productSet")
     List<ProductSetProducts> productsSets = new ArrayList<>();
 
@@ -34,10 +35,12 @@ public class ProductSet {
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
-    public ProductSet(String code, String name, BigDecimal salePrice, LocalDateTime creationDate) {
+    public ProductSet(String code, String name, BigDecimal salePrice, BigDecimal saleVat,
+                      LocalDateTime creationDate) {
         this.code = code;
         this.name = name;
         this.salePrice = salePrice;
+        this.saleVat = saleVat;
         this.creationDate = creationDate;
     }
 

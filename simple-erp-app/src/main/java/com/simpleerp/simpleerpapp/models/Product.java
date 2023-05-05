@@ -27,7 +27,9 @@ public class Product {
     @Nonnull
     private String name;
     private BigDecimal purchasePrice;
+    private BigDecimal purchaseVat;
     private BigDecimal salePrice;
+    private BigDecimal saleVat;
     @Enumerated
     @Column(columnDefinition = "smallint")
     private EUnit unit;
@@ -54,7 +56,9 @@ public class Product {
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
 
-    public Product(String code, String name, BigDecimal purchasePrice, BigDecimal salePrice, EUnit unit, EType type,
+    public Product(String code, String name, BigDecimal purchasePrice, BigDecimal salePrice,
+                   BigDecimal purchaseVat, BigDecimal saleVat,
+                   EUnit unit, EType type,
                    LocalDateTime creationDate) {
         this.code = code;
         this.name = name;
@@ -63,5 +67,7 @@ public class Product {
         this.unit = unit;
         this.type = type;
         this.creationDate = creationDate;
+        this.purchaseVat = purchaseVat;
+        this.saleVat = saleVat;
     }
 }
