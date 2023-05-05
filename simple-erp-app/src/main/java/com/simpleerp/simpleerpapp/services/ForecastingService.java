@@ -329,8 +329,14 @@ public class ForecastingService {
     public ForecastingActive checkForecastingState() {
         ForecastingProperties forecastingProperties = forecastingPropertiesRepository.findByCodeAndIsValid("FORECASTING_ACTIVE", true)
                 .orElseThrow( () -> new ApiNotFoundException("exception.forecastingPropertyNotFound"));
+        Optional<ForecastingProperties> forecastingPropertiesRMSSE = forecastingPropertiesRepository
+                .findByCodeAndIsValid("TRAIN_RMSSE", true);
+        Optional<ForecastingProperties> forecastingPropertiesLoss = forecastingPropertiesRepository
+                .findByCodeAndIsValid("TRAIN_LOSS", true);
         ForecastingActive forecastingActive = new ForecastingActive();
         forecastingActive.setActive(!forecastingProperties.getValue().equals("NO"));
+        forecastingPropertiesRMSSE.ifPresent(properties -> forecastingActive.setRmsse(properties.getValue()));
+        forecastingPropertiesLoss.ifPresent(properties -> forecastingActive.setLoss(properties.getValue()));
         return forecastingActive;
     }
 
@@ -369,9 +375,10 @@ public class ForecastingService {
             long maxDays = Duration.between(forecastingTrainingData.getStartDate(), forecastingTrainingData.getEndDate()).toDays();
 
             try {
-                this.trainModel(4,
+                TrainingResult trainingResult = this.trainModel(4,
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
                         forecastingTrainingData.getStartDate(), (int) maxDays, false);
+                saveTrainingEvaluations(trainingResult.getEvaluations());
                 long daysTillYesterday = Duration.between(forecastingTrainingData.getEndDate(),
                         LocalDateTime.now().minusDays(1)).toDays();
                 List<String> mappingList = this.prepareInferenceFile((int) daysTillYesterday);
@@ -388,6 +395,29 @@ public class ForecastingService {
             changeForecastingActiveProperty(true);
         } catch (IOException e){
             throw new ApiExpectationFailedException("exception.wrongFileFormat");
+        }
+    }
+
+    private void saveTrainingEvaluations(Map<String, Float> evaluations) {
+        Optional<ForecastingProperties> forecastingPropertiesTrainRMSSE = forecastingPropertiesRepository
+                .findByCodeAndIsValid("TRAIN_RMSSE", true);
+        if(forecastingPropertiesTrainRMSSE.isPresent()){
+            forecastingPropertiesTrainRMSSE.get().setValue("");
+            forecastingPropertiesRepository.save(forecastingPropertiesTrainRMSSE.get());
+        } else {
+            forecastingPropertiesRepository.save(new ForecastingProperties("TRAIN_RMSSE", "Training RMSSE value",
+                    String.format(java.util.Locale.US,"%.3f", evaluations.get("train_RMSSE")),
+                    LocalDateTime.now(), true));
+        }
+        Optional<ForecastingProperties> forecastingPropertiesTrainLoss = forecastingPropertiesRepository
+                .findByCodeAndIsValid("TRAIN_LOSS", true);
+        if(forecastingPropertiesTrainLoss.isPresent()){
+            forecastingPropertiesTrainLoss.get().setValue("");
+            forecastingPropertiesRepository.save(forecastingPropertiesTrainLoss.get());
+        } else {
+            forecastingPropertiesRepository.save(new ForecastingProperties("TRAIN_LOSS", "Training Loss value",
+                    String.format(java.util.Locale.US,"%.3f", evaluations.get("train_loss")),
+                    LocalDateTime.now(), true));
         }
     }
 
@@ -602,8 +632,9 @@ public class ForecastingService {
             LocalDateTime startDate = LocalDate.parse(forecastingProperties.getValue(),
                     DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
             long maxDays = Duration.between(startDate, LocalDateTime.now()).toDays();
-            this.trainModel(4, mappingList.size(),
+            TrainingResult trainingResult = this.trainModel(4, mappingList.size(),
                     startDate, (int) maxDays, true);
+            saveTrainingEvaluations(trainingResult.getEvaluations());
         } catch (IOException | TranslateException | ModelException exception){
             throw new ApiExpectationFailedException("exception.forecastingTraining");
         }

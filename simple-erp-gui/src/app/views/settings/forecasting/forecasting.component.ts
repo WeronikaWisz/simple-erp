@@ -37,6 +37,9 @@ export class ForecastingComponent implements OnInit {
 
   isActive: boolean = false;
 
+  rmsse = "";
+  loss = "";
+
   pageSize = 10;
   pageIndex = 0;
   pageSizeOptions: number[] = [5, 10, 20];
@@ -71,6 +74,8 @@ export class ForecastingComponent implements OnInit {
         next: (data) => {
           console.log(data);
           this.isActive = data.active
+          this.rmsse = data.rmsse
+          this.loss = data.loss
         },
         error: (err) => {
           Swal.fire({

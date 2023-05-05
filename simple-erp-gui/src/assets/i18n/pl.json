@@ -428,7 +428,9 @@
       "train": "Trenuj",
       "train-success": "Pomyślnie wytrenowano model",
       "train-error": "Trenowanie nie powiodło się",
-      "active-error": "Nie udało się załadować stanu prognozowania"
+      "active-error": "Nie udało się załadować stanu prognozowania",
+      "rmsse": "Średniokwadratowy skalowany błąd (RMSSE)",
+      "loss": "Strata (loss)"
     }
   },
   "tasks": {

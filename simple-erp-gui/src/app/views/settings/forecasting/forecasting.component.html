@@ -7,6 +7,16 @@
         <mat-chip class="chip-on" *ngIf="isActive"> {{ 'settings.forecasting.on' | translate}} </mat-chip>
         <mat-chip class="chip-off" *ngIf="!isActive"> {{ 'settings.forecasting.off' | translate}} </mat-chip>
       </mat-chip-list>
+      <div *ngIf="isActive">
+        <mat-chip-list>
+          <p class="forecasting-state">{{ 'settings.forecasting.rmsse' | translate}}: </p>
+          <mat-chip class="chip-info"> {{ rmsse }} </mat-chip>
+        </mat-chip-list>
+<!--        <mat-chip-list>-->
+<!--          <p class="forecasting-state">{{ 'settings.forecasting.loss' | translate}}: </p>-->
+<!--          <mat-chip class="chip-info"> {{ loss }} </mat-chip>-->
+<!--        </mat-chip-list>-->
+      </div>
     </div>
     <div class="training-section">
       <input type="file" class="file-input" accept=".xlsx, .xls"

@@ -428,7 +428,9 @@
       "train": "Train",
       "train-success": "Successfully trained model",
       "train-error": "Cannot train model",
-      "active-error": "Cannot upload forecasting state"
+      "active-error": "Cannot upload forecasting state",
+      "rmsse": "Root Mean Squared Scaled Error (RMSSE)",
+      "loss": "Loss"
     }
   },
   "tasks": {
