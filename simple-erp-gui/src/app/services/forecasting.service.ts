@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {ContractorsResponse} from "../models/products/ContractorsResponse";
 import {ForecastingActive} from "../models/forecasting/ForecastingActive";
 
 const FORECASTING_API = 'http://localhost:8080/forecasting/';

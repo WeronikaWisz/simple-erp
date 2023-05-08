@@ -200,4 +200,12 @@ public class TradeController {
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.import", null, LocaleContextHolder.getLocale())));
     }
+
+
+    @GetMapping("/sale-expenses")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
+    public ResponseEntity<?> getSaleAndExpenses() {
+        SalesAndExpensesData saleAndExpenses = tradeService.getSaleAndExpenses();
+        return ResponseEntity.ok(saleAndExpenses);
+    }
 }

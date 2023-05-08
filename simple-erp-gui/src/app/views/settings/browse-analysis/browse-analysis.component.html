@@ -1,0 +1,40 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && isAdmin">
+  <div class="title-container">
+    <div>
+      <h2>{{ 'settings.browse-analysis.browse-title' | translate}}</h2>
+    </div>
+    <div class="calendar-box">
+      <h2><span>{{ todayDate | localizedDate }} </span> <mat-icon>calendar_today</mat-icon></h2>
+    </div>
+  </div>
+  <br/>
+  <div class="dashboard">
+    <div class="chart-container mat-elevation-z8">
+      <canvas #quantityChart></canvas>
+    </div>
+    <div class="number-container mat-elevation-z8">
+      <p class="number-info">{{ 'settings.browse-analysis.quantity-today' | translate}}: </p>
+      <p class="number-detail quantity">{{quantityToday}}</p>
+      <p class="number-info">{{ 'settings.browse-analysis.quantity-month' | translate}}: </p>
+      <p class="number-detail quantity">{{quantityMonth}}</p>
+    </div>
+    <div class="chart-container mat-elevation-z8">
+      <canvas #saleChart></canvas>
+    </div>
+    <div class="number-container mat-elevation-z8">
+      <p class="number-info">{{ 'settings.browse-analysis.sale-today' | translate}}: </p>
+      <p class="number-detail sale">{{saleToday}}<span class="currency">zł</span></p>
+      <p class="number-info">{{ 'settings.browse-analysis.sale-month' | translate}}: </p>
+      <p class="number-detail sale">{{saleMonth}}<span class="currency">zł</span></p>
+    </div>
+    <div class="chart-container mat-elevation-z8">
+      <canvas #purchaseChart></canvas>
+    </div>
+    <div class="number-container mat-elevation-z8">
+      <p class="number-info">{{ 'settings.browse-analysis.purchase-today' | translate}}: </p>
+      <p class="number-detail purchase">{{purchaseToday}}<span class="currency">zł</span></p>
+      <p class="number-info">{{ 'settings.browse-analysis.purchase-month' | translate}}: </p>
+      <p class="number-detail purchase">{{purchaseMonth}}<span class="currency">zł</span></p>
+    </div>
+  </div>
+</div>

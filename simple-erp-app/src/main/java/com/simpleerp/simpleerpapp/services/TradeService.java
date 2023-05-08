@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -772,4 +773,102 @@ public class TradeService {
             throw new ApiExpectationFailedException("exception.importOrders");
         }
     }
+
+    public SalesAndExpensesData getSaleAndExpenses() {
+        SalesAndExpensesData salesAndExpensesData = new SalesAndExpensesData();
+
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime lastMonth = LocalDate.now().atStartOfDay().minusDays(30);
+        LocalDateTime firstDayOfMonth = LocalDate.now().atStartOfDay().withDayOfMonth(1);
+
+        List<Order> last30DaysOrders = orderRepository.findByOrderDateBetween(lastMonth, today)
+                .orElse(Collections.emptyList());
+
+        List<Purchase> last30DaysPurchases = purchaseRepository.findByExecutionDateBetween(lastMonth, today)
+                .orElse(Collections.emptyList());
+
+        salesAndExpensesData.setQuantity(getQuantityChartData(lastMonth, last30DaysOrders));
+        salesAndExpensesData.setSale(getSaleChartData(lastMonth, last30DaysOrders));
+        salesAndExpensesData.setPurchase(getPurchaseChartData(lastMonth, last30DaysPurchases));
+
+        setQuantityData(salesAndExpensesData, last30DaysOrders, firstDayOfMonth);
+        setSaleData(salesAndExpensesData, last30DaysOrders, firstDayOfMonth);
+        setPurchaseData(salesAndExpensesData, last30DaysPurchases, firstDayOfMonth);
+        return salesAndExpensesData;
+    }
+
+    private void setQuantityData(SalesAndExpensesData salesAndExpensesData, List<Order> last30DaysOrders,
+                                 LocalDateTime firstDayOfMonth) {
+        salesAndExpensesData.setQuantityToday(Long.toString(last30DaysOrders.stream()
+                .filter(o -> o.getOrderDate().toLocalDate().equals(LocalDate.now())).count()));
+        salesAndExpensesData.setQuantityMonth(Long.toString(last30DaysOrders.stream()
+                .filter(o -> o.getOrderDate().toLocalDate().isAfter(firstDayOfMonth.toLocalDate().minusDays(1))).count()));
+    }
+
+    private void setSaleData(SalesAndExpensesData salesAndExpensesData, List<Order> last30DaysOrders,
+                             LocalDateTime firstDayOfMonth) {
+        salesAndExpensesData.setSaleToday(last30DaysOrders.stream()
+                .filter(o -> o.getOrderDate().toLocalDate().equals(LocalDate.now()))
+                .map(Order::getPrice)
+                .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP).toString());
+        salesAndExpensesData.setSaleMonth(last30DaysOrders.stream()
+                .filter(o -> o.getOrderDate().toLocalDate().isAfter(firstDayOfMonth.toLocalDate().minusDays(1)))
+                .map(Order::getPrice)
+                .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP).toString());
+    }
+
+    private void setPurchaseData(SalesAndExpensesData salesAndExpensesData, List<Purchase> last30DaysPurchases,
+                                 LocalDateTime firstDayOfMonth) {
+        salesAndExpensesData.setPurchaseToday(last30DaysPurchases.stream()
+                .filter(o -> o.getExecutionDate().toLocalDate().equals(LocalDate.now()))
+                .map(p -> p.getProduct().getPurchasePrice().multiply(p.getQuantity()))
+                .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP).toString());
+        salesAndExpensesData.setPurchaseMonth(last30DaysPurchases.stream()
+                .filter(o -> o.getExecutionDate().toLocalDate().isAfter(firstDayOfMonth.toLocalDate().minusDays(1)))
+                .map(p -> p.getProduct().getPurchasePrice().multiply(p.getQuantity()))
+                .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP).toString());
+    }
+
+    private List<ChartData> getQuantityChartData(LocalDateTime lastMonth, List<Order> last30DaysOrders){
+        List<ChartData> chartDataList = new ArrayList<>();
+        for(int i = 0; i<30; i++){
+            LocalDateTime day = lastMonth.plusDays(i);
+            double data = last30DaysOrders.stream()
+                    .filter(o -> o.getOrderDate().toLocalDate().equals(day.toLocalDate())).count();
+            ChartData chartData = new ChartData(day.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), data);
+            chartDataList.add(chartData);
+        }
+        return chartDataList;
+    }
+
+    private List<ChartData> getSaleChartData(LocalDateTime lastMonth, List<Order> last30DaysOrders){
+        List<ChartData> chartDataList = new ArrayList<>();
+        for(int i = 0; i<30; i++){
+            LocalDateTime day = lastMonth.plusDays(i);
+            double data = last30DaysOrders.stream()
+                    .filter(o -> o.getOrderDate().toLocalDate().equals(day.toLocalDate()))
+                    .map(Order::getPrice)
+                    .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            ChartData chartData = new ChartData(day.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), data);
+            chartDataList.add(chartData);
+        }
+        return chartDataList;
+    }
+
+    private List<ChartData> getPurchaseChartData(LocalDateTime lastMonth, List<Purchase> last30DaysPurchases){
+        List<ChartData> chartDataList = new ArrayList<>();
+        for(int i = 0; i<30; i++){
+            LocalDateTime day = lastMonth.plusDays(i);
+            double data = last30DaysPurchases.stream()
+                    .filter(o -> o.getExecutionDate().toLocalDate().equals(day.toLocalDate()))
+                    .map(p -> p.getProduct().getPurchasePrice().multiply(p.getQuantity()))
+                    .reduce(new BigDecimal(0), BigDecimal::add).setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            ChartData chartData = new ChartData(day.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), data);
+            chartDataList.add(chartData);
+        }
+        return chartDataList;
+    }
+
 }

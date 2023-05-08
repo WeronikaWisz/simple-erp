@@ -13,6 +13,7 @@ import {ReleasesAcceptancesResponse} from "../models/warehouse/ReleasesAcceptanc
 import {ReleaseDetails} from "../models/warehouse/ReleaseDetails";
 import {AcceptanceDetails} from "../models/warehouse/AcceptanceDetails";
 import {UpdateContractorRequest} from "../models/products/UpdateContractorRequest";
+import {SalesAndExpensesData} from "../models/trade/SalesAndExpensesData";
 
 const TRADE_API = 'http://localhost:8080/trade/';
 
@@ -109,5 +110,9 @@ export class TradeService {
     formData.append('file', file);
 
     return this.http.post<ArrayBuffer>(TRADE_API + 'orders/import', formData)
+  }
+
+  getSaleAndExpenses(): Observable<SalesAndExpensesData> {
+    return this.http.get<SalesAndExpensesData>(TRADE_API + 'sale-expenses');
   }
 }

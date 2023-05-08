@@ -46,6 +46,9 @@
         <span class="button-text">{{ 'nav.browse-contractors' | translate}}</span>
       </a>
       <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.settings' | translate}}</h2>
+      <a mat-list-item href routerLink="browse-analysis" *ngIf="hasAdminRole()"><mat-icon>bar_chart</mat-icon>
+        <span class="button-text">{{ 'nav.browse-analysis' | translate}}</span>
+      </a>
       <a mat-list-item href routerLink="forecasting" *ngIf="hasAdminRole()"><mat-icon>trending_up</mat-icon>
         <span class="button-text">{{ 'nav.forecasting' | translate}}</span>
       </a>
@@ -136,6 +139,9 @@
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="settings" *ngIf="hasAdminRole()">{{ 'nav.settings-l' | translate}}</button>
         <mat-menu #settings="matMenu">
+          <button mat-menu-item routerLink="browse-analysis">
+            <mat-icon>bar_chart</mat-icon> {{ 'nav.browse-analysis' | translate}}
+          </button>
           <button mat-menu-item routerLink="forecasting">
             <mat-icon>trending_up</mat-icon> {{ 'nav.forecasting' | translate}}
           </button>

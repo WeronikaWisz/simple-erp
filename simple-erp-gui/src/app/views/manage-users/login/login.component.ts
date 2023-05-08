@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import Swal from "sweetalert2";
 import {TranslateService} from "@ngx-translate/core";
+import {ERole} from "../../../enums/ERole";
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,7 @@ export class LoginComponent implements OnInit {
     if (this.tokenStorage.getToken()) {
       this.isLoggedIn = true;
       this.roles = this.tokenStorage.getUser().roles;
-      this.router.navigate(['/profile']).then(() => this.reloadPage());
+      this.redirectToPageForRole();
     }
   }
 
@@ -47,7 +48,7 @@ export class LoginComponent implements OnInit {
         console.log(data.token);
         this.isLoggedIn = true;
         this.roles = this.tokenStorage.getUser().roles;
-        this.router.navigate(['/profile']).then(() => this.reloadPage());
+        this.redirectToPageForRole();
       },
       error: (err) => {
         this.form.controls['username'].setErrors({'incorrect': true});
@@ -60,7 +61,21 @@ export class LoginComponent implements OnInit {
           showConfirmButton: false
         })
       }
-  });
+    });
+  }
+
+  redirectToPageForRole(){
+    if(this.roles.includes(ERole[ERole.ROLE_ADMIN])) {
+      this.router.navigate(['/browse-analysis']).then(() => this.reloadPage());
+    } else if (this.roles.includes(ERole[ERole.ROLE_TRADE])){
+      this.router.navigate(['/browse-orders']).then(() => this.reloadPage());
+    } else if (this.roles.includes(ERole[ERole.ROLE_WAREHOUSE])){
+      this.router.navigate(['/browse-supplies']).then(() => this.reloadPage());
+    } else if (this.roles.includes(ERole[ERole.ROLE_PRODUCTION])){
+      this.router.navigate(['/browse-production']).then(() => this.reloadPage());
+    } else {
+      this.router.navigate(['/profile']).then(() => this.reloadPage());
+    }
   }
 
   reloadPage(): void {

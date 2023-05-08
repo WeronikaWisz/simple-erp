@@ -436,6 +436,22 @@
       "active-error": "Nie udało się załadować stanu prognozowania",
       "rmsse": "Błąd średniokwadratowy skalowany (RMSSE)",
       "loss": "Strata (loss)"
+    },
+    "browse-analysis": {
+      "browse-title": "Sprzedaż i wydatki",
+      "sale-chart": "Dochód ze sprzedaży",
+      "quantity-chart": "Liczba zamówień",
+      "purchase-chart": "Wydatki na zakupy",
+      "sale-label": "Dochód",
+      "quantity-label": "Liczba zamówień",
+      "purchase-label": "Wydatek",
+      "quantity-today": "Liczba zamówień dzisiaj",
+      "quantity-month": "Liczba zamówień w tym miesiącu",
+      "sale-today": "Dochód ze sprzedaży dzisiaj",
+      "sale-month": "Dochód ze sprzedaży w tym miesiącu",
+      "purchase-today": "Wydatki na zakupy dzisiaj",
+      "purchase-month": "Wydatki na zakupy w tym miesiącu",
+      "load-error": "Nie udało się załadować statystyk"
     }
   },
   "tasks": {
@@ -477,6 +493,7 @@
     "settings": "ANALIZY",
     "settings-l": "Analizy",
     "forecasting": "Prognozowanie",
-    "browse-production-products": "Lista produktów"
+    "browse-production-products": "Lista produktów",
+    "browse-analysis": "Sprzedaż i wydatki"
   }
 }

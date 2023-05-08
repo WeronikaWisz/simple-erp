@@ -436,6 +436,22 @@
       "active-error": "Cannot upload forecasting state",
       "rmsse": "Root Mean Squared Scaled Error (RMSSE)",
       "loss": "Loss"
+    },
+    "browse-analysis": {
+      "browse-title": "Sales and expenses",
+      "sale-chart": "Income from sales",
+      "quantity-chart": "Number of orders",
+      "purchase-chart": "Spending on purchases",
+      "sale-label": "Income",
+      "quantity-label": "Number of orders",
+      "purchase-label": "Expense",
+      "quantity-today": "Number of orders today",
+      "quantity-month": "Number of orders this month",
+      "sale-today": "Sales income today",
+      "sale-month": "Sales income this month",
+      "purchase-today": "Spending on purchases today",
+      "purchase-month": "Spending on purchases this month",
+      "load-error": "Cannot load statistics"
     }
   },
   "tasks": {
@@ -477,6 +493,7 @@
     "settings": "ANALYSIS",
     "settings-l": "Analysis",
     "forecasting": "Forecasting",
-    "browse-production-products": "Products list"
+    "browse-production-products": "Products list",
+    "browse-analysis": "Sales and expenses"
   }
 }

@@ -69,6 +69,9 @@ import { ProductionInfoDialogComponent } from './views/production/browse-product
 import { ProductSetInfoDialogComponent } from './views/products/browse-products/product-set-info-dialog/product-set-info-dialog.component';
 import { BrowseProductionProductsComponent } from './views/production/browse-production-products/browse-production-products.component';
 import { ImportOrdersDialogComponent } from './views/trade/browse-orders/import-orders-dialog/import-orders-dialog.component';
+import { BrowseAnalysisComponent } from './views/settings/browse-analysis/browse-analysis.component';
+import {LocalizedDatePipe} from "./helpers/localized-date.pipe";
+import '@angular/common/locales/global/pl';
 
 @NgModule({
   declarations: [
@@ -111,7 +114,9 @@ import { ImportOrdersDialogComponent } from './views/trade/browse-orders/import-
     ProductionInfoDialogComponent,
     ProductSetInfoDialogComponent,
     BrowseProductionProductsComponent,
-    ImportOrdersDialogComponent
+    ImportOrdersDialogComponent,
+    BrowseAnalysisComponent,
+    LocalizedDatePipe
   ],
     imports: [
         BrowserModule,
