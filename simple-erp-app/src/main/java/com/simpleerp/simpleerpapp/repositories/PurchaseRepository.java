@@ -14,11 +14,12 @@ import java.util.Optional;
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
-    Optional<List<Purchase>> findByProductAndStatusNotIn(Product product, List<EStatus> statuses);
+    List<Purchase> findByProductAndStatusNotIn(Product product, List<EStatus> statuses);
 
-    Optional<List<Purchase>> findByStatusIn(List<EStatus> statuses);
+    List<Purchase> findByStatusIn(List<EStatus> statuses);
 
-    Optional<List<Purchase>> findByStatus(EStatus statuse);
+    List<Purchase> findByStatus(EStatus statuse);
 
-    Optional<List<Purchase>> findByExecutionDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Purchase> findByExecutionDateBetweenAndStatusNot(LocalDateTime startDate, LocalDateTime endDate,
+                                                          EStatus status);
 }

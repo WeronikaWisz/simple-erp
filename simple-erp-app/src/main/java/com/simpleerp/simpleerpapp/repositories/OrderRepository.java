@@ -14,9 +14,10 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByNumber(String number);
 
-    Optional<List<Order>> findByStatus(EStatus status);
+    List<Order> findByStatus(EStatus status);
 
-    Optional<List<Order>> findByStatusIn(List<EStatus> statuses);
+    List<Order> findByStatusIn(List<EStatus> statuses);
 
-    Optional<List<Order>> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Order> findByOrderDateBetweenAndStatusNot(LocalDateTime startDate, LocalDateTime endDate,
+                                                   EStatus statuses);
 }

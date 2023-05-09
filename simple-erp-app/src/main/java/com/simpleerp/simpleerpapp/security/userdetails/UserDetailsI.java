@@ -24,14 +24,17 @@ public class UserDetailsI implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private Boolean isEnabled;
+
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsI(Long id, String username, String email, String password,
+    public UserDetailsI(Long id, String username, String email, String password, Boolean isEnabled,
                         Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.isEnabled = isEnabled;
         this.authorities = authorities;
     }
 
@@ -45,6 +48,7 @@ public class UserDetailsI implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
+                !user.getIsDeleted(),
                 authorities);
     }
 
@@ -98,6 +102,6 @@ public class UserDetailsI implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }

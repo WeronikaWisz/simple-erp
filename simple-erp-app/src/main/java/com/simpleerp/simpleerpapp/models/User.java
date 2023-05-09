@@ -31,8 +31,12 @@ public class User {
     private String email;
     private String phone;
 
+    private Boolean isDeleted;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
+    private LocalDateTime deleteDate;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(	name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -18,11 +18,11 @@ public interface ReleaseRepository extends JpaRepository<Release, Long> {
 
     Optional<Release> findByProduction(Production production);
 
-    Optional<List<Release>> findByStatus(EStatus status);
+    List<Release> findByStatus(EStatus status);
 
-    Optional<List<Release>> findByStatusIn(List<EStatus> statuses);
+    List<Release> findByStatusIn(List<EStatus> statuses);
 
-    Optional<List<Release>> findByStatusAndDirection(EStatus status, EDirection direction);
+    List<Release> findByStatusAndDirection(EStatus status, EDirection direction);
 
-    Optional<List<Release>> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
+    List<Release> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
 }

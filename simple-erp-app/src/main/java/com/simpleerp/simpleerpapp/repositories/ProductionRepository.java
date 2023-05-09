@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface ProductionRepository extends JpaRepository<Production, Long> {
 
-    Optional<List<Production>> findByProductAndStatusNotIn(Product product, List<EStatus> statuses);
+    List<Production> findByProductAndStatusNotIn(Product product, List<EStatus> statuses);
 
-    Optional<List<Production>> findByStatusIn(List<EStatus> statuses);
+    List<Production> findByStatusIn(List<EStatus> statuses);
 
-    Optional<List<Production>> findByStatus(EStatus status);
+    List<Production> findByStatus(EStatus status);
 }

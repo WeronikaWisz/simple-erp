@@ -70,8 +70,8 @@ public class TradeService {
     }
 
     public List<ProductCode> loadOrderProductList() {
-        List<Product> productList = productRepository.findAll();
-        List<ProductSet> productSetList = productSetRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<ProductSet> productSetList = productSetRepository.findByIsDeleted(false);
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             if(product.getSalePrice() == null){
@@ -96,7 +96,7 @@ public class TradeService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -139,7 +139,13 @@ public class TradeService {
         Map<Product, BigDecimal> orderProductsMap = new HashMap<>();
         for(OrderProductQuantity orderProductQuantity: addOrderRequest.getProductSet()){
             Optional<Product> product = productRepository.findByCode(orderProductQuantity.getProduct());
+            if(product.isPresent() && product.get().getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             Optional<ProductSet> productSet = productSetRepository.findByCode(orderProductQuantity.getProduct());
+            if(productSet.isPresent() && productSet.get().getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             if(product.isEmpty() && productSet.isEmpty()){
                 throw new ApiExpectationFailedException("exception.productNotFound");
             }
@@ -257,7 +263,7 @@ public class TradeService {
 
     public OrdersResponse loadOrders(EStatus status, int page, int size) {
         OrdersResponse ordersResponse = new OrdersResponse();
-        List<Order> orderList = orderRepository.findByStatus(status).orElse(Collections.emptyList());
+        List<Order> orderList = orderRepository.findByStatus(status);
         int total = orderList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -297,13 +303,12 @@ public class TradeService {
         if(!order.getStatus().equals(EStatus.WAITING)){
             throw new ApiExpectationFailedException("exception.orderNotWaiting");
         }
-        List<OrderProducts> orderProducts = order.getOrderProductsSet();
-        orderProductsRepository.deleteAll(orderProducts);
-        orderRepository.delete(order);
+        order.setStatus(EStatus.CANCELED);
+        orderRepository.save(order);
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findAll()
+        List<User> userList = userRepository.findByIsDeleted(false)
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_TRADE)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
@@ -319,6 +324,9 @@ public class TradeService {
     public void updateAssignedUser(UpdateAssignedUserRequest updateAssignedUserRequest) {
         User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
         if(updateAssignedUserRequest.getTask().equals(ETask.TASK_SALE)) {
             for (Long id : updateAssignedUserRequest.getTaskIds()) {
                 Order order = orderRepository.findById(id)
@@ -358,6 +366,9 @@ public class TradeService {
     public void updateOrder(UpdateOrderRequest updateOrderRequest) {
         Order order = orderRepository.findById(updateOrderRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.orderNotFound"));
+        if(order.getStatus().equals(EStatus.CANCELED) || order.getStatus().equals(EStatus.DONE)){
+            throw new ApiExpectationFailedException("exception.orderDeleted");
+        }
         if(!Objects.equals(order.getNumber(), updateOrderRequest.getNumber())){
             Optional<Order> existingOrder = orderRepository.findByNumber(updateOrderRequest.getNumber());
             if(existingOrder.isPresent()) {
@@ -383,7 +394,13 @@ public class TradeService {
         Map<Product, BigDecimal> orderProductsMap = new HashMap<>();
         for(OrderProductQuantity orderProductQuantity: updateOrderRequest.getProductSet()){
             Optional<Product> product = productRepository.findByCode(orderProductQuantity.getProduct());
+            if(product.isPresent() && product.get().getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             Optional<ProductSet> productSet = productSetRepository.findByCode(orderProductQuantity.getProduct());
+            if(productSet.isPresent() && productSet.get().getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             if(product.isEmpty() && productSet.isEmpty()){
                 throw new ApiExpectationFailedException("exception.productNotFound");
             }
@@ -504,8 +521,7 @@ public class TradeService {
 
     public DelegatedTasksResponse loadPurchaseTasks(EStatus status, int page, int size) {
         DelegatedTasksResponse delegatedTasksResponse = new DelegatedTasksResponse();
-        List<Purchase> purchaseList = purchaseRepository.findByStatus(status)
-                .orElse(Collections.emptyList());
+        List<Purchase> purchaseList = purchaseRepository.findByStatus(status);
         int total = purchaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -620,8 +636,7 @@ public class TradeService {
     public ReleasesAcceptancesResponse loadReleases(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Release> releaseList = this.releaseRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
-                        EDirection.EXTERNAL)
-                .orElse(Collections.emptyList());
+                        EDirection.EXTERNAL);
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -652,8 +667,7 @@ public class TradeService {
     public ReleasesAcceptancesResponse loadAcceptances(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Acceptance> acceptanceList = acceptanceRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
-                        EDirection.EXTERNAL)
-                .orElse(Collections.emptyList());
+                        EDirection.EXTERNAL);
         int total = acceptanceList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -781,11 +795,11 @@ public class TradeService {
         LocalDateTime lastMonth = LocalDate.now().atStartOfDay().minusDays(30);
         LocalDateTime firstDayOfMonth = LocalDate.now().atStartOfDay().withDayOfMonth(1);
 
-        List<Order> last30DaysOrders = orderRepository.findByOrderDateBetween(lastMonth, today)
-                .orElse(Collections.emptyList());
+        List<Order> last30DaysOrders = orderRepository.findByOrderDateBetweenAndStatusNot(lastMonth, today,
+                EStatus.CANCELED);
 
-        List<Purchase> last30DaysPurchases = purchaseRepository.findByExecutionDateBetween(lastMonth, today)
-                .orElse(Collections.emptyList());
+        List<Purchase> last30DaysPurchases = purchaseRepository.findByExecutionDateBetweenAndStatusNot(lastMonth, today,
+                EStatus.CANCELED);
 
         salesAndExpensesData.setQuantity(getQuantityChartData(lastMonth, last30DaysOrders));
         salesAndExpensesData.setSale(getSaleChartData(lastMonth, last30DaysOrders));

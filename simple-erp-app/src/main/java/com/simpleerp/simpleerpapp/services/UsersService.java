@@ -4,6 +4,7 @@ import com.simpleerp.simpleerpapp.dtos.manageusers.ChangePassword;
 import com.simpleerp.simpleerpapp.dtos.manageusers.UpdateUserData;
 import com.simpleerp.simpleerpapp.dtos.warehouse.AssignedUser;
 import com.simpleerp.simpleerpapp.exception.ApiBadRequestException;
+import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.models.User;
 import com.simpleerp.simpleerpapp.repositories.UserRepository;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
@@ -40,6 +41,9 @@ public class UsersService {
         String username = getCurrentUserUsername();
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("Cannot found user"));
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
         boolean dataChanged = false;
         if(updateUserData.getEmail() != null && !Objects.equals(updateUserData.getEmail(), "")
                 && !updateUserData.getEmail().equals(user.getEmail())){
@@ -85,6 +89,9 @@ public class UsersService {
         String username = getCurrentUserUsername();
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("Cannot found user"));
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
         if(encoder.matches(changePassword.getOldPassword(), user.getPassword())){
             if(encoder.matches(changePassword.getNewPassword(), user.getPassword())){
                 throw new ApiBadRequestException("exception.newPasswordSameAsOld");

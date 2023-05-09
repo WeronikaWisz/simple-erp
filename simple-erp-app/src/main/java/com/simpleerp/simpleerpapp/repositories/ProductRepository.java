@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByCode(String code);
-    Optional<List<Product>> findByContractor(Contractor contractor);
-    Optional<List<Product>> findByType(EType type);
+    List<Product> findByContractor(Contractor contractor);
     Optional<Product> findByForecastingMapping(String mapping);
+    List<Product> findByIsDeleted(Boolean isDeleted);
+    List<Product> findByTypeAndIsDeleted(EType type, Boolean isDeleted);
 }

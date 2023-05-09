@@ -2,8 +2,8 @@ INSERT INTO simpleerp.role (id, name)
 SELECT nextval('simpleerp.role_seq'), 'ROLE_ADMIN'
 WHERE NOT EXISTS (SELECT * FROM simpleerp.role WHERE name='ROLE_ADMIN');
 
-INSERT INTO simpleerp.user (id, username, password, creation_date)
-SELECT nextval('simpleerp.user_seq'), 'admin', '$2a$12$jlKUD04hlIt3/tjABhch7OfDO1Qf5G6aSnUlQq/FqpQF.7mZgCJrq', now()
+INSERT INTO simpleerp.user (id, username, password, creation_date, is_deleted)
+SELECT nextval('simpleerp.user_seq'), 'admin', '$2a$12$jlKUD04hlIt3/tjABhch7OfDO1Qf5G6aSnUlQq/FqpQF.7mZgCJrq', now(), false
 WHERE NOT EXISTS (SELECT * FROM simpleerp.user WHERE username='admin');
 
 INSERT INTO simpleerp.user_roles (user_id, role_id)

@@ -16,11 +16,11 @@ public interface AcceptanceRepository extends JpaRepository<Acceptance, Long> {
 
     Optional<Acceptance> findByProduction(Production production);
 
-    Optional<List<Acceptance>> findByStatusIn(List<EStatus> statuses);
+    List<Acceptance> findByStatusIn(List<EStatus> statuses);
 
-    Optional<List<Acceptance>> findByStatus(EStatus statuse);
+    List<Acceptance> findByStatus(EStatus statuse);
 
-    Optional<List<Acceptance>> findByStatusAndDirection(EStatus status, EDirection direction);
+    List<Acceptance> findByStatusAndDirection(EStatus status, EDirection direction);
 
-    Optional<List<Acceptance>> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
+    List<Acceptance> findByStatusInAndDirection(List<EStatus> statuses, EDirection direction);
 }

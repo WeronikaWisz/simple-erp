@@ -29,12 +29,16 @@ public class ProductProduction {
     @OneToMany(mappedBy = "productProduction")
     List<ProductProductionProducts> productProductionProducts = new ArrayList<>();
 
+    private Boolean isDeleted;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
+    private LocalDateTime deleteDate;
 
     public ProductProduction(String productCode, LocalDateTime creationDate) {
         this.productCode = productCode;
         this.creationDate = creationDate;
+        this.isDeleted = false;
     }
 
     public void addProduct(Product product, BigDecimal quantity){

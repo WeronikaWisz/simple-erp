@@ -53,8 +53,11 @@ public class Product {
 
     private String forecastingMapping;
 
+    private Boolean isDeleted;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
+    private LocalDateTime deleteDate;
 
     public Product(String code, String name, BigDecimal purchasePrice, BigDecimal salePrice,
                    BigDecimal purchaseVat, BigDecimal saleVat,
@@ -69,5 +72,6 @@ public class Product {
         this.creationDate = creationDate;
         this.purchaseVat = purchaseVat;
         this.saleVat = saleVat;
+        this.isDeleted = false;
     }
 }

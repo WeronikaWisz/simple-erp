@@ -80,7 +80,7 @@ public class WarehouseService {
 
     public SuppliesResponse loadSupplies(int page, int size) {
         SuppliesResponse suppliesResponse = new SuppliesResponse();
-        List<StockLevel> stockLevelList = stockLevelRepository.findAll();
+        List<StockLevel> stockLevelList = stockLevelRepository.findByIsDeleted(false);
         int total = stockLevelList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -117,15 +117,13 @@ public class WarehouseService {
 
     private boolean purchaseTaskDelegated(Product product){
         List<Purchase> purchaseList = purchaseRepository
-                .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED))
-                .orElse(Collections.emptyList());
+                .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED));
         return !purchaseList.isEmpty();
     }
 
     private boolean productionTaskDelegated(Product product){
         List<Production> productionList = productionRepository
-                .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED))
-                .orElse(Collections.emptyList());
+                .findByProductAndStatusNotIn(product, List.of(EStatus.DONE,EStatus.CANCELED));
         return !productionList.isEmpty();
     }
 
@@ -141,6 +139,9 @@ public class WarehouseService {
     public void updateSupplies(UpdateSuppliesRequest updateSuppliesRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(updateSuppliesRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        if(stockLevel.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.stockLevelDeleted");
+        }
         stockLevel.setQuantity(new BigDecimal(updateSuppliesRequest.getQuantity()));
         stockLevel.setMinQuantity(new BigDecimal(updateSuppliesRequest.getMinQuantity()));
         stockLevel.setDaysUntilStockLasts(updateSuppliesRequest.getDays());
@@ -152,6 +153,9 @@ public class WarehouseService {
     public void delegatePurchaseTask(PurchaseTaskRequest purchaseTaskRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(purchaseTaskRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        if(stockLevel.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.stockLevelDeleted");
+        }
         Purchase purchase = new Purchase();
         purchase.setProduct(stockLevel.getProduct());
         purchase.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
@@ -184,6 +188,9 @@ public class WarehouseService {
     public void delegateProductionTask(PurchaseTaskRequest purchaseTaskRequest) {
         StockLevel stockLevel = stockLevelRepository.findById(purchaseTaskRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.stockLevelNotFound"));
+        if(stockLevel.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.stockLevelDeleted");
+        }
         Production production = new Production();
         production.setProduct(stockLevel.getProduct());
         production.setQuantity(new BigDecimal(purchaseTaskRequest.getQuantity()));
@@ -233,8 +240,7 @@ public class WarehouseService {
 
     private void loadDelegatedPurchaseTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
         List<Purchase> purchaseList = purchaseRepository
-                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
-                .orElse(Collections.emptyList());
+                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS));
         int total = purchaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -271,8 +277,7 @@ public class WarehouseService {
 
     private void loadDelegatedProductionTasks(DelegatedTasksResponse delegatedTasksResponse, int page, int size) {
         List<Production> productionList = productionRepository
-                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
-                .orElse(Collections.emptyList());
+                .findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS));
         int total = productionList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -339,7 +344,8 @@ public class WarehouseService {
         if(!purchase.getStatus().equals(EStatus.WAITING)){
             throw new ApiExpectationFailedException("exception.taskNotWaiting");
         }
-        purchaseRepository.delete(purchase);
+        purchase.setStatus(EStatus.CANCELED);
+        purchaseRepository.save(purchase);
     }
 
     private void deleteDelegatedProductionTasks(Long id) {
@@ -348,12 +354,13 @@ public class WarehouseService {
         if(!production.getStatus().equals(EStatus.WAITING)){
             throw new ApiExpectationFailedException("exception.taskNotWaiting");
         }
-        productionRepository.delete(production);
+        production.setStatus(EStatus.CANCELED);
+        productionRepository.save(production);
     }
 
     public ReleasesAcceptancesResponse loadReleases(EStatus status, int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Release> releaseList = this.releaseRepository.findByStatus(status).orElse(Collections.emptyList());
+        List<Release> releaseList = this.releaseRepository.findByStatus(status);
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -368,8 +375,7 @@ public class WarehouseService {
 
     public ReleasesAcceptancesResponse loadReleases(EStatus status, EDirection direction, int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Release> releaseList = this.releaseRepository.findByStatusAndDirection(status, direction)
-                .orElse(Collections.emptyList());
+        List<Release> releaseList = this.releaseRepository.findByStatusAndDirection(status, direction);
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -412,6 +418,9 @@ public class WarehouseService {
     public void updateAssignedUsers(UpdateAssignedUserRequest updateAssignedUserRequest) {
         User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
         if(updateAssignedUserRequest.getTask().equals(ETask.TASK_EXTERNAL_RELEASE)
                 || updateAssignedUserRequest.getTask().equals(ETask.TASK_INTERNAL_RELEASE)) {
             for (Long id : updateAssignedUserRequest.getTaskIds()) {
@@ -433,7 +442,7 @@ public class WarehouseService {
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findAll()
+        List<User> userList = userRepository.findByIsDeleted(false)
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_WAREHOUSE)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
@@ -500,7 +509,7 @@ public class WarehouseService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -619,7 +628,7 @@ public class WarehouseService {
 
     public ReleasesAcceptancesResponse loadAcceptances(EStatus status, int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Acceptance> acceptanceList = acceptanceRepository.findByStatus(status).orElse(Collections.emptyList());
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatus(status);
         int total = acceptanceList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -634,8 +643,7 @@ public class WarehouseService {
 
     public ReleasesAcceptancesResponse loadAcceptances(EStatus status, EDirection direction, int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
-        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusAndDirection(status, direction)
-                .orElse(Collections.emptyList());
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusAndDirection(status, direction);
         int total = acceptanceList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -757,22 +765,28 @@ public class WarehouseService {
 
     private boolean checkIfProductForecastingActive(Product product){
 
+        if(product.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
+
         boolean productActive = true;
         if(product.getSalePrice() != null){
             productActive = product.getForecastingMapping() != null;
         }
 
         boolean productSetActive = true;
-        Optional<List<ProductSetProducts>> productSetProducts = productSetProductsRepository.findByProduct(product);
-        if(productSetProducts.isPresent() && !productSetProducts.get().isEmpty()){
-            productSetActive = productSetProducts.get().stream().allMatch(psp -> psp.getProductSet().getForecastingMapping() != null);
+        List<ProductSetProducts> productSetProducts = productSetProductsRepository.findByProduct(product);
+        if(!productSetProducts.isEmpty()){
+            productSetActive = productSetProducts.stream().allMatch(psp ->
+                    psp.getProductSet().getForecastingMapping() != null
+            && !psp.getProductSet().getIsDeleted());
         }
 
         boolean productProductionActive = true;
-        Optional<List<ProductProductionProducts>> productProductionProducts = productProductionProductsRepository
+        List<ProductProductionProducts> productProductionProducts = productProductionProductsRepository
                 .findByProduct(product);
-        if(productProductionProducts.isPresent() && !productProductionProducts.get().isEmpty()){
-            productProductionActive = productProductionProducts.get().stream().allMatch(p ->
+        if(!productProductionProducts.isEmpty()){
+            productProductionActive = productProductionProducts.stream().allMatch(p ->
                     checkIfProductHasForecastingMapping(p.getProductProduction().getProductCode()));
         }
 
@@ -782,7 +796,7 @@ public class WarehouseService {
     private boolean checkIfProductHasForecastingMapping(String code){
         Product product = productRepository.findByCode(code)
                 .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
-        return product.getForecastingMapping() != null;
+        return product.getForecastingMapping() != null && !product.getIsDeleted();
     }
 
     public ProductQuantity suggestProductStockQuantity(Long id, int days) {
@@ -811,6 +825,11 @@ public class WarehouseService {
     }
 
     private ProductQuantity suggestProductQuantity(Product product, StockLevel stockLevel, int days){
+
+        if(product.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
+
         double productForecastForDays = getProductForecastForDays(product, days);
         BigDecimal suggestedAmount;
         if (BigDecimal.valueOf(productForecastForDays).compareTo(stockLevel.getQuantity()) > 0) {
@@ -835,18 +854,18 @@ public class WarehouseService {
             quantity += getProductForecastQuantity(product.getCode(), days);
         }
 
-        Optional<List<ProductSetProducts>> productSetProducts = productSetProductsRepository.findByProduct(product);
-        if(productSetProducts.isPresent() && !productSetProducts.get().isEmpty()){
-            for (ProductSetProducts productSetProduct: productSetProducts.get()) {
+        List<ProductSetProducts> productSetProducts = productSetProductsRepository.findByProduct(product);
+        if(!productSetProducts.isEmpty()){
+            for (ProductSetProducts productSetProduct: productSetProducts) {
                 quantity += getProductForecastQuantity(productSetProduct.getProductSet().getCode(), days)
                         * productSetProduct.getQuantity().doubleValue();
             }
         }
 
-        Optional<List<ProductProductionProducts>> productProductionProducts = productProductionProductsRepository
+        List<ProductProductionProducts> productProductionProducts = productProductionProductsRepository
                 .findByProduct(product);
-        if(productProductionProducts.isPresent() && !productProductionProducts.get().isEmpty()){
-            for (ProductProductionProducts productProductionProduct: productProductionProducts.get()) {
+        if(!productProductionProducts.isEmpty()){
+            for (ProductProductionProducts productProductionProduct: productProductionProducts) {
                 quantity += getProductForecastQuantity(productProductionProduct.getProductProduction().getProductCode(), days)
                         * productProductionProduct.getQuantity().doubleValue();
             }

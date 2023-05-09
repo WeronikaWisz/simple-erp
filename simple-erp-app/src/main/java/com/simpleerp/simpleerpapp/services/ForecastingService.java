@@ -40,6 +40,7 @@ import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import com.simpleerp.simpleerpapp.dtos.forecasting.*;
 import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
+import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.helpers.Evaluator;
@@ -609,9 +610,9 @@ public class ForecastingService {
         } else {
             productCode = productSet.get().getCode();
         }
-        Optional<List<Order>> orders = orderRepository.findByOrderDateBetween(yesterday, today);
-        if(orders.isPresent() && !orders.get().isEmpty()){
-            for (Order order: orders.get()) {
+        List<Order> orders = orderRepository.findByOrderDateBetweenAndStatusNot(yesterday, today, EStatus.CANCELED);
+        if(!orders.isEmpty()){
+            for (Order order: orders) {
                 for (OrderProductQuantity orderProductQuantity: order.getOrderProducts().getOrderProductQuantityList()) {
                     if(orderProductQuantity.getProduct().equals(productCode)){
                         quantity += Double.parseDouble(orderProductQuantity.getQuantity());

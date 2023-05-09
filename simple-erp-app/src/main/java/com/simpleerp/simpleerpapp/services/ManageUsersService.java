@@ -4,14 +4,12 @@ import com.simpleerp.simpleerpapp.dtos.auth.AddUserRequest;
 import com.simpleerp.simpleerpapp.dtos.auth.UpdateUserRequest;
 import com.simpleerp.simpleerpapp.dtos.manageusers.*;
 import com.simpleerp.simpleerpapp.enums.ERole;
+import com.simpleerp.simpleerpapp.enums.EStatus;
 import com.simpleerp.simpleerpapp.exception.ApiBadRequestException;
+import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
-import com.simpleerp.simpleerpapp.models.Role;
-import com.simpleerp.simpleerpapp.models.Task;
-import com.simpleerp.simpleerpapp.models.User;
-import com.simpleerp.simpleerpapp.repositories.RoleRepository;
-import com.simpleerp.simpleerpapp.repositories.TaskRepository;
-import com.simpleerp.simpleerpapp.repositories.UserRepository;
+import com.simpleerp.simpleerpapp.models.*;
+import com.simpleerp.simpleerpapp.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,14 +24,27 @@ public class ManageUsersService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final TaskRepository taskRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final ProductionRepository productionRepository;
+    private final OrderRepository orderRepository;
+    private final ReleaseRepository releaseRepository;
+    private final AcceptanceRepository acceptanceRepository;
     PasswordEncoder encoder;
 
     @Autowired
     public ManageUsersService(UserRepository userRepository, RoleRepository roleRepository,
-                              TaskRepository taskRepository, PasswordEncoder encoder) {
+                              TaskRepository taskRepository, PurchaseRepository purchaseRepository,
+                              ProductionRepository productionRepository, OrderRepository orderRepository,
+                              ReleaseRepository releaseRepository, AcceptanceRepository acceptanceRepository,
+                              PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.taskRepository = taskRepository;
+        this.purchaseRepository = purchaseRepository;
+        this.productionRepository = productionRepository;
+        this.orderRepository = orderRepository;
+        this.releaseRepository = releaseRepository;
+        this.acceptanceRepository = acceptanceRepository;
         this.encoder = encoder;
     }
 
@@ -67,6 +78,7 @@ public class ManageUsersService {
         }
 
         user.setRoles(roles);
+        user.setIsDeleted(false);
         userRepository.save(user);
     }
 
@@ -81,7 +93,7 @@ public class ManageUsersService {
     }
 
     public UsersResponse loadUsers(Integer page, Integer size){
-        List<User> userList = userRepository.findAll();
+        List<User> userList = userRepository.findByIsDeleted(false);
         int total = userList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -116,12 +128,55 @@ public class ManageUsersService {
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
-        userRepository.delete(user);
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
+        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new ApiNotFoundException("exception.userRoleMissing"));
+        if(user.getRoles().contains(adminRole)){
+            throw new ApiExpectationFailedException("exception.cannotDeleteAdmin");
+        }
+        if(taskRepository.findAll().stream().anyMatch(t -> t.getDefaultUser().equals(user))){
+            throw new ApiExpectationFailedException("exception.userHasDefaultTask");
+        }
+        List<Purchase> purchaseList = purchaseRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .stream()
+                .filter(t -> t.getRequestingUser().equals(user)
+                        || t.getAssignedUser().equals(user)).collect(Collectors.toList());
+        List<Production> productionList = productionRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .stream()
+                .filter(t -> t.getRequestingUser().equals(user)
+                        || t.getAssignedUser().equals(user)).collect(Collectors.toList());
+        List<Order> orderList = orderRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .stream()
+                .filter(t -> t.getRequestingUser().equals(user)
+                        || t.getAssignedUser().equals(user)).collect(Collectors.toList());
+        List<Release> releaseList = releaseRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .stream()
+                .filter(t -> t.getRequestingUser().equals(user)
+                        || t.getAssignedUser().equals(user)).collect(Collectors.toList());
+        List<Acceptance> acceptanceList = acceptanceRepository.findByStatusIn(List.of(EStatus.WAITING, EStatus.IN_PROGRESS))
+                .stream()
+                .filter(t -> t.getRequestingUser().equals(user)
+                        || t.getAssignedUser().equals(user)).collect(Collectors.toList());
+
+        if(!purchaseList.isEmpty() || !productionList.isEmpty() || !orderList.isEmpty() || !releaseList.isEmpty()
+                || !acceptanceList.isEmpty()){
+            throw new ApiExpectationFailedException("exception.userHasCurrentTask");
+        }
+
+        user.setIsDeleted(true);
+        user.setDeleteDate(LocalDateTime.now());
+        userRepository.save(user);
     }
 
     public void updateUser(UpdateUserRequest updateUserRequest) {
         User user = userRepository.findById(updateUserRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
+
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
 
         if(!Objects.equals(updateUserRequest.getUsername(), user.getUsername())){
             if (userRepository.existsByUsername(updateUserRequest.getUsername())) {
@@ -209,7 +264,7 @@ public class ManageUsersService {
     public List<UserName> loadUserForTask(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
-        List<User> userList = userRepository.findAll()
+        List<User> userList = userRepository.findByIsDeleted(false)
                 .stream().filter(user -> user.getRoles().contains(task.getRole())).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
         admin.ifPresent(userList::add);

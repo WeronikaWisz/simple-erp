@@ -161,13 +161,13 @@ public class ProductsService {
     }
 
     public List<Product> loadProductForSetList() {
-        return productRepository.findAll();
+        return productRepository.findByIsDeleted(false);
     }
 
     public ProductsResponse loadProducts(int page, int size) {
         ProductsResponse productsResponse = new ProductsResponse();
-        List<Product> productList = productRepository.findAll();
-        List<ProductSet> productSetList = productSetRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<ProductSet> productSetList = productSetRepository.findByIsDeleted(false);
         int total = productList.size() + productSetList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -208,67 +208,77 @@ public class ProductsService {
         if(type.equals(EType.SET)){
             ProductSet productSet = productSetRepository.findById(id)
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            if(productSet.getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             this.checkIfProductSetNotInOrder(productSet);
             this.deleteFromForecasting(productSet.getCode());
-            List<ProductSetProducts> productSetProducts = productSet.getProductsSets();
-            productSetProductsRepository.deleteAll(productSetProducts);
-            productSetRepository.delete(productSet);
+            productSet.setIsDeleted(true);
+            productSet.setDeleteDate(LocalDateTime.now());
+            productSetRepository.save(productSet);
         } else {
             Product product = productRepository.findById(id).
                     orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            if(product.getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             this.checkIfProductNotInOrderOrTask(product);
-            Optional<List<ProductSetProducts>> productSetProductsList = productSetProductsRepository.findByProduct(product);
-            Optional<List<ProductProductionProducts>> productProductionProductsList = productProductionProductsRepository.findByProduct(product);
-            if(productSetProductsList.isPresent() && !productSetProductsList.get().isEmpty()
-            || productProductionProductsList.isPresent() && !productProductionProductsList.get().isEmpty()){
+            List<ProductSetProducts> productSetProductsList = productSetProductsRepository.findByProduct(product)
+                    .stream().filter(psp -> !psp.getProductSet().getIsDeleted()).collect(Collectors.toList());
+            List<ProductProductionProducts> productProductionProductsList = productProductionProductsRepository
+                    .findByProduct(product)
+                    .stream().filter(ppp -> !ppp.getProductProduction().getIsDeleted()).collect(Collectors.toList());
+            if(!productSetProductsList.isEmpty() || !productProductionProductsList.isEmpty()){
                 throw new ApiExpectationFailedException("exception.productIsInSet");
             } else {
                 if(type.equals(EType.PRODUCED)){
                     ProductProduction productProduction = productProductionRepository.findByProductCode(product.getCode())
                             .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
-                    List<ProductProductionProducts> productProductionProducts = productProduction.getProductProductionProducts();
-                    productProductionProductsRepository.deleteAll(productProductionProducts);
-                    List<ProductionStep> productionSteps = productionStepRepository.findByProductProduction(productProduction)
-                            .orElse(Collections.emptyList());
-                    productionStepRepository.deleteAll(productionSteps);
-                    productProductionRepository.delete(productProduction);
+                    productProduction.setDeleteDate(LocalDateTime.now());
+                    productProduction.setIsDeleted(true);
+                    productProductionRepository.save(productProduction);
                 }
                 this.deleteFromForecasting(product.getCode());
                 StockLevel stockLevel = product.getStockLevel();
-                stockLevelRepository.delete(stockLevel);
-                productRepository.delete(product);
+                stockLevel.setIsDeleted(true);
+                stockLevel.setDeleteDate(LocalDateTime.now());
+                stockLevelRepository.save(stockLevel);
+                product.setIsDeleted(true);
+                product.setDeleteDate(LocalDateTime.now());
+                productRepository.save(product);
             }
         }
     }
 
+//    TODO
     private void deleteFromForecasting(String code) {
         Optional<ProductForecasting> productForecasting = productForecastingRepository.findByProductCode(code);
         productForecasting.ifPresent(productForecastingRepository::delete);
     }
 
     private void checkIfProductNotInOrderOrTask(Product product) {
-        Optional<List<Purchase>> purchases = purchaseRepository.findByProductAndStatusNotIn(product,
+        List<Purchase> purchases = purchaseRepository.findByProductAndStatusNotIn(product,
                 List.of(EStatus.DONE,EStatus.CANCELED));
-        if(purchases.isPresent() && !purchases.get().isEmpty()){
+        if(!purchases.isEmpty()){
             throw new ApiExpectationFailedException("exception.productInPurchase");
         }
-        Optional<List<Production>> productions = productionRepository.findByProductAndStatusNotIn(product,
+        List<Production> productions = productionRepository.findByProductAndStatusNotIn(product,
                 List.of(EStatus.DONE,EStatus.CANCELED));
-        if(productions.isPresent() && !productions.get().isEmpty()){
+        if(!productions.isEmpty()){
             throw new ApiExpectationFailedException("exception.productInProduction");
         }
-        Optional<List<OrderProducts>> orderProducts = orderProductsRepository.findByProduct(product);
-        if(orderProducts.isPresent() && !orderProducts.get().isEmpty()
-                && orderProducts.get().stream().anyMatch(o -> o.getOrder().getStatus().equals(EStatus.WAITING)
+        List<OrderProducts> orderProducts = orderProductsRepository.findByProduct(product);
+        if(!orderProducts.isEmpty()
+                && orderProducts.stream().anyMatch(o -> o.getOrder().getStatus().equals(EStatus.WAITING)
                 || o.getOrder().getStatus().equals(EStatus.IN_PROGRESS) )){
             throw new ApiExpectationFailedException("exception.productInOrder");
         }
     }
 
     private void checkIfProductSetNotInOrder(ProductSet productSet) {
-        Optional<List<Order>> orders = orderRepository.findByStatusIn(List.of(EStatus.WAITING,EStatus.IN_PROGRESS));
-        if(orders.isPresent() && !orders.get().isEmpty()){
-            if(orders.get().stream().anyMatch(o ->
+        List<Order> orders = orderRepository.findByStatusIn(List.of(EStatus.WAITING,EStatus.IN_PROGRESS));
+        if(!orders.isEmpty()){
+            if(orders.stream().anyMatch(o ->
                     o.getOrderProducts().getOrderProductQuantityList().stream().map(OrderProductQuantity::getProduct)
                             .anyMatch(p -> p.equals(productSet.getCode())))){
                 throw new ApiExpectationFailedException("exception.productInOrder");
@@ -338,6 +348,9 @@ public class ProductsService {
     private void updateProductSet(UpdateProductRequest updateProductRequest) {
         ProductSet productSet = productSetRepository.findById(updateProductRequest.getId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        if(productSet.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
         List<ProductSetProducts> productSetProducts = productSet.getProductsSets();
         productSet.setCode(updateProductRequest.getCode());
         productSet.setName(updateProductRequest.getName());
@@ -348,6 +361,9 @@ public class ProductsService {
         for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
             Product product = productRepository.findById(productQuantity.getProduct())
                     .orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+            if(product.getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
             Optional<ProductSetProducts> productAlreadyInList = productSetProducts.stream()
                     .filter(currentProduct -> currentProduct.getProduct().getId().equals(product.getId())).findFirst();
             if(productAlreadyInList.isPresent()){
@@ -373,6 +389,9 @@ public class ProductsService {
     private void updateSingleProduct(UpdateProductRequest updateProductRequest){
         Product product = productRepository.findById(updateProductRequest.getId()).
                 orElseThrow(() -> new ApiNotFoundException("exception.productNotFound"));
+        if(product.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
         product.setCode(updateProductRequest.getCode());
         product.setName(updateProductRequest.getName());
         product.setUnit(updateProductRequest.getUnit());
@@ -414,7 +433,9 @@ public class ProductsService {
         ProductProduction productProduction = productProductionRepository.findByProductCode(
                         product.getCode())
                 .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
-
+        if(productProduction.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
         List<ProductProductionProducts> productProductionProducts = productProduction.getProductProductionProducts();
         for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
             Product subProduct = productRepository.findById(productQuantity.getProduct())
@@ -440,8 +461,7 @@ public class ProductsService {
         }
         productProductionProductsRepository.deleteAll(productProductionProductsToDelete);
 
-        List<ProductionStep> productionSteps = productionStepRepository.findByProductProduction(productProduction)
-                .orElse(Collections.emptyList());
+        List<ProductionStep> productionSteps = productionStepRepository.findByProductProduction(productProduction);
 
         for(int i=1; i<=updateProductRequest.getProductionSteps().size(); i++){
             Optional<ProductionStep> productionStep = productionStepRepository.findByProductProductionAndNumber(productProduction, i);
@@ -458,10 +478,10 @@ public class ProductsService {
 
         if(productionSteps.size() > updateProductRequest.getProductionSteps().size()){
             Integer numbersToDelete = productionSteps.size() - (productionSteps.size() - updateProductRequest.getProductionSteps().size());
-            Optional<List<ProductionStep>> productionStepsToDelete = productionStepRepository.findByProductProductionAndNumberAfter(
+            List<ProductionStep> productionStepsToDelete = productionStepRepository.findByProductProductionAndNumberAfter(
                     productProduction, numbersToDelete);
-            if(productionStepsToDelete.isPresent() && !productionStepsToDelete.get().isEmpty()) {
-                productionStepRepository.deleteAll(productionStepsToDelete.get());
+            if(!productionStepsToDelete.isEmpty()) {
+                productionStepRepository.deleteAll(productionStepsToDelete);
             }
         }
 
@@ -531,8 +551,7 @@ public class ProductsService {
     public void deleteContractor(Long id) {
         Contractor contractor = contractorRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.contractorNotFound"));
-        List<Product> productList = productRepository.findByContractor(contractor)
-                        .orElse(Collections.emptyList());
+        List<Product> productList = productRepository.findByContractor(contractor);
         if(!productList.isEmpty()){
             productList.forEach(product -> {
                 product.setContractor(null);
@@ -651,7 +670,7 @@ public class ProductsService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();

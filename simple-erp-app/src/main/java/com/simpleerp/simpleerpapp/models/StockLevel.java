@@ -27,8 +27,12 @@ public class StockLevel {
 
     private Integer daysUntilStockLasts;
 
+    private Boolean isDeleted;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
+
+    private LocalDateTime deleteDate;
 
     public StockLevel(Product product, BigDecimal quantity, BigDecimal minQuantity, Integer daysUntilStockLasts,
                       LocalDateTime creationDate) {
@@ -37,5 +41,6 @@ public class StockLevel {
         this.minQuantity = minQuantity;
         this.daysUntilStockLasts = daysUntilStockLasts;
         this.creationDate = creationDate;
+        this.isDeleted = false;
     }
 }

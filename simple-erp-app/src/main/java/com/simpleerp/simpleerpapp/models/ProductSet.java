@@ -32,8 +32,11 @@ public class ProductSet {
 
     private String forecastingMapping;
 
+    private Boolean isDeleted;
+
     private LocalDateTime creationDate;
     private LocalDateTime updateDate;
+    private LocalDateTime deleteDate;
 
     public ProductSet(String code, String name, BigDecimal salePrice, BigDecimal saleVat,
                       LocalDateTime creationDate) {
@@ -42,6 +45,7 @@ public class ProductSet {
         this.salePrice = salePrice;
         this.saleVat = saleVat;
         this.creationDate = creationDate;
+        this.isDeleted = false;
     }
 
     public void addProduct(Product product, BigDecimal quantity){

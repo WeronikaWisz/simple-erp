@@ -9,13 +9,13 @@ import com.simpleerp.simpleerpapp.dtos.products.*;
 import com.simpleerp.simpleerpapp.dtos.trade.UpdateAssignedUserRequest;
 import com.simpleerp.simpleerpapp.dtos.warehouse.*;
 import com.simpleerp.simpleerpapp.enums.*;
+import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.models.*;
 import com.simpleerp.simpleerpapp.repositories.*;
 import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -35,7 +35,6 @@ public class ProductionService {
     private static final String SEPARATOR = "/";
 
     private final ProductRepository productRepository;
-    private final ProductSetRepository productSetRepository;
     private final ProductionRepository productionRepository;
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
@@ -45,13 +44,11 @@ public class ProductionService {
     private final MessageSource messageSource;
 
     @Autowired
-    public ProductionService(ProductRepository productRepository, ProductSetRepository productSetRepository,
-                             ProductionRepository productionRepository, UserRepository userRepository,
-                             TaskRepository taskRepository, ReleaseRepository releaseRepository,
-                             AcceptanceRepository acceptanceRepository, MessageSource messageSource,
-                             ProductProductionRepository productProductionRepository) {
+    public ProductionService(ProductRepository productRepository, ProductionRepository productionRepository,
+                             UserRepository userRepository, TaskRepository taskRepository,
+                             ReleaseRepository releaseRepository, AcceptanceRepository acceptanceRepository,
+                             MessageSource messageSource, ProductProductionRepository productProductionRepository) {
         this.productRepository = productRepository;
-        this.productSetRepository = productSetRepository;
         this.productionRepository = productionRepository;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
@@ -63,8 +60,7 @@ public class ProductionService {
 
     public DelegatedTasksResponse loadProductionTasks(EStatus status, int page, int size) {
         DelegatedTasksResponse delegatedTasksResponse = new DelegatedTasksResponse();
-        List<Production> productionList = productionRepository.findByStatus(status)
-                .orElse(Collections.emptyList());
+        List<Production> productionList = productionRepository.findByStatus(status);
         int total = productionList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -202,7 +198,7 @@ public class ProductionService {
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findAll()
+        List<User> userList = userRepository.findByIsDeleted(false)
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_PRODUCTION)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
@@ -218,6 +214,9 @@ public class ProductionService {
     public void updateAssignedUser(UpdateAssignedUserRequest updateAssignedUserRequest) {
         User user = userRepository.findById(updateAssignedUserRequest.getEmployeeId())
                 .orElseThrow(() -> new ApiNotFoundException("exception.userNotFound"));
+        if(user.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.userDeleted");
+        }
         if(updateAssignedUserRequest.getTask().equals(ETask.TASK_PRODUCTION)) {
             for (Long id : updateAssignedUserRequest.getTaskIds()) {
                 Production production = productionRepository.findById(id)
@@ -246,8 +245,7 @@ public class ProductionService {
     public ReleasesAcceptancesResponse loadReleases(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Release> releaseList = this.releaseRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
-                        EDirection.INTERNAL)
-                .orElse(Collections.emptyList());
+                        EDirection.INTERNAL);
         int total = releaseList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -278,8 +276,7 @@ public class ProductionService {
     public ReleasesAcceptancesResponse loadAcceptances(int page, int size) {
         ReleasesAcceptancesResponse releasesAcceptancesResponse = new ReleasesAcceptancesResponse();
         List<Acceptance> acceptanceList = acceptanceRepository.findByStatusInAndDirection(List.of(EStatus.WAITING, EStatus.IN_PROGRESS),
-                        EDirection.INTERNAL)
-                .orElse(Collections.emptyList());
+                        EDirection.INTERNAL);
         int total = acceptanceList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -308,7 +305,7 @@ public class ProductionService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findAll();
+        List<Product> productList = productRepository.findByIsDeleted(false);
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -402,8 +399,7 @@ public class ProductionService {
 
     public ProductionProductResponse loadProductionProducts(int page, int size) {
         ProductionProductResponse productionProductResponse = new ProductionProductResponse();
-        List<Product> productList = productRepository.findByType(EType.PRODUCED)
-                .orElse(Collections.emptyList());
+        List<Product> productList = productRepository.findByTypeAndIsDeleted(EType.PRODUCED, false);
         int total = productList.size();
         int start = page * size;
         int end = Math.min(start + size, total);

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductionStepRepository extends JpaRepository<ProductionStep, Long> {
-    Optional<List<ProductionStep>> findByProductProduction(ProductProduction productProduction);
+    List<ProductionStep> findByProductProduction(ProductProduction productProduction);
     Optional<ProductionStep> findByProductProductionAndNumber(ProductProduction productProduction, Integer number);
-    Optional<List<ProductionStep>> findByProductProductionAndNumberAfter(ProductProduction productProduction, Integer number);
+    List<ProductionStep> findByProductProductionAndNumberAfter(ProductProduction productProduction, Integer number);
 }
