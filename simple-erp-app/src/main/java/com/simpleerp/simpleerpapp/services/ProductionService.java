@@ -198,7 +198,7 @@ public class ProductionService {
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findByIsDeleted(false)
+        List<User> userList = userRepository.findByIsDeletedFalse()
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_PRODUCTION)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
@@ -305,7 +305,7 @@ public class ProductionService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -399,7 +399,7 @@ public class ProductionService {
 
     public ProductionProductResponse loadProductionProducts(int page, int size) {
         ProductionProductResponse productionProductResponse = new ProductionProductResponse();
-        List<Product> productList = productRepository.findByTypeAndIsDeleted(EType.PRODUCED, false);
+        List<Product> productList = productRepository.findByTypeAndIsDeletedFalse(EType.PRODUCED);
         int total = productList.size();
         int start = page * size;
         int end = Math.min(start + size, total);

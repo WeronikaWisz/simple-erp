@@ -93,7 +93,7 @@ public class ManageUsersService {
     }
 
     public UsersResponse loadUsers(Integer page, Integer size){
-        List<User> userList = userRepository.findByIsDeleted(false);
+        List<User> userList = userRepository.findByIsDeletedFalse();
         int total = userList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -264,7 +264,7 @@ public class ManageUsersService {
     public List<UserName> loadUserForTask(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ApiNotFoundException("exception.taskNotFound"));
-        List<User> userList = userRepository.findByIsDeleted(false)
+        List<User> userList = userRepository.findByIsDeletedFalse()
                 .stream().filter(user -> user.getRoles().contains(task.getRole())).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
         admin.ifPresent(userList::add);

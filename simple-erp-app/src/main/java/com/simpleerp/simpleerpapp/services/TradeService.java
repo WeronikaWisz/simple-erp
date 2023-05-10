@@ -70,8 +70,8 @@ public class TradeService {
     }
 
     public List<ProductCode> loadOrderProductList() {
-        List<Product> productList = productRepository.findByIsDeleted(false);
-        List<ProductSet> productSetList = productSetRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
+        List<ProductSet> productSetList = productSetRepository.findByIsDeletedFalse();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             if(product.getSalePrice() == null){
@@ -96,7 +96,7 @@ public class TradeService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -308,7 +308,7 @@ public class TradeService {
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findByIsDeleted(false)
+        List<User> userList = userRepository.findByIsDeletedFalse()
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_TRADE)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");

@@ -161,13 +161,13 @@ public class ProductsService {
     }
 
     public List<Product> loadProductForSetList() {
-        return productRepository.findByIsDeleted(false);
+        return productRepository.findByIsDeletedFalse();
     }
 
     public ProductsResponse loadProducts(int page, int size) {
         ProductsResponse productsResponse = new ProductsResponse();
-        List<Product> productList = productRepository.findByIsDeleted(false);
-        List<ProductSet> productSetList = productSetRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
+        List<ProductSet> productSetList = productSetRepository.findByIsDeletedFalse();
         int total = productList.size() + productSetList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -250,7 +250,6 @@ public class ProductsService {
         }
     }
 
-//    TODO
     private void deleteFromForecasting(String code) {
         Optional<ProductForecasting> productForecasting = productForecastingRepository.findByProductCode(code);
         productForecasting.ifPresent(productForecastingRepository::delete);
@@ -670,7 +669,7 @@ public class ProductsService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();

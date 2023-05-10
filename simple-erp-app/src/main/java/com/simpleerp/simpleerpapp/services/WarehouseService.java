@@ -80,7 +80,7 @@ public class WarehouseService {
 
     public SuppliesResponse loadSupplies(int page, int size) {
         SuppliesResponse suppliesResponse = new SuppliesResponse();
-        List<StockLevel> stockLevelList = stockLevelRepository.findByIsDeleted(false);
+        List<StockLevel> stockLevelList = stockLevelRepository.findByIsDeletedFalse();
         int total = stockLevelList.size();
         int start = page * size;
         int end = Math.min(start + size, total);
@@ -442,7 +442,7 @@ public class WarehouseService {
     }
 
     public List<UserName> loadUsers() {
-        List<User> userList = userRepository.findByIsDeleted(false)
+        List<User> userList = userRepository.findByIsDeletedFalse()
                 .stream().filter(user -> user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
                         .contains(ERole.ROLE_WAREHOUSE)).collect(Collectors.toList());
         Optional<User> admin = userRepository.findByUsername("admin");
@@ -509,7 +509,7 @@ public class WarehouseService {
     }
 
     public List<ProductCode> loadProductList() {
-        List<Product> productList = productRepository.findByIsDeleted(false);
+        List<Product> productList = productRepository.findByIsDeletedFalse();
         List<ProductCode> productCodeList = new ArrayList<>();
         for (Product product: productList){
             ProductCode productCode = new ProductCode();
@@ -826,10 +826,6 @@ public class WarehouseService {
 
     private ProductQuantity suggestProductQuantity(Product product, StockLevel stockLevel, int days){
 
-        if(product.getIsDeleted()){
-            throw new ApiExpectationFailedException("exception.productDeleted");
-        }
-
         double productForecastForDays = getProductForecastForDays(product, days);
         BigDecimal suggestedAmount;
         if (BigDecimal.valueOf(productForecastForDays).compareTo(stockLevel.getQuantity()) > 0) {
@@ -849,6 +845,11 @@ public class WarehouseService {
     }
 
     private double getProductForecastForDays(Product product, int days){
+
+        if(product.getIsDeleted()){
+            throw new ApiExpectationFailedException("exception.productDeleted");
+        }
+
         double quantity = 0;
         if(product.getSalePrice() != null && product.getForecastingMapping() != null){
             quantity += getProductForecastQuantity(product.getCode(), days);

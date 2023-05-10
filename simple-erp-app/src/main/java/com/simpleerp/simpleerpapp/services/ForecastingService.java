@@ -80,19 +80,17 @@ public class ForecastingService {
     private final ForecastingPropertiesRepository forecastingPropertiesRepository;
     private final ProductForecastingRepository productForecastingRepository;
     private final OrderRepository orderRepository;
-    private final OrderProductsRepository orderProductsRepository;
 
     @Autowired
     public ForecastingService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                               ForecastingPropertiesRepository forecastingPropertiesRepository,
                               ProductForecastingRepository productForecastingRepository,
-                              OrderRepository orderRepository, OrderProductsRepository orderProductsRepository) {
+                              OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.forecastingPropertiesRepository = forecastingPropertiesRepository;
         this.productForecastingRepository = productForecastingRepository;
         this.orderRepository = orderRepository;
-        this.orderProductsRepository = orderProductsRepository;
     }
 
     public TrainingResult trainModel(Integer predictionLength, Integer itemCardinality,
@@ -572,16 +570,93 @@ public class ForecastingService {
         File csvInferenceFile = new File(MODEL_PATH + "/weekly_sales_train_evaluation.csv");
         List<String> mappingsList = new ArrayList<>();
         List<String> lines = getLinesFrom("/weekly_sales_train_evaluation.csv");
+        List<String> newProductLines = getNewProductIfDefinedYearAgo(lines.get(0), lines.get(lines.size()-1));
         try(PrintWriter pw = new PrintWriter(csvInferenceFile)) {
             lines.stream()
+                    .filter(this::checkIfProductNotDeleted)
                     .map(this::appendPreviousDayToPredictFile)
                     .forEach(l -> {
                         mappingsList.add(this.getMappingCodeFromFileLine(l));
                         pw.println(l);
                     });
+            newProductLines.forEach(pw::println);
         }
         mappingsList.remove(0);
         return mappingsList;
+    }
+
+    private List<String> getNewProductIfDefinedYearAgo(String firstLine, String lastLine) {
+        List<String> lines = new ArrayList<>();
+        int id = 1;
+        if(!lastLine.contains("id,item_id")){
+            id = Integer.parseInt(lastLine.split(",")[0]) + 1;
+        }
+        int howManyDays = Integer.parseInt(firstLine.substring(firstLine.lastIndexOf(",") + 3)) - PREDICTION_LENGTH + 1;
+        LocalDateTime yearAgo = LocalDate.now().atStartOfDay().minusYears(1);
+        List<Product> productList =
+                productRepository.findByForecastingMappingIsNullAndIsDeletedFalseAndSalePriceIsNotNullAndCreationDateBefore(yearAgo);
+        List<ProductSet> productSetList =
+                productSetRepository.findByForecastingMappingIsNullAndIsDeletedFalseAndCreationDateBefore(yearAgo);
+        for (Product product: productList) {
+            String mapping = getProductCategoryMapping(product.getCode());
+            StringBuilder newLine = new StringBuilder(String.valueOf(id));
+            newLine.append(",").append(mapping);
+            LocalDateTime productCreationDate = product.getCreationDate().toLocalDate().atStartOfDay();
+            int daysTillToday = (int) Duration.between(productCreationDate,
+                    LocalDateTime.now()).toDays();
+            int howManyNaN = howManyDays - daysTillToday;
+            newLine.append(",NaN".repeat(Math.max(0, howManyNaN)));
+            for(int i=0; i<daysTillToday;i++){
+                newLine.append(",").append(getProductValueForDay(product.getCode(), productCreationDate.plusDays(i)));
+            }
+            newLine.append(",NaN".repeat(Math.max(0, PREDICTION_LENGTH)));
+            lines.add(newLine.toString());
+        }
+        for (ProductSet productSet: productSetList) {
+            String mapping = getProductCategoryMapping(productSet.getCode());
+            StringBuilder newLine = new StringBuilder(String.valueOf(id));
+            newLine.append(",").append(mapping);
+            LocalDateTime productCreationDate = productSet.getCreationDate().toLocalDate().atStartOfDay();
+            int daysTillToday = (int) Duration.between(productCreationDate,
+                    LocalDateTime.now()).toDays();
+            int howManyNaN = howManyDays - daysTillToday;
+            newLine.append(",NaN".repeat(Math.max(0, howManyNaN)));
+            for(int i=0; i<daysTillToday;i++){
+                newLine.append(",").append(getProductValueForDay(productSet.getCode(), productCreationDate.plusDays(i)));
+            }
+            newLine.append(",NaN".repeat(Math.max(0, PREDICTION_LENGTH)));
+            lines.add(newLine.toString());
+        }
+        return lines;
+    }
+
+    private String getProductValueForDay(String productCode, LocalDateTime date) {
+        double quantity = 0;
+        LocalDateTime nextDay = date.plusDays(1);
+
+        List<Order> orders = orderRepository.findByOrderDateBetweenAndStatusNot(date, nextDay, EStatus.CANCELED);
+        if(!orders.isEmpty()){
+            for (Order order: orders) {
+                for (OrderProductQuantity orderProductQuantity: order.getOrderProducts().getOrderProductQuantityList()) {
+                    if(orderProductQuantity.getProduct().equals(productCode)){
+                        quantity += Double.parseDouble(orderProductQuantity.getQuantity());
+                    }
+                }
+            }
+        }
+        return String.format(Locale.US, "%.2f", quantity);
+    }
+
+    private boolean checkIfProductNotDeleted(String line) {
+        if(line.contains("id,item_id")){
+            return true;
+        }
+        String mappingName = getMappingCodeFromFileLine(line);
+        Optional<Product> product = productRepository.findByForecastingMapping(mappingName);
+        if(product.isEmpty()) {
+            throw new ApiExpectationFailedException("exception.forecastingProductCode");
+        }
+        return !product.get().getIsDeleted();
     }
 
     private String appendPreviousDayToPredictFile(String line) {

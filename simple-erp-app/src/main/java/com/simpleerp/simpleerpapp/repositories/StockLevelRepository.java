@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface StockLevelRepository extends JpaRepository<StockLevel, Long> {
     Optional<StockLevel> findByProduct(Product product);
-    List<StockLevel> findByIsDeleted(Boolean isDeleted);
+    List<StockLevel> findByIsDeletedFalse();
 }
