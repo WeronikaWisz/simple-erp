@@ -452,6 +452,13 @@
       "purchase-today": "Spending on purchases today",
       "purchase-month": "Spending on purchases this month",
       "load-error": "Cannot load statistics"
+    },
+    "training-evaluation": {
+      "load-error": "Cannot load training results",
+      "chart-forecast": "Predicted value",
+      "chart-real": "Real value",
+      "chart-title": "Prediction of the product demand",
+      "browse-title": "Forecast accuracy analysis"
     }
   },
   "tasks": {
@@ -494,6 +501,7 @@
     "settings-l": "Analysis",
     "forecasting": "Forecasting",
     "browse-production-products": "Products list",
-    "browse-analysis": "Sales and expenses"
+    "browse-analysis": "Sales and expenses",
+    "training-evaluation": "Model evaluation"
   }
 }

@@ -2,6 +2,9 @@ package com.simpleerp.simpleerpapp.controllers;
 
 import com.simpleerp.simpleerpapp.dtos.auth.MessageResponse;
 import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
+import com.simpleerp.simpleerpapp.dtos.forecasting.TrainingEvaluationData;
+import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.trade.SalesAndExpensesData;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.services.ForecastingService;
@@ -13,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/forecasting")
@@ -47,5 +52,19 @@ public class ForecastingController {
         }
         return ResponseEntity.ok(new MessageResponse(messageSource.getMessage(
                 "success.training", null, LocaleContextHolder.getLocale())));
+    }
+
+    @GetMapping("/evaluation/{code}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getTrainingEvaluation(@PathVariable("code") String code) {
+        TrainingEvaluationData trainingEvaluationData = forecastingService.getTrainingEvaluation(code);
+        return ResponseEntity.ok(trainingEvaluationData);
+    }
+
+    @GetMapping("/products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> loadForecastProductList() {
+        List<ProductCode> productCodeList = forecastingService.loadForecastProductList();
+        return ResponseEntity.ok(productCodeList);
     }
 }

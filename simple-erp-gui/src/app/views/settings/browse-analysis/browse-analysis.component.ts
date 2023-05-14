@@ -88,18 +88,19 @@ export class BrowseAnalysisComponent implements OnInit {
     this.createChart(this.quantityChartElementRef.nativeElement,
       this.getTranslateMessage("settings.browse-analysis.quantity-chart"),
       this.getTranslateMessage("settings.browse-analysis.quantity-label"),
-      '#6495ed', this.quantityData.map(d => d.label), this.quantityData.map(d => d.data.toString()));
+      '#6495ed', this.quantityData.map(d => d.label), this.quantityData.map(d => d.data.toString()), "szt.");
     this.createChart(this.saleChartElementRef.nativeElement,
       this.getTranslateMessage("settings.browse-analysis.sale-chart"),
       this.getTranslateMessage("settings.browse-analysis.sale-label"),
-      '#2E8B57FF', this.saleData.map(d => d.label), this.saleData.map(d => d.data.toString()) );
+      '#2E8B57FF', this.saleData.map(d => d.label), this.saleData.map(d => d.data.toString()), "zł");
     this.createChart(this.purchaseChartElementRef.nativeElement,
       this.getTranslateMessage("settings.browse-analysis.purchase-chart"),
       this.getTranslateMessage("settings.browse-analysis.purchase-label"),
-      '#CD5C5CFF', this.purchaseData.map(d => d.label), this.purchaseData.map(d => d.data.toString()) );
+      '#CD5C5CFF', this.purchaseData.map(d => d.label), this.purchaseData.map(d => d.data.toString()), "zł");
   }
 
-  createChart(context: ChartItem, title: string, label: string, color: string, labels: string[], data: string[]){
+  createChart(context: ChartItem, title: string, label: string, color: string, labels: string[], data: string[],
+              yAxisTitle: string){
 
     this.chart = new Chart(context, {
       type: 'line',
@@ -126,6 +127,14 @@ export class BrowseAnalysisComponent implements OnInit {
           },
           legend: {
             display: false,
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: yAxisTitle
+            }
           }
         },
         aspectRatio:2.5

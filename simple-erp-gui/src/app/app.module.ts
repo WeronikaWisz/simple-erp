@@ -72,6 +72,7 @@ import { ImportOrdersDialogComponent } from './views/trade/browse-orders/import-
 import { BrowseAnalysisComponent } from './views/settings/browse-analysis/browse-analysis.component';
 import {LocalizedDatePipe} from "./helpers/localized-date.pipe";
 import '@angular/common/locales/global/pl';
+import { TrainingEvaluationComponent } from './views/settings/training-evaluation/training-evaluation.component';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import '@angular/common/locales/global/pl';
     BrowseProductionProductsComponent,
     ImportOrdersDialogComponent,
     BrowseAnalysisComponent,
-    LocalizedDatePipe
+    LocalizedDatePipe,
+    TrainingEvaluationComponent
   ],
     imports: [
         BrowserModule,

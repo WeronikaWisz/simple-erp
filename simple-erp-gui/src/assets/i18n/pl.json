@@ -452,6 +452,13 @@
       "purchase-today": "Wydatki na zakupy dzisiaj",
       "purchase-month": "Wydatki na zakupy w tym miesiącu",
       "load-error": "Nie udało się załadować statystyk"
+    },
+    "training-evaluation": {
+      "load-error": "Nie udało się załadować rezultatów treningu",
+      "chart-forecast": "Wartość przewidywana",
+      "chart-real": "Wartość prawdziwa",
+      "chart-title": "Prognoza popytu na produkt",
+      "browse-title": "Analiza trafności prognozy"
     }
   },
   "tasks": {
@@ -494,6 +501,7 @@
     "settings-l": "Analizy",
     "forecasting": "Prognozowanie",
     "browse-production-products": "Lista produktów",
-    "browse-analysis": "Sprzedaż i wydatki"
+    "browse-analysis": "Sprzedaż i wydatki",
+    "training-evaluation": "Ocena modelu"
   }
 }

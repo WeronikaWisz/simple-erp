@@ -39,8 +39,11 @@ import ai.djl.training.util.ProgressBar;
 import ai.djl.translate.TranslateException;
 import ai.djl.util.Progress;
 import com.simpleerp.simpleerpapp.dtos.forecasting.*;
+import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
+import com.simpleerp.simpleerpapp.dtos.trade.ChartData;
 import com.simpleerp.simpleerpapp.dtos.trade.OrderProductQuantity;
 import com.simpleerp.simpleerpapp.enums.EStatus;
+import com.simpleerp.simpleerpapp.enums.EUnit;
 import com.simpleerp.simpleerpapp.exception.ApiExpectationFailedException;
 import com.simpleerp.simpleerpapp.exception.ApiNotFoundException;
 import com.simpleerp.simpleerpapp.helpers.Evaluator;
@@ -71,6 +74,9 @@ public class ForecastingService {
 
     private static final String FREQ = "D";
     private static final Integer PREDICTION_LENGTH = 365;
+//    TODO bedzie 30 i 10
+    private static final Integer EVALUATION_LENGTH = 5;
+    private static final Integer TRAINING_PREDICTION_LENGTH = 2;
     private static final String MODEL_PATH = "/Users/Weronika/Inf_semestr10/simple-erp/simple-erp-app/src/main/resources/forecasting";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForecastingService.class);
@@ -79,17 +85,20 @@ public class ForecastingService {
     private final ProductSetRepository productSetRepository;
     private final ForecastingPropertiesRepository forecastingPropertiesRepository;
     private final ProductForecastingRepository productForecastingRepository;
+    private final ForecastingTrainingEvaluationRepository forecastingTrainingEvaluationRepository;
     private final OrderRepository orderRepository;
 
     @Autowired
     public ForecastingService(ProductRepository productRepository, ProductSetRepository productSetRepository,
                               ForecastingPropertiesRepository forecastingPropertiesRepository,
                               ProductForecastingRepository productForecastingRepository,
+                              ForecastingTrainingEvaluationRepository forecastingTrainingEvaluationRepository,
                               OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.forecastingPropertiesRepository = forecastingPropertiesRepository;
         this.productForecastingRepository = productForecastingRepository;
+        this.forecastingTrainingEvaluationRepository = forecastingTrainingEvaluationRepository;
         this.orderRepository = orderRepository;
     }
 
@@ -150,12 +159,12 @@ public class ForecastingService {
         }
     }
 
-    public Map<String, Float> predict(LocalDateTime startTime, Integer itemCardinality, int maxDays,
-                                      List<String> mappingList)
+    public Map<String, Float> predict(LocalDateTime startTime, Integer itemCardinality, int maxDays, int predictionLength,
+                                      List<String> mappingList, boolean isForTrainingEvaluation)
             throws IOException, TranslateException, ModelException {
         try (Model model = Model.newInstance("deepar")) {
             DeepARNetwork predictionNetwork = getDeepARModel(new NegativeBinomialOutput(), false,
-                    itemCardinality, PREDICTION_LENGTH);
+                    itemCardinality, predictionLength);
             model.setBlock(predictionNetwork);
             model.load(Paths.get(MODEL_PATH));
 
@@ -166,7 +175,7 @@ public class ForecastingService {
                             Dataset.Usage.TEST, startTime, maxDays);
 
             Map<String, Object> arguments = new ConcurrentHashMap<>();
-            arguments.put("prediction_length", PREDICTION_LENGTH);
+            arguments.put("prediction_length", predictionLength);
             arguments.put("freq", FREQ);
             arguments.put("use_" + FieldName.FEAT_DYNAMIC_REAL.name().toLowerCase(), false);
             arguments.put("use_" + FieldName.FEAT_STATIC_CAT.name().toLowerCase(), true);
@@ -183,8 +192,8 @@ public class ForecastingService {
                     NDArray target = data.head();
                     NDArray featStaticCat = data.get(1);
 
-                    NDArray gt = target.get(":, {}:", -PREDICTION_LENGTH);
-                    NDArray pastTarget = target.get(":, :{}", -PREDICTION_LENGTH);
+                    NDArray gt = target.get(":, {}:", -predictionLength);
+                    NDArray pastTarget = target.get(":, :{}", -predictionLength);
 
                     NDList gtSplit = gt.split(batch.getSize());
                     NDList pastTargetSplit = pastTarget.split(batch.getSize());
@@ -202,7 +211,13 @@ public class ForecastingService {
                     List<Forecast> forecasts = predictor.batchPredict(batchInput);
                     LocalDateTime predictionStartDate = LocalDateTime.now();
                     for (int i = 0; i < forecasts.size(); i++) {
-                        this.saveForecast(forecasts.get(i).mean(), predictionStartDate, mappingList.get(i));
+                        if(!isForTrainingEvaluation) {
+                            this.saveForecast(forecasts.get(i).mean(), predictionStartDate, mappingList.get(i));
+                        } else {
+                            this.saveForecastForEvaluationCharts(forecasts.get(i).mean(),
+                                    getDailyRealValues(mappingList.get(i)),
+                                    predictionStartDate.minusDays(EVALUATION_LENGTH), mappingList.get(i));
+                        }
                         LOGGER.info("Forecast mean: "+forecasts.get(i).mean());
                         evaluator.aggregateMetrics(
                                 evaluator.getMetricsPerTs(
@@ -246,6 +261,62 @@ public class ForecastingService {
         } else {
             productForecastingRepository.save(new ProductForecasting(productCode, startTime,
                     dailyForecastList, LocalDateTime.now()));
+        }
+    }
+
+    private DailyForecastList getDailyRealValues(String mappingName){
+        try {
+            List<String> lines = getLinesFrom("/weekly_sales_train_validation.csv");
+            String line = lines.stream().filter(l -> l.contains(mappingName)).findFirst().orElseThrow(
+                    () ->  new ApiExpectationFailedException("exception.forecastingProductCode")
+            );
+
+            DailyForecastList dailyForecastList = new DailyForecastList();
+            List<DailyForecastAmount> dailyForecastAmountList = new ArrayList<>();
+            String[] values = line.split(",");
+            for (String value: Arrays.asList(values).subList(values.length-EVALUATION_LENGTH, values.length)) {
+                dailyForecastAmountList.add(new DailyForecastAmount(value));
+            }
+            dailyForecastList.setDailyForecastAmountList(dailyForecastAmountList);
+            return dailyForecastList;
+        } catch (IOException exception){
+            throw new ApiExpectationFailedException("exception.forecastingTraining");
+        }
+    }
+
+    private void saveForecastForEvaluationCharts(NDArray predictions, DailyForecastList dailyRealValuesList,
+                                                 LocalDateTime startTime, String mappingName){
+        Optional<Product> product = productRepository.findByForecastingMapping(mappingName);
+        Optional<ProductSet> productSet = productSetRepository.findByForecastingMapping(mappingName);
+        String productCode;
+        if(product.isEmpty() && productSet.isEmpty()) {
+            throw new ApiExpectationFailedException("exception.forecastingProductCode");
+        } else if(product.isPresent()){
+            productCode = product.get().getCode();
+        } else {
+            productCode = productSet.get().getCode();
+        }
+
+//        TODO - do sprawdzenia
+        DailyForecastList dailyForecastList = new DailyForecastList();
+        List<Number> predictionsNumbers = Arrays.asList(predictions.toArray()).subList(0, TRAINING_PREDICTION_LENGTH);
+        List<DailyForecastAmount> dailyForecastAmountList = new ArrayList<>(dailyRealValuesList.getDailyForecastAmountList()
+                .subList(0, (dailyRealValuesList.getDailyForecastAmountList().size() - predictionsNumbers.size())));
+        predictionsNumbers.forEach(number -> dailyForecastAmountList.add(
+                new DailyForecastAmount(number.toString())));
+        dailyForecastList.setDailyForecastAmountList(dailyForecastAmountList);
+
+        Optional<ForecastingTrainingEvaluation> forecastingTrainingEvaluation = forecastingTrainingEvaluationRepository
+                .findByProductCode(productCode);
+        if(forecastingTrainingEvaluation.isPresent()){
+            forecastingTrainingEvaluation.get().setStartDate(startTime);
+            forecastingTrainingEvaluation.get().setUpdateDate(LocalDateTime.now());
+            forecastingTrainingEvaluation.get().setForecast(dailyForecastList);
+            forecastingTrainingEvaluation.get().setReal(dailyRealValuesList);
+            forecastingTrainingEvaluationRepository.save(forecastingTrainingEvaluation.get());
+        } else {
+            forecastingTrainingEvaluationRepository.save(new ForecastingTrainingEvaluation(productCode, dailyForecastList,
+                    dailyRealValuesList, LocalDateTime.now(), startTime, true));
         }
     }
 
@@ -381,9 +452,15 @@ public class ForecastingService {
                 long daysTillYesterday = Duration.between(forecastingTrainingData.getEndDate(),
                         LocalDateTime.now().minusDays(1)).toDays();
                 List<String> mappingList = this.prepareInferenceFile((int) daysTillYesterday);
+                this.predict(forecastingTrainingData.getStartDate(),
+                        forecastingTrainingData.getForecastingTrainingElementList().size(),
+                        (int) maxDays, TRAINING_PREDICTION_LENGTH, mappingList,
+                        true);
                 Map<String, Float> metrics = this.predict(forecastingTrainingData.getStartDate(),
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
-                        (int) maxDays + (int) daysTillYesterday + PREDICTION_LENGTH, mappingList);
+                        (int) maxDays + (int) daysTillYesterday + PREDICTION_LENGTH,
+                        PREDICTION_LENGTH, mappingList,
+                        false);
                 for (Map.Entry<String, Float> entry : metrics.entrySet()) {
                     LOGGER.info(String.format("metric: %s:\t%.2f", entry.getKey(), entry.getValue()));
                 }
@@ -401,7 +478,8 @@ public class ForecastingService {
         Optional<ForecastingProperties> forecastingPropertiesTrainRMSSE = forecastingPropertiesRepository
                 .findByCodeAndIsValid("TRAIN_RMSSE", true);
         if(forecastingPropertiesTrainRMSSE.isPresent()){
-            forecastingPropertiesTrainRMSSE.get().setValue("");
+            forecastingPropertiesTrainRMSSE.get().setValue(
+                    String.format(java.util.Locale.US,"%.3f", evaluations.get("train_RMSSE")));
             forecastingPropertiesRepository.save(forecastingPropertiesTrainRMSSE.get());
         } else {
             forecastingPropertiesRepository.save(new ForecastingProperties("TRAIN_RMSSE", "Training RMSSE value",
@@ -411,7 +489,7 @@ public class ForecastingService {
         Optional<ForecastingProperties> forecastingPropertiesTrainLoss = forecastingPropertiesRepository
                 .findByCodeAndIsValid("TRAIN_LOSS", true);
         if(forecastingPropertiesTrainLoss.isPresent()){
-            forecastingPropertiesTrainLoss.get().setValue("");
+            forecastingPropertiesTrainLoss.get().setValue(String.format(java.util.Locale.US,"%.3f", evaluations.get("train_loss")));
             forecastingPropertiesRepository.save(forecastingPropertiesTrainLoss.get());
         } else {
             forecastingPropertiesRepository.save(new ForecastingProperties("TRAIN_LOSS", "Training Loss value",
@@ -560,7 +638,8 @@ public class ForecastingService {
                     DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
             long maxDays = Duration.between(startDate, LocalDateTime.now()).toDays();
             Map<String, Float> metrics = this.predict(startDate, mappingList.size(),
-                (int) maxDays + PREDICTION_LENGTH, mappingList);
+                (int) maxDays + PREDICTION_LENGTH, PREDICTION_LENGTH, mappingList,
+                    false);
         } catch (IOException | TranslateException | ModelException exception){
             throw new ApiExpectationFailedException("exception.forecastingTraining");
         }
@@ -711,6 +790,9 @@ public class ForecastingService {
             TrainingResult trainingResult = this.trainModel(4, mappingList.size(),
                     startDate, (int) maxDays, true);
             saveTrainingEvaluations(trainingResult.getEvaluations());
+            this.predict(startDate, mappingList.size(),
+                    (int) maxDays, TRAINING_PREDICTION_LENGTH, mappingList,
+                    true);
         } catch (IOException | TranslateException | ModelException exception){
             throw new ApiExpectationFailedException("exception.forecastingTraining");
         }
@@ -745,5 +827,67 @@ public class ForecastingService {
             newLine.append(line, 0, offset);
         }
         return newLine.toString();
+    }
+
+    public TrainingEvaluationData getTrainingEvaluation(String productCode) {
+        TrainingEvaluationData trainingEvaluationData = new TrainingEvaluationData();
+        List<ChartData> realChartDataList = new ArrayList<>();
+        List<ChartData> forecastChartDataList = new ArrayList<>();
+        ForecastingTrainingEvaluation forecastingTrainingEvaluation = forecastingTrainingEvaluationRepository
+                .findByProductCode(productCode)
+                .orElseThrow(() -> new ApiExpectationFailedException("exception.forecastingProductCode"));
+        LocalDateTime startDate = forecastingTrainingEvaluation.getStartDate();
+        for(int i = 0; i<EVALUATION_LENGTH; i++){
+            ChartData realChartData;
+            if(!forecastingTrainingEvaluation.getReal().getDailyForecastAmountList().get(i).getAmount().equals("NaN")) {
+                realChartData = new ChartData(startDate.plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        Double.parseDouble(forecastingTrainingEvaluation.getReal().getDailyForecastAmountList().get(i).getAmount()));
+            } else {
+                realChartData = new ChartData(startDate.plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        0d);
+            }
+            ChartData forecastChartData;
+            if(!forecastingTrainingEvaluation.getForecast().getDailyForecastAmountList().get(i).getAmount().equals("NaN")) {
+                forecastChartData = new ChartData(startDate.plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        Double.parseDouble(forecastingTrainingEvaluation.getForecast().getDailyForecastAmountList().get(i).getAmount()));
+            } else {
+                forecastChartData = new ChartData(startDate.plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        0d);
+            }
+            realChartDataList.add(realChartData);
+            forecastChartDataList.add(forecastChartData);
+        }
+        trainingEvaluationData.setReal(realChartDataList);
+        trainingEvaluationData.setForecast(forecastChartDataList);
+        return trainingEvaluationData;
+    }
+
+    public List<ProductCode> loadForecastProductList() {
+        List<Product> productList = productRepository.findByIsDeletedFalse();
+        List<ProductSet> productSetList = productSetRepository.findByIsDeletedFalse();
+        List<ProductCode> productCodeList = new ArrayList<>();
+        for (Product product: productList){
+            if(product.getForecastingMapping() == null){
+                continue;
+            }
+            ProductCode productCode = new ProductCode();
+            productCode.setId(product.getId());
+            productCode.setName(product.getName());
+            productCode.setCode(product.getCode());
+            productCode.setUnit(product.getUnit());
+            productCodeList.add(productCode);
+        }
+        for(ProductSet productSet: productSetList){
+            if(productSet.getForecastingMapping() == null){
+                continue;
+            }
+            ProductCode productCode = new ProductCode();
+            productCode.setId(productSet.getId());
+            productCode.setName(productSet.getName());
+            productCode.setCode(productSet.getCode());
+            productCode.setUnit(EUnit.PIECES);
+            productCodeList.add(productCode);
+        }
+        return productCodeList;
     }
 }

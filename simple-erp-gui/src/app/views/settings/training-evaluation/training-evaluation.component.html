@@ -1,0 +1,21 @@
+<div class="content mat-elevation-z8" *ngIf="isLoggedIn && isAdmin">
+  <div class="title-container">
+    <div>
+      <h2>{{ 'settings.training-evaluation.browse-title' | translate}}</h2>
+    </div>
+    <div>
+      <mat-form-field class="full-width-input product-input" appearance="outline">
+        <mat-label>{{ 'products.add-product.product' | translate}}</mat-label>
+        <mat-select [(ngModel)]="product" (selectionChange)="changeProduct()">
+          <mat-option *ngFor="let product of productList" [value]="product.code">{{product.code}} - {{product.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <br/>
+  <div class="dashboard">
+    <div class="chart-container mat-elevation-z8">
+      <canvas #chart></canvas>
+    </div>
+  </div>
+</div>

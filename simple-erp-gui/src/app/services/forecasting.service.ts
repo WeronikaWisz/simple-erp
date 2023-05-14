@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ForecastingActive} from "../models/forecasting/ForecastingActive";
+import {TrainingEvaluationData} from "../models/forecasting/TrainingEvaluationData";
+import {ProductCode} from "../models/products/ProductCode";
 
 const FORECASTING_API = 'http://localhost:8080/forecasting/';
 
@@ -25,5 +27,13 @@ export class ForecastingService {
 
   checkForecastingState(): Observable<ForecastingActive> {
     return this.http.get<ForecastingActive>(FORECASTING_API + 'active');
+  }
+
+  getTrainingEvaluation(code: string): Observable<TrainingEvaluationData> {
+    return this.http.get<TrainingEvaluationData>(FORECASTING_API + 'evaluation/' + code);
+  }
+
+  loadProductList(): Observable<ProductCode[]> {
+    return this.http.get<ProductCode[]>(FORECASTING_API + 'products');
   }
 }

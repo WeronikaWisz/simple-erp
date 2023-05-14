@@ -52,6 +52,9 @@
       <a mat-list-item href routerLink="forecasting" *ngIf="hasAdminRole()"><mat-icon>trending_up</mat-icon>
         <span class="button-text">{{ 'nav.forecasting' | translate}}</span>
       </a>
+      <a mat-list-item href routerLink="training-evaluation" *ngIf="hasAdminRole()"><mat-icon>multiline_chart</mat-icon>
+        <span class="button-text">{{ 'nav.training-evaluation' | translate}}</span>
+      </a>
       <h2 matSubheader *ngIf="hasAdminRole()">{{ 'nav.manage-users' | translate}}</h2>
       <a mat-list-item href routerLink="browse-users" *ngIf="hasAdminRole()"><mat-icon>face</mat-icon>
         <span class="button-text">{{ 'nav.browse-users' | translate}}</span>
@@ -144,6 +147,9 @@
           </button>
           <button mat-menu-item routerLink="forecasting">
             <mat-icon>trending_up</mat-icon> {{ 'nav.forecasting' | translate}}
+          </button>
+          <button mat-menu-item routerLink="training-evaluation">
+            <mat-icon>multiline_chart</mat-icon> {{ 'nav.training-evaluation' | translate}}
           </button>
         </mat-menu>
         <button mat-button [matMenuTriggerFor]="users" *ngIf="hasAdminRole()">{{ 'nav.manage-users-l' | translate}}</button>

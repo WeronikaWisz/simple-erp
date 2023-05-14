@@ -21,6 +21,7 @@ import {BrowseProductionComponent} from "./views/production/browse-production/br
 import {ForecastingComponent} from "./views/settings/forecasting/forecasting.component";
 import {BrowseProductionProductsComponent} from "./views/production/browse-production-products/browse-production-products.component";
 import {BrowseAnalysisComponent} from "./views/settings/browse-analysis/browse-analysis.component";
+import {TrainingEvaluationComponent} from "./views/settings/training-evaluation/training-evaluation.component";
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -48,6 +49,7 @@ const routes: Routes = [
   { path: 'browse-production-products', component: BrowseProductionProductsComponent },
   { path: 'forecasting', component: ForecastingComponent },
   { path: 'browse-analysis', component: BrowseAnalysisComponent },
+  { path: 'training-evaluation', component: TrainingEvaluationComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' }
 ];
 
