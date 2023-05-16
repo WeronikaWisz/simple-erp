@@ -74,10 +74,10 @@ public class ForecastingService {
 
     private static final String FREQ = "D";
     private static final Integer PREDICTION_LENGTH = 365;
-//    TODO bedzie 30 i 10
-    private static final Integer EVALUATION_LENGTH = 5;
-    private static final Integer TRAINING_PREDICTION_LENGTH = 2;
-    private static final String MODEL_PATH = "/Users/Weronika/Inf_semestr10/simple-erp/simple-erp-app/src/main/resources/forecasting";
+    private static final Integer EVALUATION_LENGTH = 90;
+    private static final Integer TRAINING_PREDICTION_LENGTH = 10;
+    private static final String FORECASTING_PATH = ForecastingService.class.getClassLoader()
+            .getResource("forecasting").getFile();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForecastingService.class);
 
@@ -115,7 +115,7 @@ public class ForecastingService {
                     itemCardinality, predictionLength);
             model.setBlock(trainingNetwork);
             if(retrain){
-                model.load(Paths.get(MODEL_PATH));
+                model.load(Paths.get(FORECASTING_PATH));
             }
 
             List<TimeSeriesTransform> trainingTransformation =
@@ -153,7 +153,7 @@ public class ForecastingService {
                 inputShapes[8] = new Shape(1, predictionLength);
                 trainer.initialize(inputShapes);
 
-                EasyTrain.fit(trainer, 10, trainSet, null);
+                EasyTrain.fit(trainer, 100, trainSet, null);
                 return trainer.getTrainingResult();
             }
         }
@@ -166,7 +166,7 @@ public class ForecastingService {
             DeepARNetwork predictionNetwork = getDeepARModel(new NegativeBinomialOutput(), false,
                     itemCardinality, predictionLength);
             model.setBlock(predictionNetwork);
-            model.load(Paths.get(MODEL_PATH));
+            model.load(Paths.get(FORECASTING_PATH));
 
             M5Forecast testSet =
                     getDataset(
@@ -216,7 +216,7 @@ public class ForecastingService {
                         } else {
                             this.saveForecastForEvaluationCharts(forecasts.get(i).mean(),
                                     getDailyRealValues(mappingList.get(i)),
-                                    predictionStartDate.minusDays(EVALUATION_LENGTH), mappingList.get(i));
+                                    startTime.plusDays(maxDays).minusDays((EVALUATION_LENGTH-1)), mappingList.get(i));
                         }
                         LOGGER.info("Forecast mean: "+forecasts.get(i).mean());
                         evaluator.aggregateMetrics(
@@ -297,7 +297,6 @@ public class ForecastingService {
             productCode = productSet.get().getCode();
         }
 
-//        TODO - do sprawdzenia
         DailyForecastList dailyForecastList = new DailyForecastList();
         List<Number> predictionsNumbers = Arrays.asList(predictions.toArray()).subList(0, TRAINING_PREDICTION_LENGTH);
         List<DailyForecastAmount> dailyForecastAmountList = new ArrayList<>(dailyRealValuesList.getDailyForecastAmountList()
@@ -321,7 +320,7 @@ public class ForecastingService {
     }
 
     private static DefaultTrainingConfig setupTrainingConfig(DistributionOutput distributionOutput) {
-        SaveModelTrainingListener listener = new SaveModelTrainingListener(MODEL_PATH);
+        SaveModelTrainingListener listener = new SaveModelTrainingListener(FORECASTING_PATH);
         listener.setSaveModelCallback(
                 trainer -> {
                     TrainingResult result = trainer.getTrainingResult();
@@ -335,7 +334,7 @@ public class ForecastingService {
                 .addEvaluator(new Rmsse(distributionOutput))
                 .optDevices(Engine.getInstance().getDevices(1))
                 .optInitializer(new XavierInitializer(), Parameter.Type.WEIGHT)
-                .addTrainingListeners(TrainingListener.Defaults.logging(MODEL_PATH))
+                .addTrainingListeners(TrainingListener.Defaults.logging(FORECASTING_PATH))
                 .addTrainingListeners(listener);
     }
 
@@ -366,7 +365,7 @@ public class ForecastingService {
             throws IOException {
 
         Repository repository = Repository.newInstance("local_dataset",
-                Paths.get("/Users/Weronika/Inf_semestr10/simple-erp/simple-erp-app/src/main/resources/forecasting/"));
+                Paths.get(FORECASTING_PATH));
 
         M5Forecast.Builder builder =
                 M5Forecast.builder()
@@ -433,7 +432,7 @@ public class ForecastingService {
                 trainingFileLines.add(record);
             }
 
-            File csvTrainingFile = new File(MODEL_PATH + "/weekly_sales_train_validation.csv");
+            File csvTrainingFile = new File(FORECASTING_PATH + "/weekly_sales_train_validation.csv");
             try(PrintWriter pw = new PrintWriter(csvTrainingFile)) {
                 trainingFileLines.stream()
                         .map(this::convertToCSV)
@@ -524,7 +523,7 @@ public class ForecastingService {
     }
 
     private List<String> prepareInferenceFile(int daysTillNow) throws IOException {
-        File csvInferenceFile = new File(MODEL_PATH + "/weekly_sales_train_evaluation.csv");
+        File csvInferenceFile = new File(FORECASTING_PATH + "/weekly_sales_train_evaluation.csv");
         List<String> mappingsList = new ArrayList<>();
         List<String> lines = getLinesFrom("/weekly_sales_train_validation.csv");
         try(PrintWriter pw = new PrintWriter(csvInferenceFile)) {
@@ -559,7 +558,7 @@ public class ForecastingService {
 
     static List<String> getLinesFrom(String fileName) throws IOException {
         List<String> lines = new ArrayList<>();
-        Scanner file = new Scanner(new File(MODEL_PATH,fileName));
+        Scanner file = new Scanner(new File(FORECASTING_PATH,fileName));
         while(file.hasNextLine()) {
             lines.add(file.nextLine());
         }
@@ -584,7 +583,16 @@ public class ForecastingService {
             String mappingPrefix = "FOODS_1_";
             ForecastingProperties forecastingProperties = forecastingPropertiesRepository.findByCodeAndIsValid("CATEGORY_SEQUENCE_NUMBER", true)
                     .orElseThrow( () -> new ApiNotFoundException("exception.forecastingPropertyNotFound"));
-            StringBuilder mappingSuffix = new StringBuilder(forecastingProperties.getValue());
+            String number = forecastingProperties.getValue();
+            String newSequenceValue;
+            StringBuilder mappingSuffix;
+            if(number.equals("7")){
+                mappingSuffix = new StringBuilder("8");
+                newSequenceValue = "9";
+            } else {
+                mappingSuffix = new StringBuilder(forecastingProperties.getValue());
+                newSequenceValue = String.valueOf(Integer.parseInt(forecastingProperties.getValue()) + 1);
+            }
             while(mappingSuffix.length() < 3){
                 mappingSuffix.insert(0, "0");
             }
@@ -596,7 +604,6 @@ public class ForecastingService {
                 product.get().setForecastingMapping(mapping);
                 productRepository.save(product.get());
             }
-            String newSequenceValue = String.valueOf(Integer.parseInt(forecastingProperties.getValue()) + 1);
             forecastingPropertiesRepository.changeValue(forecastingProperties.getCode(), newSequenceValue);
             return mapping;
         }
@@ -646,7 +653,7 @@ public class ForecastingService {
     }
 
     private List<String> changeInferenceFile() throws IOException {
-        File csvInferenceFile = new File(MODEL_PATH + "/weekly_sales_train_evaluation.csv");
+        File csvInferenceFile = new File(FORECASTING_PATH + "/weekly_sales_train_evaluation.csv");
         List<String> mappingsList = new ArrayList<>();
         List<String> lines = getLinesFrom("/weekly_sales_train_evaluation.csv");
         List<String> newProductLines = getNewProductIfDefinedYearAgo(lines.get(0), lines.get(lines.size()-1));
@@ -799,7 +806,7 @@ public class ForecastingService {
     }
 
     private List<String> changeTrainingFile() throws IOException {
-        File csvTrainingFile = new File(MODEL_PATH + "/weekly_sales_train_validation.csv");
+        File csvTrainingFile = new File(FORECASTING_PATH + "/weekly_sales_train_validation.csv");
         List<String> mappingsList = new ArrayList<>();
         List<String> lines = getLinesFrom("/weekly_sales_train_evaluation.csv");
         try(PrintWriter pw = new PrintWriter(csvTrainingFile)) {

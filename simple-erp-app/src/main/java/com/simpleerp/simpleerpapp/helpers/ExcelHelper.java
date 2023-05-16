@@ -132,7 +132,7 @@ public final class ExcelHelper {
                     long daysBetweenCurrentDateAndPrevious = Duration.between(previousDate, currenDate).toDays();
                     for(long i=1; i<daysBetweenCurrentDateAndPrevious; i++){
                         forecastingTrainingElements.stream().filter(fr -> fr.getItemId().equals(currentProduct))
-                                .findFirst().get().getDayQuantity().add("NaN");
+                                .findFirst().get().getDayQuantity().add("0");
                     }
                     forecastingTrainingElements.stream().filter(fr -> fr.getItemId().equals(currentProduct))
                             .findFirst().get().getDayQuantity().add(forecastingRecord.getQuantity());
