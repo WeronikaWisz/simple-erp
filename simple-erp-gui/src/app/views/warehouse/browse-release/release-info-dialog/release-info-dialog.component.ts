@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {ProductCode} from "../../../../models/products/ProductCode";
 import {Unit} from "../../../../models/products/Unit";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
@@ -8,12 +8,16 @@ import {EUnit} from "../../../../enums/EUnit";
 import {ReleaseDetails} from "../../../../models/warehouse/ReleaseDetails";
 import {EDirection} from "../../../../enums/EDirection";
 import {WarehouseService} from "../../../../services/warehouse.service";
-import {EStatus} from "../../../../enums/EStatus";
 import {TradeService} from "../../../../services/trade.service";
-import {TokenStorageService} from "../../../../services/token-storage.service";
-import {ERole} from "../../../../enums/ERole";
 import {ReleaseAcceptanceDialogData} from "../../../../models/warehouse/ReleaseAcceptanceDialogData";
 import {ProductionService} from "../../../../services/production.service";
+
+declare var require: any;
+
+import * as pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from "pdfmake/build/vfs_fonts";
+const htmlToPdfmake = require("html-to-pdfmake");
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-release-info-dialog',
@@ -46,6 +50,9 @@ export class ReleaseInfoDialogComponent implements OnInit {
     direction: EDirection.EXTERNAL,
     executionDate: "",
   }
+
+  @ViewChild('pdfTable') pdfTable!: ElementRef;
+
   constructor(
     public dialogRef: MatDialogRef<ReleaseInfoDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ReleaseAcceptanceDialogData, private tradeService: TradeService,
@@ -227,5 +234,13 @@ export class ReleaseInfoDialogComponent implements OnInit {
 
   isStatusDone(): boolean {
     return this.release.executionDate != "";
+  }
+
+  public downloadAsPDF() {
+    const pdfTable = this.pdfTable.nativeElement;
+    var html = htmlToPdfmake(pdfTable.innerHTML);
+    var title = this.release.number
+    const documentDefinition = { content: html};
+    pdfMake.createPdf(documentDefinition).download(title);
   }
 }

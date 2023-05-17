@@ -1,3 +1,4 @@
+<div id="pdfTable" #pdfTable>
 <h2 mat-dialog-title *ngIf="isExternal(release.direction)">{{ 'supplies.browse-release.info-title-external' | translate}} {{release.number}}</h2>
 <h2 mat-dialog-title  *ngIf="!isExternal(release.direction)">{{ 'supplies.browse-release.info-title-internal' | translate}} {{release.number}}</h2>
 <div mat-dialog-content>
@@ -28,7 +29,9 @@
     <p *ngIf="isExternal(release.direction)"><span class="description-titles">{{release.postalCode}} {{release.post}}</span></p>
   </div>
 </div>
+</div>
 <div mat-dialog-actions align="end">
+  <button mat-button (click)="downloadAsPDF()">{{ 'supplies.download' | translate}}</button>
   <button mat-button [mat-dialog-close]="dataChanged">
     {{ 'supplies.browse-supplies.close' | translate}}
   </button>

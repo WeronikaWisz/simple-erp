@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {ProductCode} from "../../../../models/products/ProductCode";
 import {Unit} from "../../../../models/products/Unit";
 import {EDirection} from "../../../../enums/EDirection";
@@ -11,6 +11,13 @@ import {EUnit} from "../../../../enums/EUnit";
 import {AcceptanceDetails} from "../../../../models/warehouse/AcceptanceDetails";
 import {ReleaseAcceptanceDialogData} from "../../../../models/warehouse/ReleaseAcceptanceDialogData";
 import {ProductionService} from "../../../../services/production.service";
+
+declare var require: any;
+
+import * as pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from "pdfmake/build/vfs_fonts";
+const htmlToPdfmake = require("html-to-pdfmake");
+(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-acceptance-info-dialog',
@@ -49,6 +56,9 @@ export class AcceptanceInfoDialogComponent implements OnInit {
     direction: EDirection.EXTERNAL,
     executionDate: "",
   }
+
+  @ViewChild('pdfTable') pdfTable!: ElementRef;
+
   constructor(
     public dialogRef: MatDialogRef<AcceptanceInfoDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ReleaseAcceptanceDialogData, private tradeService: TradeService,
@@ -226,6 +236,14 @@ export class AcceptanceInfoDialogComponent implements OnInit {
   isExternal(eDirection: EDirection): boolean {
     let direction = eDirection as unknown as string;
     return direction === EDirection[EDirection.EXTERNAL];
+  }
+
+  public downloadAsPDF() {
+    const pdfTable = this.pdfTable.nativeElement;
+    var html = htmlToPdfmake(pdfTable.innerHTML);
+    var title = this.acceptance.number
+    const documentDefinition = { content: html};
+    pdfMake.createPdf(documentDefinition).download(title);
   }
 
 }

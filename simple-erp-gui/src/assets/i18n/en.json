@@ -300,7 +300,8 @@
       "nip": "NIP",
       "info-title-external": "External acceptance",
       "info-title-internal": "Internal acceptance"
-    }
+    },
+    "download": "Download PDF"
   },
   "trade": {
     "add-order": {
