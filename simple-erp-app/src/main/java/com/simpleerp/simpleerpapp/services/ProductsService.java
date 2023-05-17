@@ -1,5 +1,6 @@
 package com.simpleerp.simpleerpapp.services;
 
+import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingTrainingData;
 import com.simpleerp.simpleerpapp.dtos.production.ProductProductionInfo;
 import com.simpleerp.simpleerpapp.dtos.production.ProductionProductQuantity;
 import com.simpleerp.simpleerpapp.dtos.products.*;
@@ -36,6 +37,7 @@ public class ProductsService {
     private final OrderRepository orderRepository;
     private final OrderProductsRepository orderProductsRepository;
     private final ProductForecastingRepository productForecastingRepository;
+    private final ForecastingTrainingEvaluationRepository forecastingTrainingEvaluationRepository;
 
     @Autowired
     public ProductsService(ProductRepository productRepository, ProductSetRepository productSetRepository,
@@ -46,7 +48,8 @@ public class ProductsService {
                            ProductionStepRepository productionStepRepository, PurchaseRepository purchaseRepository,
                            ProductionRepository productionRepository, OrderRepository orderRepository,
                            OrderProductsRepository orderProductsRepository,
-                           ProductForecastingRepository productForecastingRepository) {
+                           ProductForecastingRepository productForecastingRepository,
+                           ForecastingTrainingEvaluationRepository forecastingTrainingEvaluationRepository) {
         this.productRepository = productRepository;
         this.productSetRepository = productSetRepository;
         this.productSetProductsRepository = productSetProductsRepository;
@@ -60,6 +63,7 @@ public class ProductsService {
         this.orderRepository = orderRepository;
         this.orderProductsRepository = orderProductsRepository;
         this.productForecastingRepository = productForecastingRepository;
+        this.forecastingTrainingEvaluationRepository = forecastingTrainingEvaluationRepository;
     }
 
     @Transactional
@@ -351,7 +355,21 @@ public class ProductsService {
             throw new ApiExpectationFailedException("exception.productDeleted");
         }
         List<ProductSetProducts> productSetProducts = productSet.getProductsSets();
-        productSet.setCode(updateProductRequest.getCode());
+        if(!Objects.equals(updateProductRequest.getCode(), productSet.getCode())) {
+            Optional<ProductForecasting> productForecasting = productForecastingRepository
+                    .findByProductCode(productSet.getCode());
+            if(productForecasting.isPresent()){
+                productForecasting.get().setProductCode(updateProductRequest.getCode());
+                productForecastingRepository.save(productForecasting.get());
+            }
+            Optional<ForecastingTrainingEvaluation> forecastingTrainingEvaluation = forecastingTrainingEvaluationRepository
+                    .findByProductCode(productSet.getCode());
+            if(forecastingTrainingEvaluation.isPresent()){
+                forecastingTrainingEvaluation.get().setProductCode(updateProductRequest.getCode());
+                forecastingTrainingEvaluationRepository.save(forecastingTrainingEvaluation.get());
+            }
+            productSet.setCode(updateProductRequest.getCode());
+        }
         productSet.setName(updateProductRequest.getName());
         productSet.setSalePrice(new BigDecimal(updateProductRequest.getSalePrice()));
         productSet.setSaleVat(new BigDecimal(updateProductRequest.getSaleVat()));
@@ -391,7 +409,34 @@ public class ProductsService {
         if(product.getIsDeleted()){
             throw new ApiExpectationFailedException("exception.productDeleted");
         }
-        product.setCode(updateProductRequest.getCode());
+        if(product.getType().equals(EType.PRODUCED)){
+            ProductProduction productProduction = productProductionRepository.findByProductCode(
+                            product.getCode())
+                    .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
+            if(productProduction.getIsDeleted()){
+                throw new ApiExpectationFailedException("exception.productDeleted");
+            }
+            if(!Objects.equals(updateProductRequest.getCode(), product.getCode())) {
+                productProduction.setProductCode(updateProductRequest.getCode());
+                productProductionRepository.save(productProduction);
+            }
+            this.updateProducedProduct(updateProductRequest, product, productProduction);
+        }
+        if(!Objects.equals(updateProductRequest.getCode(), product.getCode())) {
+            Optional<ProductForecasting> productForecasting = productForecastingRepository
+                    .findByProductCode(product.getCode());
+            if(productForecasting.isPresent()){
+                productForecasting.get().setProductCode(updateProductRequest.getCode());
+                productForecastingRepository.save(productForecasting.get());
+            }
+            Optional<ForecastingTrainingEvaluation> forecastingTrainingEvaluation = forecastingTrainingEvaluationRepository
+                    .findByProductCode(product.getCode());
+            if(forecastingTrainingEvaluation.isPresent()){
+                forecastingTrainingEvaluation.get().setProductCode(updateProductRequest.getCode());
+                forecastingTrainingEvaluationRepository.save(forecastingTrainingEvaluation.get());
+            }
+            product.setCode(updateProductRequest.getCode());
+        }
         product.setName(updateProductRequest.getName());
         product.setUnit(updateProductRequest.getUnit());
         if(updateProductRequest.getPurchasePrice() != null && !updateProductRequest.getPurchasePrice().isEmpty()) {
@@ -421,20 +466,11 @@ public class ProductsService {
         } else {
             product.setContractor(null);
         }
-        if(product.getType().equals(EType.PRODUCED)){
-            this.updateProducedProduct(updateProductRequest, product);
-        }
         product.setUpdateDate(LocalDateTime.now());
         productRepository.save(product);
     }
 
-    private void updateProducedProduct(UpdateProductRequest updateProductRequest, Product product) {
-        ProductProduction productProduction = productProductionRepository.findByProductCode(
-                        product.getCode())
-                .orElseThrow(() -> new ApiNotFoundException("exception.productProductionNotFound"));
-        if(productProduction.getIsDeleted()){
-            throw new ApiExpectationFailedException("exception.productDeleted");
-        }
+    private void updateProducedProduct(UpdateProductRequest updateProductRequest, Product product, ProductProduction productProduction) {
         List<ProductProductionProducts> productProductionProducts = productProduction.getProductProductionProducts();
         for(ProductQuantity productQuantity: updateProductRequest.getProductSet()){
             Product subProduct = productRepository.findById(productQuantity.getProduct())
