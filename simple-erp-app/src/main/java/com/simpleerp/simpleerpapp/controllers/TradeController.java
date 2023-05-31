@@ -191,7 +191,7 @@ public class TradeController {
 
     @PostMapping("/orders/import")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TRADE')")
-    public ResponseEntity<?> train(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> importOrders(@RequestParam("file") MultipartFile file) {
         if(ExcelHelper.hasExcelFormat(file)) {
             tradeService.importOrders(file);
         } else {
