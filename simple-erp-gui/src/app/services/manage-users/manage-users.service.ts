@@ -4,8 +4,6 @@ import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {UsersResponse} from "../../models/manage-users/UsersResponse";
 import {UserListItem} from "../../models/manage-users/UserListItem";
-import {ProfileData} from "../../models/manage-users/ProfileData";
-import {UpdateUserData} from "../../models/manage-users/UpdateUserData";
 import {UpdateUserRequest} from "../../models/auth/UpdateUserRequest";
 import {DefaultUser} from "../../models/manage-users/DefaultUser";
 import {UpdateDefaultUserRequest} from "../../models/manage-users/UpdateDefaultUserRequest";
