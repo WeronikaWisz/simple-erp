@@ -13,6 +13,8 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatOptionModule} from "@angular/material/core";
 import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {MatCardModule} from "@angular/material/card";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('TrainingEvaluationComponent', () => {
   let component: TrainingEvaluationComponent;
@@ -31,16 +33,14 @@ describe('TrainingEvaluationComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ TrainingEvaluationComponent ],
       imports: [
+        FormsModule,
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule,
-        MatDialogModule
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

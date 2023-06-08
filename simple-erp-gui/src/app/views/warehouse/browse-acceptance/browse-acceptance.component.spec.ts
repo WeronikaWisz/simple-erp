@@ -1,12 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BrowseAcceptanceComponent } from './browse-acceptance.component';
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {TranslateModule} from "@ngx-translate/core";
 import {MatDialogModule} from "@angular/material/dialog";
 import {TokenStorageService} from "../../../services/token-storage.service";
+import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {MaterialModule} from "../../../helpers/MaterialModule";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 describe('BrowseAcceptanceComponent', () => {
   let component: BrowseAcceptanceComponent;
@@ -25,15 +29,19 @@ describe('BrowseAcceptanceComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ BrowseAcceptanceComponent ],
       imports: [
+        FormsModule,
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
         TranslateModule.forRoot(),
-        MatDialogModule
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
 

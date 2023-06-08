@@ -1,12 +1,13 @@
 <h2 mat-dialog-title>{{formTitle}}</h2>
 <div mat-dialog-content>
   <h3>{{data.code}} - {{data.name}}</h3>
-  <h3>{{ 'supplies.browse-supplies.current-quantity' | translate}} <span class="thick">{{data.stockQuantity}} {{getUnit()}}</span></h3>
+  <h3>{{ 'supplies.browse-supplies.current-quantity' | translate}} <span class="thick">{{data.stockQuantity}}
+    <span *ngIf="data.unit && units != []">{{getUnit()}}</span></span></h3>
   <form [formGroup]="form">
     <mat-form-field class="full-width-input" appearance="outline">
       <mat-label>{{ 'supplies.browse-supplies.quantity' | translate}}</mat-label>
       <input matInput type="number" formControlName="quantity">
-      <span matSuffix>{{getUnit()}}</span>
+      <span *ngIf="data.unit && units != []" matSuffix>{{getUnit()}}</span>
     </mat-form-field>
     <div *ngIf="forecastingActive">
     <h3><mat-icon>live_help</mat-icon> {{ 'supplies.browse-supplies.help' | translate}}</h3>

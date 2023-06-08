@@ -7,6 +7,9 @@ import {TranslateModule} from "@ngx-translate/core";
 import {MatDialogModule} from "@angular/material/dialog";
 import {TokenStorageService} from "../../../services/token-storage.service";
 import {ReactiveFormsModule} from "@angular/forms";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('BrowseProductionComponent', () => {
   let component: BrowseProductionComponent;
@@ -29,7 +32,9 @@ describe('BrowseProductionComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         TranslateModule.forRoot(),
-        MatDialogModule
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

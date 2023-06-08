@@ -12,6 +12,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatOptionModule} from "@angular/material/core";
 import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('AddUserComponent', () => {
   let component: AddUserComponent;
@@ -36,9 +37,7 @@ describe('AddUserComponent', () => {
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

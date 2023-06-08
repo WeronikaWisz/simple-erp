@@ -6,6 +6,9 @@ import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {TranslateModule} from "@ngx-translate/core";
 import {TokenStorageService} from "../../../services/token-storage.service";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('BrowseUsersComponent', () => {
   let component: BrowseUsersComponent;
@@ -27,7 +30,10 @@ describe('BrowseUsersComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        TranslateModule.forRoot()
+        TranslateModule.forRoot(),
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

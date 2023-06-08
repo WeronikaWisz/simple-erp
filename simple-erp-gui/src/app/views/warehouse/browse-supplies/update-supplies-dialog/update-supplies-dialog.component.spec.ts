@@ -5,7 +5,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
-import {TranslateModule, TranslateService} from "@ngx-translate/core";
+import {TranslateModule} from "@ngx-translate/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MatSelectModule} from "@angular/material/select";
@@ -14,8 +14,6 @@ import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {EUnit} from "../../../../enums/EUnit";
 import {UpdateSuppliesData} from "../../../../models/warehouse/UpdateSuppliesData";
-import {TokenStorageService} from "../../../../services/token-storage.service";
-import {of} from "rxjs";
 
 describe('UpdateSuppliesDialogComponent', () => {
   let component: UpdateSuppliesDialogComponent;
@@ -28,10 +26,6 @@ describe('UpdateSuppliesDialogComponent', () => {
   const dialogMock = {
     close: () => { }
   }
-
-  let testTranslateService = jasmine.createSpyObj(['getTranslateMessage', 'get'])
-  testTranslateService.getTranslateMessage.and.returnValue('')
-  testTranslateService.get.and.returnValue(of(''))
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -51,8 +45,7 @@ describe('UpdateSuppliesDialogComponent', () => {
       ],
       providers: [
         { provide: MatDialogRef, useValue: dialogMock },
-        { provide: MAT_DIALOG_DATA, useValue: data },
-        { provide: TranslateService, useValue: testTranslateService }
+        { provide: MAT_DIALOG_DATA, useValue: data }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -64,6 +57,6 @@ describe('UpdateSuppliesDialogComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+      expect(component).toBeTruthy();
   });
 });

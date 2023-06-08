@@ -13,6 +13,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatOptionModule} from "@angular/material/core";
 import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {MaterialModule} from "../../../../helpers/MaterialModule";
 
 describe('ReleaseInfoDialogComponent', () => {
   let component: ReleaseInfoDialogComponent;
@@ -34,13 +35,10 @@ describe('ReleaseInfoDialogComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        MatDialogModule,
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule
+        MaterialModule
       ],
       providers: [
         { provide: MatDialogRef, useValue: dialogMock },

@@ -12,6 +12,7 @@ import {MatOptionModule} from "@angular/material/core";
 import {MatInputModule} from "@angular/material/input";
 import {TokenStorageService} from "../../../services/token-storage.service";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('AddContractorComponent', () => {
   let component: AddContractorComponent;
@@ -36,9 +37,7 @@ describe('AddContractorComponent', () => {
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

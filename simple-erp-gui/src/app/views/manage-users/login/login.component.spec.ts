@@ -8,6 +8,9 @@ import {TranslateModule} from "@ngx-translate/core";
 import {TokenStorageService} from "../../../services/token-storage.service";
 import {AuthService} from "../../../services/manage-users/auth.service";
 import {LoginRequest} from "../../../models/auth/LoginRequest";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -31,7 +34,10 @@ describe('LoginComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        TranslateModule.forRoot()
+        TranslateModule.forRoot(),
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService },

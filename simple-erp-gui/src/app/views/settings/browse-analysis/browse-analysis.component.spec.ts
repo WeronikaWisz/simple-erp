@@ -8,6 +8,9 @@ import {TranslateModule} from "@ngx-translate/core";
 import {MatDialogModule} from "@angular/material/dialog";
 import {TokenStorageService} from "../../../services/token-storage.service";
 import {LocalizedDatePipe} from "../../../helpers/localized-date.pipe";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('BrowseAnalysisComponent', () => {
   let component: BrowseAnalysisComponent;
@@ -30,7 +33,9 @@ describe('BrowseAnalysisComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         TranslateModule.forRoot(),
-        MatDialogModule
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

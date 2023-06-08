@@ -5,14 +5,14 @@
     <mat-form-field class="full-width-input left-mat-field" appearance="outline">
       <mat-label>{{ 'supplies.browse-supplies.quantity' | translate}}</mat-label>
       <input matInput type="number" formControlName="quantity" required>
-      <span matSuffix>{{getUnit()}}</span>
+      <span *ngIf="data.unit && units != []" matSuffix>{{getUnit()}}</span>
     </mat-form-field>
     <h3><mat-icon>settings</mat-icon> {{ 'supplies.browse-supplies.settings' | translate}}</h3>
     <h3>{{ 'supplies.browse-supplies.info' | translate}}</h3>
     <mat-form-field class="full-width-input left-mat-field" appearance="outline">
       <mat-label>{{ 'supplies.browse-supplies.min-quantity' | translate}}</mat-label>
       <input matInput type="number" formControlName="minQuantity" required>
-      <span matSuffix>{{getUnit()}}</span>
+      <span *ngIf="data.unit && units != []" matSuffix>{{getUnit()}}</span>
     </mat-form-field>
     <mat-form-field class="full-width-input" appearance="outline">
       <mat-label>{{ 'supplies.browse-supplies.days' | translate}}</mat-label>

@@ -14,6 +14,7 @@ import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {ProductProductionDialogData} from "../../../../models/production/ProductProductionDialogData";
 import {ContractorDialogInfo} from "../../../../models/products/ContractorDialogInfo";
+import {MaterialModule} from "../../../../helpers/MaterialModule";
 
 describe('ContractorDialogComponent', () => {
   let component: ContractorDialogComponent;
@@ -35,13 +36,10 @@ describe('ContractorDialogComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        MatDialogModule,
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule
+        MaterialModule
       ],
       providers: [
         { provide: MatDialogRef, useValue: dialogMock },

@@ -9,6 +9,9 @@ import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {of, throwError} from "rxjs";
 import {UsersService} from "../../../../services/manage-users/users.service";
 import Swal from "sweetalert2";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MaterialModule} from "../../../../helpers/MaterialModule";
 
 describe('ChangePasswordDialogComponent', () => {
   let component: ChangePasswordDialogComponent;
@@ -23,8 +26,15 @@ describe('ChangePasswordDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ ChangePasswordDialogComponent ],
-      imports: [ReactiveFormsModule, HttpClientTestingModule, RouterTestingModule,
-        TranslateModule.forRoot(), MatDialogModule],
+      imports: [
+        ReactiveFormsModule,
+        HttpClientTestingModule,
+        RouterTestingModule,
+        TranslateModule.forRoot(),
+        BrowserModule,
+        BrowserAnimationsModule,
+        MaterialModule
+      ],
       providers: [
         { provide: MatDialogRef, useValue: dialogMock },
         { provide: UsersService, useValue: testUserService }

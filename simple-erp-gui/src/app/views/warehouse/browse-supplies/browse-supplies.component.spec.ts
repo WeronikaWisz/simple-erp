@@ -7,6 +7,7 @@ import {RouterTestingModule} from "@angular/router/testing";
 import {TranslateModule} from "@ngx-translate/core";
 import {MatDialogModule} from "@angular/material/dialog";
 import {TokenStorageService} from "../../../services/token-storage.service";
+import {MaterialModule} from "../../../helpers/MaterialModule";
 
 describe('BrowseSuppliesComponent', () => {
   let component: BrowseSuppliesComponent;
@@ -29,7 +30,7 @@ describe('BrowseSuppliesComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule,
         TranslateModule.forRoot(),
-        MatDialogModule
+        MaterialModule
       ],
       providers: [
         { provide: TokenStorageService, useValue: testTokenStorageService }

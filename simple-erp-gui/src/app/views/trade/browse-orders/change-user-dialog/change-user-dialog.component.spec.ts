@@ -14,6 +14,7 @@ import {MatInputModule} from "@angular/material/input";
 import {CUSTOM_ELEMENTS_SCHEMA} from "@angular/core";
 import {TaskNumberType} from "../../../../models/trade/TaskNumberType";
 import {ETask} from "../../../../enums/ETask";
+import {MaterialModule} from "../../../../helpers/MaterialModule";
 
 describe('ChangeUserDialogComponent', () => {
   let component: ChangeUserDialogComponent;
@@ -35,13 +36,10 @@ describe('ChangeUserDialogComponent', () => {
         ReactiveFormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        MatDialogModule,
         TranslateModule.forRoot(),
         BrowserModule,
         BrowserAnimationsModule,
-        MatSelectModule,
-        MatOptionModule,
-        MatInputModule
+        MaterialModule
       ],
       providers: [
         { provide: MatDialogRef, useValue: dialogMock },
