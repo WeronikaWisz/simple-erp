@@ -71,8 +71,4 @@ describe('MainNavComponent', () => {
     expect(testTokenStorageService.getUser).toHaveBeenCalled();
   });
 
-  // it('logout should call signOut on tokenStorageService', () => {
-  //   component.logout()
-  //   expect(testTokenStorageService.signOut).toHaveBeenCalled();
-  // });
 });

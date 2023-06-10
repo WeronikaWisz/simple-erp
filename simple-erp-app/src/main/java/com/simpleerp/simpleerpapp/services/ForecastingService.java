@@ -75,7 +75,6 @@ public class ForecastingService {
     private static final String FREQ = "D";
     private static final Integer PREDICTION_LENGTH = 365;
     private static final Integer EVALUATION_LENGTH = 90;
-    private static final Integer TRAINING_PREDICTION_LENGTH = 10;
     private static final String FORECASTING_PATH = ForecastingService.class.getClassLoader()
             .getResource("forecasting").getFile();
 
@@ -298,9 +297,8 @@ public class ForecastingService {
         }
 
         DailyForecastList dailyForecastList = new DailyForecastList();
-        List<Number> predictionsNumbers = Arrays.asList(predictions.toArray()).subList(0, TRAINING_PREDICTION_LENGTH);
-        List<DailyForecastAmount> dailyForecastAmountList = new ArrayList<>(dailyRealValuesList.getDailyForecastAmountList()
-                .subList(0, (dailyRealValuesList.getDailyForecastAmountList().size() - predictionsNumbers.size())));
+        List<Number> predictionsNumbers = Arrays.asList(predictions.toArray()).subList(0, EVALUATION_LENGTH);
+        List<DailyForecastAmount> dailyForecastAmountList = new ArrayList<>();
         predictionsNumbers.forEach(number -> dailyForecastAmountList.add(
                 new DailyForecastAmount(number.toString())));
         dailyForecastList.setDailyForecastAmountList(dailyForecastAmountList);
@@ -453,7 +451,7 @@ public class ForecastingService {
                 List<String> mappingList = this.prepareInferenceFile((int) daysTillYesterday);
                 this.predict(forecastingTrainingData.getStartDate(),
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
-                        (int) maxDays, TRAINING_PREDICTION_LENGTH, mappingList,
+                        (int) maxDays, EVALUATION_LENGTH, mappingList,
                         true);
                 Map<String, Float> metrics = this.predict(forecastingTrainingData.getStartDate(),
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
@@ -798,7 +796,7 @@ public class ForecastingService {
                     startDate, (int) maxDays, true);
             saveTrainingEvaluations(trainingResult.getEvaluations());
             this.predict(startDate, mappingList.size(),
-                    (int) maxDays, TRAINING_PREDICTION_LENGTH, mappingList,
+                    (int) maxDays, EVALUATION_LENGTH, mappingList,
                     true);
         } catch (IOException | TranslateException | ModelException exception){
             throw new ApiExpectationFailedException("exception.forecastingTraining");

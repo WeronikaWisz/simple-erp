@@ -65,12 +65,6 @@ describe('LoginComponent', () => {
     expect(testTokenStorageService.getUser).toHaveBeenCalled();
   });
 
-  // it('onSubmit should call authService login', () => {
-  //   testAuthService.login.and.returnValue("data")
-  //   component.onSubmit()
-  //   expect(testAuthService.login).toHaveBeenCalled()
-  // });
-
 });
 
 describe('LoginComponent integration test with AuthService', () => {
@@ -100,7 +94,7 @@ describe('LoginComponent integration test with AuthService', () => {
 
   describe('login user', () => {
 
-    it('loginButton should call service register', () => {
+    it('loginButton should call service login', () => {
       component.form.controls['username'].setValue('username')
       component.form.controls['password'].setValue('passwordpassword')
 
