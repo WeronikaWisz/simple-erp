@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simpleerp.simpleerpapp.dtos.forecasting.ForecastingActive;
 import com.simpleerp.simpleerpapp.dtos.forecasting.TrainingEvaluationData;
 import com.simpleerp.simpleerpapp.dtos.products.ProductCode;
-import com.simpleerp.simpleerpapp.helpers.ExcelHelper;
 import com.simpleerp.simpleerpapp.security.WebSecurityConfig;
 import com.simpleerp.simpleerpapp.security.jwt.AuthEntryPointJwt;
 import com.simpleerp.simpleerpapp.security.jwt.JwtUtils;
@@ -12,8 +11,6 @@ import com.simpleerp.simpleerpapp.security.userdetails.UserDetailsServiceI;
 import com.simpleerp.simpleerpapp.services.ForecastingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +20,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.DelegatingMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -101,6 +96,16 @@ class ForecastingControllerTest {
         verify(testForecastingService).checkForecastingState();
     }
 
+    @Test
+    @WithMockUser()
+    void testCheckForecastingStateNotAdmin() throws Exception {
+        mockMvc.perform(get("/forecasting/active")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
 //    @Test
 //    @WithMockUser(roles = {"ADMIN"})
 //    void testTrain() throws Exception {
@@ -144,6 +149,17 @@ class ForecastingControllerTest {
     }
 
     @Test
+    @WithMockUser()
+    void testGetTrainingEvaluationNotAdmin() throws Exception {
+        String productCode = "code";
+        mockMvc.perform(get("/forecasting/evaluation/{code}", productCode)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
     @WithMockUser(roles = {"ADMIN"})
     void testLoadForecastProductList() throws Exception {
         List<ProductCode> productCodeList = new ArrayList<>();
@@ -157,5 +173,15 @@ class ForecastingControllerTest {
                 .andReturn();
 
         verify(testForecastingService).loadForecastProductList();
+    }
+
+    @Test
+    @WithMockUser()
+    void testLoadForecastProductListNotAdmin() throws Exception {
+        mockMvc.perform(get("/forecasting/products")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
     }
 }

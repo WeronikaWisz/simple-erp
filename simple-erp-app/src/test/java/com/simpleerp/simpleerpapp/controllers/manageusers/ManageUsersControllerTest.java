@@ -101,6 +101,20 @@ class ManageUsersControllerTest {
     }
 
     @Test
+    @WithMockUser()
+    void testAddUserNotAdmin() throws Exception {
+        AddUserRequest addUserRequest = new AddUserRequest();
+        addUserRequest.setName("username");
+
+        mockMvc.perform(post("/manage-users/user")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(addUserRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+    }
+
+    @Test
     @WithMockUser(roles = {"ADMIN"})
     void testLoadUsers() throws Exception {
         UsersResponse usersResponse = new UsersResponse();
@@ -114,6 +128,17 @@ class ManageUsersControllerTest {
                 .andReturn();
 
         verify(testManageUsersService).loadUsers(0,10);
+    }
+
+    @Test
+    @WithMockUser()
+    void testLoadUsersNotAdmin() throws Exception {
+
+        mockMvc.perform(get("/manage-users/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
     }
 
     @Test
@@ -131,6 +156,18 @@ class ManageUsersControllerTest {
     }
 
     @Test
+    @WithMockUser()
+    void testDeleteUserNotAdmin() throws Exception {
+        Long id = 1L;
+
+        mockMvc.perform(delete("/manage-users/user/{id}", id)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+    }
+
+    @Test
     @WithMockUser(roles = {"ADMIN"})
     void testUpdateUser() throws Exception {
         UpdateUserRequest updateUserRequest = new UpdateUserRequest();
@@ -144,6 +181,19 @@ class ManageUsersControllerTest {
                 .andExpect(status().isOk());
 
         verify(testManageUsersService).updateUser(updateUserRequest);
+    }
+
+    @Test
+    @WithMockUser()
+    void testUpdateUserNotAdmin() throws Exception {
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest();
+
+        mockMvc.perform(put("/manage-users/user")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(updateUserRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
     }
 
     @Test
@@ -196,6 +246,18 @@ class ManageUsersControllerTest {
                 .andExpect(status().isOk());
 
         verify(testManageUsersService).updateDefaultUser(updateDefaultUserRequest);
+    }
+
+    @Test
+    @WithMockUser()
+    void testUpdateDefaultUserNotAdmin() throws Exception {
+        UpdateDefaultUserRequest updateDefaultUserRequest = new UpdateDefaultUserRequest();
+
+        mockMvc.perform(put("/manage-users/default-user")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(updateDefaultUserRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
