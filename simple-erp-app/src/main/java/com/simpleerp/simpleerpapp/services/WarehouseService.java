@@ -839,7 +839,7 @@ public class WarehouseService {
         if (product.getUnit().equals(EUnit.PIECES)){
             productQuantity.setQuantity(String.format("%.0f", suggestedAmount));
         } else {
-            productQuantity.setQuantity(String.format("%.2f", suggestedAmount));
+            productQuantity.setQuantity(String.format(Locale.US, "%.2f", suggestedAmount));
         }
         return productQuantity;
     }
