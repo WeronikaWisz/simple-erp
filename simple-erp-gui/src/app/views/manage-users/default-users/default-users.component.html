@@ -15,7 +15,7 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef></mat-header-cell>
       <mat-cell *matCellDef="let row" class="action-buttons">
-        <button mat-icon-button (click)="goToEditUser(row)">
+        <button id="change-default-user" mat-icon-button (click)="goToEditUser(row)">
           <mat-icon>edit</mat-icon>
         </button>
       </mat-cell>

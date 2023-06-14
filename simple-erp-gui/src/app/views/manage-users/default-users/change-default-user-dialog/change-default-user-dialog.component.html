@@ -4,8 +4,8 @@
   <form [formGroup]="form">
     <mat-form-field class="full-width-input left-mat-field" appearance="outline">
       <mat-label>{{ 'manage-users.default-users.user-name' | translate}}</mat-label>
-      <mat-select formControlName="defaultUser" required>
-        <mat-option *ngFor="let user of users" [value]="user.id">
+      <mat-select id="select-default-user" formControlName="defaultUser" required>
+        <mat-option id="option-default-user" *ngFor="let user of users" [value]="user.id">
           {{user.name}}
         </mat-option>
       </mat-select>
@@ -16,7 +16,7 @@
   <button mat-button [mat-dialog-close]="dataChanged">
     {{ 'manage-users.default-users.close' | translate}}
   </button>
-  <button mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid || !form.dirty">
+  <button id="save-default-user" mat-raised-button color="primary" (click)="saveData()" [disabled]="form.invalid || !form.dirty">
     {{ 'manage-users.default-users.save' | translate}}
   </button>
 </div>

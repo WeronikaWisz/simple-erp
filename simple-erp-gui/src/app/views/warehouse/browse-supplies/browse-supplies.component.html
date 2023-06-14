@@ -47,7 +47,7 @@
         <button mat-icon-button (click)="goToEditSupplies(row)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row)">
+        <button id="purchase-button" mat-icon-button *ngIf="isBoughtType(row.type)" (click)="addPurchaseTask(row)">
           <mat-icon matTooltip="{{ 'supplies.browse-supplies.purchase-task' | translate}}">add_shopping_cart</mat-icon>
         </button>
         <button mat-icon-button *ngIf="isProductionType(row.type)" (click)="addProductionTask(row)">
