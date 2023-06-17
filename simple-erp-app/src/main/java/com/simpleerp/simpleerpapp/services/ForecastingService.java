@@ -152,7 +152,7 @@ public class ForecastingService {
                 inputShapes[8] = new Shape(1, predictionLength);
                 trainer.initialize(inputShapes);
 
-                EasyTrain.fit(trainer, 100, trainSet, null);
+                EasyTrain.fit(trainer, 500, trainSet, null);
                 return trainer.getTrainingResult();
             }
         }
@@ -442,7 +442,7 @@ public class ForecastingService {
             long maxDays = Duration.between(forecastingTrainingData.getStartDate(), forecastingTrainingData.getEndDate()).toDays();
 
             try {
-                TrainingResult trainingResult = this.trainModel(4,
+                TrainingResult trainingResult = this.trainModel(30,
                         forecastingTrainingData.getForecastingTrainingElementList().size(),
                         forecastingTrainingData.getStartDate(), (int) maxDays, false);
                 saveTrainingEvaluations(trainingResult.getEvaluations());
@@ -792,7 +792,7 @@ public class ForecastingService {
             LocalDateTime startDate = LocalDate.parse(forecastingProperties.getValue(),
                     DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
             long maxDays = Duration.between(startDate, LocalDateTime.now()).toDays();
-            TrainingResult trainingResult = this.trainModel(4, mappingList.size(),
+            TrainingResult trainingResult = this.trainModel(10, mappingList.size(),
                     startDate, (int) maxDays, true);
             saveTrainingEvaluations(trainingResult.getEvaluations());
             this.predict(startDate, mappingList.size(),
